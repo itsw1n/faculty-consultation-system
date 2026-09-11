@@ -1,0 +1,3 @@
+import type { ReactNode } from 'react'
+import type { ConsultationItem } from '@/features/consultations/types'
+export function ConsultationList({items,person,actions}:{items:ConsultationItem[];person:'student'|'faculty';actions?:(item:ConsultationItem)=>ReactNode}){if(!items.length)return <p className="empty-row">No consultations found.</p>;return <section className="consultation-list">{items.map(item=><article key={item.id}><div><strong>{person==='student'?item.student_name:item.faculty_name}</strong><p>{item.purpose}</p></div><div><time>{item.slot_date}</time><p>{item.start_time.slice(0,5)}–{item.end_time.slice(0,5)}</p></div><span className="status-badge">{item.consultation_status}</span>{actions?.(item)}</article>)}</section>}

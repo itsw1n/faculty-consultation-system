@@ -1,0 +1,2 @@
+import { signOut } from '@/features/auth/actions'
+export default function PendingPage() { return <main className="status-page"><section className="status-card"><p className="status-icon" aria-hidden="true">⌛</p><p className="eyebrow">Application submitted</p><h1>Your application is pending approval.</h1><p>We’ll notify you when an administrator has reviewed your application.</p><form action={signOut}><button className="secondary-button">Sign out</button></form></section></main> }

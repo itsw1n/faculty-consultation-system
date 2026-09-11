@@ -1,0 +1,4 @@
+import { PageHeading } from '@/components/common/PageHeading'
+import { createDepartment } from '@/features/admin/actions'
+import { listDepartments } from '@/features/admin/repositories/adminRepository'
+export default async function DepartmentsPage(){const departments=await listDepartments();return <><PageHeading title="Departments" description="Manage departments used in applications and faculty discovery."/><section className="form-card compact-card"><h2>Add department</h2><form action={createDepartment} className="department-form"><label>Code<input name="code" required minLength={2} maxLength={20}/></label><label>Name<input name="name" required minLength={2} maxLength={120}/></label><button className="primary-button">Add department</button></form></section><section className="department-grid">{departments.map(department=><article key={department.id}><strong>{department.code}</strong><p>{department.name}</p></article>)}</section></>}

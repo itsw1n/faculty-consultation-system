@@ -1,14 +1,5 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-
-export async function listApplications(filters: { search?: string; status?: string; role?: string; department?: string }) {
-  const supabase = await createClient()
-  let query = supabase.from('profiles').select('id,full_name,email,requested_role,account_status,departments(code,name)').order('created_at', { ascending: false }).limit(20)
-  if (filters.status) query = query.eq('account_status', filters.status)
-  if (filters.role) query = query.eq('requested_role', filters.role)
-  if (filters.department) query = query.eq('department_id', filters.department)
-  if (filters.search?.trim()) query = query.or(`full_name.ilike.%${filters.search.trim()}%,email.ilike.%${filters.search.trim()}%`)
-  const { data, error } = await query
-  if (error) throw new Error('Unable to load applications')
-  return data
-}
+export type ApplicationItem={id:string;full_name:string;email:string;requested_role:'STUDENT'|'FACULTY'|null;account_status:'PENDING'|'APPROVED'|'REJECTED'|null;department_name:string|null;created_at:string}
+export type ApplicationFilters={search?:string;status?:string;role?:string;department?:string;cursor?:{createdAt:string;id:string}}
+export async function getApplicationPage(filters:ApplicationFilters){const{data,error}=await(await createClient()).rpc('list_application_page',{search_text:filters.search??'',status_filter:filters.status||null,role_filter:filters.role||null,department_filter:filters.department||null,cursor_created_at:filters.cursor?.createdAt??null,cursor_id:filters.cursor?.id??null,result_limit:20});if(error)throw new Error('Unable to load applications');const items=data as ApplicationItem[];const last=items.at(-1);return{items,hasMore:items.length===20,nextCursor:last?{createdAt:last.created_at,id:last.id}:null}}

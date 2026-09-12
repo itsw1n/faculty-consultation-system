@@ -1,9 +1,8 @@
 import { PageHeading } from '@/components/common/PageHeading'
-import { createAvailability, deleteAvailability } from '@/features/availability/actions'
 import { listOwnAvailability } from '@/features/availability/repositories/availabilityRepository'
-import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { AvailabilityManager } from '@/features/availability/components/AvailabilityManager'
 
 export default async function AvailabilityPage() {
   const slots = await listOwnAvailability()
-  return <><PageHeading title="My Availability" description="Create consultation times and review their booking status."/><section className="form-card compact-card"><h2>Add availability</h2><form action={createAvailability} className="availability-form"><label>Date<input name="date" type="date" required/></label><label>Start<input name="startTime" type="time" required/></label><label>End<input name="endTime" type="time" required/></label><label>Mode<select name="mode" required><option value="IN_PERSON">In person</option><option value="ONLINE">Online</option></select></label><label>Location<input name="location" maxLength={160}/></label><label>Meeting link<input name="meetingLink" type="url"/></label><button className="primary-button">Add availability</button></form></section><section className="slot-list" aria-label="Upcoming availability">{slots.length === 0 ? <p className="empty-row">No upcoming availability.</p> : slots.map(slot => <article key={slot.id}><time dateTime={slot.date}>{new Intl.DateTimeFormat('en-PH',{dateStyle:'medium'}).format(new Date(`${slot.date}T00:00:00`))}</time><strong>{slot.start_time.slice(0,5)}–{slot.end_time.slice(0,5)}</strong><span className="status-badge">{slot.status}</span><span>{slot.mode === 'IN_PERSON' ? slot.location : 'Online'}</span>{slot.status === 'OPEN' && <ConfirmAction label="Remove" title="Remove availability?" description="Students will no longer be able to request this time." fields={{slotId:slot.id}} submitAction={deleteAvailability} variant="danger"/>}</article>)}</section></>
+  return <><PageHeading title="My Availability" description="Create consultation times and review their booking status."/><AvailabilityManager slots={slots}/></>
 }

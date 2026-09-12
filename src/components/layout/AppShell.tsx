@@ -4,6 +4,7 @@ import { Bell, CalendarDays, ClipboardList, GraduationCap, Home, Menu, Users } f
 import { signOut } from '@/features/auth/actions'
 import type { AuthProfile, UserRole } from '@/features/auth/types'
 import { listNotifications } from '@/features/notifications/repositories/notificationRepository'
+import { Breadcrumbs } from './Breadcrumbs'
 
 const links: Record<UserRole, { href: string; label: string; icon: typeof Home }[]> = {
   STUDENT: [
@@ -26,7 +27,7 @@ export async function AppShell({ children, profile }: { children: ReactNode; pro
   const notifications = await listNotifications(5)
   const unread = notifications.filter(item => !item.read_at).length
   return <div className="app-shell">
-    <aside className="sidebar"><Link className="sidebar-brand" href={`/${role.toLowerCase()}`}><span>CC</span><strong>CampusConnect</strong></Link><Navigation role={role}/><details className="profile-menu"><summary><span className="avatar">{profile.fullName.slice(0, 1).toUpperCase()}</span><span><strong>{profile.fullName}</strong><small>{role.toLowerCase()}</small></span></summary><div><p>{profile.email}</p><form action={signOut}><button type="submit">Sign out</button></form></div></details></aside>
-    <div className="app-column"><header className="app-header"><details className="mobile-menu"><summary aria-label="Open navigation"><Menu aria-hidden="true"/></summary><div><Navigation role={role}/></div></details><div><strong>CampusConnect</strong><small>Faculty Consultation &amp; Scheduling System</small></div><details className="notification-menu"><summary aria-label={`${unread} unread notifications`}><Bell aria-hidden="true"/>{unread>0&&<span>{unread}</span>}</summary><div>{notifications.length===0?<p>No notifications yet.</p>:notifications.map(item=><article key={item.id} className={item.read_at?'':'unread'}><strong>{item.title}</strong><p>{item.message}</p></article>)}<Link href="/notifications">View all notifications</Link></div></details></header><main className="app-content">{children}</main></div>
+    <aside className="sidebar"><Link className="sidebar-brand" href={`/${role.toLowerCase()}`}><span>CC</span><strong>CampusConnect</strong></Link><Navigation role={role}/><details className="profile-menu"><summary><span className="avatar">{profile.fullName.slice(0, 1).toUpperCase()}</span><span><strong>{profile.fullName}</strong><small>{role.toLowerCase()}</small></span></summary><div><dl><dt>Email</dt><dd>{profile.email}</dd><dt>Role</dt><dd>{role.toLowerCase()}</dd><dt>Department</dt><dd>{profile.departmentName??'Not assigned'}</dd>{profile.positionTitle&&<><dt>Position</dt><dd>{profile.positionTitle}</dd></>}</dl><form action={signOut}><button type="submit">Sign out</button></form></div></details></aside>
+    <div className="app-column"><header className="app-header"><details className="mobile-menu"><summary aria-label="Open navigation"><Menu aria-hidden="true"/></summary><div><Navigation role={role}/></div></details><Breadcrumbs/><details className="notification-menu"><summary aria-label={`${unread} unread notifications`}><Bell aria-hidden="true"/>{unread>0&&<span>{unread}</span>}</summary><div>{notifications.length===0?<p>No notifications yet.</p>:notifications.map(item=><article key={item.id} className={item.read_at?'':'unread'}><strong>{item.title}</strong><p>{item.message}</p></article>)}<Link href="/notifications">View all notifications</Link></div></details></header><main className="app-content">{children}</main></div>
   </div>
 }

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { getPublicEnvironment } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
+import type { ActionState } from '@/lib/actionState'
 
 const applicationSchema = z.object({
   requestedRole: z.enum(['STUDENT', 'FACULTY']),
@@ -26,21 +27,26 @@ export async function signInWithGoogle() {
   redirect(data.url)
 }
 
-export async function submitApplication(formData: FormData) {
+export async function submitApplication(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const supabase = await createClient()
+  const { data: claims } = await supabase.auth.getClaims()
+  const userId = claims?.claims?.sub
+  if (!userId) return { error: 'Authentication is required.' }
+  const { data: profile } = await supabase.from('profiles').select('account_status').eq('id', userId).single()
+  if (!profile || profile.account_status) return { error: 'This account cannot submit a new application.' }
   const result = applicationSchema.safeParse({
     requestedRole: formData.get('requestedRole'),
     departmentId: formData.get('departmentId'),
     positionTitle: formData.get('positionTitle') || undefined,
   })
-  if (!result.success) redirect('/apply?error=invalid')
+  if (!result.success) return { error: result.error.issues[0]?.message ?? 'Check the application details.' }
 
-  const supabase = await createClient()
   const { error } = await supabase.rpc('submit_application', {
     requested_role: result.data.requestedRole,
     selected_department_id: result.data.departmentId,
     faculty_position_title: result.data.positionTitle ?? null,
   })
-  if (error) redirect('/apply?error=submit')
+  if (error) return { error: 'The application could not be submitted. Refresh and try again.' }
   redirect('/application/pending')
 }
 

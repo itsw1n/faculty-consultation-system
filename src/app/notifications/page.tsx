@@ -1,0 +1,7 @@
+import { redirect } from 'next/navigation'
+import { PageHeading } from '@/components/common/PageHeading'
+import { AppShell } from '@/components/layout/AppShell'
+import { getAuthenticatedProfile } from '@/features/auth/repositories/authRepository'
+import { markAllNotificationsRead, markNotificationRead } from '@/features/notifications/actions'
+import { listNotifications } from '@/features/notifications/repositories/notificationRepository'
+export default async function NotificationsPage(){const profile=await getAuthenticatedProfile();if(!profile||profile.accountStatus!=='APPROVED'||!profile.role)redirect('/auth/continue');const items=await listNotifications(50);return <AppShell profile={profile}><PageHeading title="Notifications" description="Updates about applications and consultations."/>{items.some(item=>!item.read_at)&&<form action={markAllNotificationsRead} className="notification-actions"><button>Mark all as read</button></form>}<section className="notification-list">{items.length===0?<p className="empty-row">No notifications yet.</p>:items.map(item=><article className={item.read_at?'':'unread'} key={item.id}><div><strong>{item.title}</strong><p>{item.message}</p><time dateTime={item.created_at}>{new Intl.DateTimeFormat('en-PH',{dateStyle:'medium',timeStyle:'short'}).format(new Date(item.created_at))}</time></div>{!item.read_at&&<form action={markNotificationRead}><input type="hidden" name="notificationId" value={item.id}/><button>Mark read</button></form>}</article>)}</section></AppShell>}

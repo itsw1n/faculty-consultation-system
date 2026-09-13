@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="route-state" aria-busy="true" aria-live="polite"><div className="loading-spinner" aria-hidden="true"/><h1>Loading CampusConnect</h1><p>Please wait while we prepare this page.</p></main>}

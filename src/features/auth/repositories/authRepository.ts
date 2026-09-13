@@ -2,6 +2,8 @@ import 'server-only'
 
 import { createClient } from '@/lib/supabase/server'
 import type { AuthProfile } from '@/features/auth/types'
+import type { UserRole } from '@/features/auth/types'
+import { redirect } from 'next/navigation'
 
 export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
   const supabase = await createClient()
@@ -25,6 +27,13 @@ export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
     requestedRole: data.requested_role,
     role: data.role,
   }
+}
+
+export async function requireRole(role: UserRole): Promise<AuthProfile> {
+  const profile = await getAuthenticatedProfile()
+  if (!profile) redirect('/')
+  if (profile.accountStatus !== 'APPROVED' || profile.role !== role) redirect('/auth/continue')
+  return profile
 }
 
 export async function getDepartments() {

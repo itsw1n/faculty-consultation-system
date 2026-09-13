@@ -14,7 +14,7 @@ jobs:
     name: Lint, Test, Build
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3100
       NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-key
     steps:
@@ -24,6 +24,7 @@ jobs:
           node-version: '24.20.0'
           cache: npm
       - run: npm ci
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
@@ -32,3 +33,22 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run end-to-end tests
         run: npm run test:e2e
+
+  database:
+    name: Database Migrations and RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.20.0'
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase and apply migrations
+        run: npm run supabase:start
+      - name: Run database tests
+        run: npm run supabase:test
+      - name: Stop local Supabase
+        if: always()
+        run: npm run supabase:stop

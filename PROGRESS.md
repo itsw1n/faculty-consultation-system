@@ -1,21 +1,20 @@
-# PROGRESS.md
+# Progress
 
 ## Status
-🟡 In Progress
 
----
+Core v1 implementation complete; awaiting environment-specific OAuth configuration and deployment.
 
 ## Completed
-<!-- Move items here when done -->
 
-## In Progress
-<!-- Current work -->
+- Supabase schema, RLS, seed data, atomic workflow RPCs, and database tests.
+- Google OAuth application flow with admin approval and role routing.
+- Student booking and consultation management.
+- Faculty availability and request management.
+- Admin applications, faculty, department, and consultation views.
+- In-app notifications, responsive layouts, accessible dialogs, filters, and cursor loading.
+- Unit, database, desktop/mobile E2E, keyboard, type, lint, and production-build validation.
 
-## Up Next
-<!-- Planned work -->
+## Deferred
 
-## Blocked
-<!-- Anything blocking progress -->
-
-## Decisions Made
-<!-- Key decisions logged here -->
+- Optional Resend email notification delivery.
+- Production deployment and live OAuth verification.

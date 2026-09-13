@@ -11,13 +11,9 @@
 ```bash
 cp .env.example .env.local
 npm install
-npm run dev
-```
-
-Start the local Supabase stack from the npm package directory:
-
-```bash
 npm run supabase:start
+npm run supabase:reset
+npm run dev
 ```
 
 ## Validate
@@ -27,6 +23,8 @@ npm run lint
 npm run typecheck
 npm run test --if-present
 npm run build
+npm run supabase:test
+npm run test:e2e
 ```
 
 Commit the generated `package-lock.json`; CI uses `npm ci`.

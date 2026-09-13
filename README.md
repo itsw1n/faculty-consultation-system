@@ -1,38 +1,28 @@
-# faculty-consultation-system
+# CampusConnect
 
-> designed for school system
+A faculty consultation and scheduling system for students, faculty, and school administrators. It uses Next.js 16, Supabase Auth/PostgreSQL, TypeScript, React Aria, and Tailwind CSS.
 
-Generated with create-win-project. This repository includes a runnable application, tests, CI guidance, and task-routed agent playbooks.
-
-## Start
+## Local development
 
 ```bash
-cp .env.example .env.local 2>/dev/null || cp .env.example .env
+cp .env.example .env.local
 npm install
+npm run supabase:start
+npm run supabase:reset
 npm run dev
 ```
 
-## Validate
+Configure Google OAuth in Supabase to exercise the full account flow. Local seed data and database tests live under `supabase/`.
+
+## Validation
 
 ```bash
 npm run lint
 npm run typecheck
-npm run test --if-present
+npm run test
 npm run build
+npm run supabase:test
+npm run test:e2e
 ```
 
-Commit the generated lockfile before enabling CI; CI intentionally uses `npm ci`.
-
-## Agent-assisted work
-
-1. Put product goals and boundaries in `CONTEXT.md`.
-2. Read `AGENTS.md` for commands and authority boundaries.
-3. Use `RULES.md` to open only the relevant playbook section.
-4. Treat tests and application behavior as the source of truth when prose drifts.
-
-## Important files
-
-- `AGENTS.md`: small always-on operating contract.
-- `RULES.md`: concern-to-playbook router.
-- `CONTEXT.md`: project-specific intent and decisions.
-- `docs/`: architecture, API, setup, and deployment documentation.
+See [CONTEXT.md](CONTEXT.md), [the product specifications](docs/specs/product-requirements.md), and [the implementation plan](docs/plans/implementation-plan.md) for system behavior and status.

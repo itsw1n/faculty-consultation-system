@@ -1,7 +1,5 @@
-import { StarterStatus } from '@/features/status/components/StarterStatus'
-import { getStarterStatus } from '@/features/status/services/getStarterStatus'
+import { signInWithGoogle } from '@/features/auth/actions'
 
 export default function HomePage() {
-  const status = getStarterStatus()
-  return <main><p>create-win-project</p><StarterStatus status={status} /><p>{"designed for school system"}</p><p>Read <code>AGENTS.md</code> before your first agent-assisted change.</p></main>
+  return <main className="login-page"><section className="login-intro" aria-labelledby="welcome-title"><p className="eyebrow">A stronger academic community</p><h1 id="welcome-title">Welcome to <span>CampusConnect</span></h1><p className="lead">Connect. Consult. Create progress.</p><p>Schedule consultations, seek guidance, and build a more connected academic community.</p><ul className="benefits" aria-label="Benefits"><li>Better discussions</li><li>Easier scheduling</li><li>A stronger community</li></ul></section><section className="login-panel" aria-labelledby="signin-title"><div><p className="brand-mark" aria-hidden="true">CC</p><p className="brand-name">CampusConnect</p><p>Faculty Consultation &amp; Scheduling System</p></div><div className="signin-card"><h2 id="signin-title">One account. A more connected campus.</h2><p>Use your school Google account to sign in securely and get started.</p><form action={signInWithGoogle}><button className="google-button" type="submit"><span aria-hidden="true">G</span> Sign in with Google</button></form></div></section></main>
 }

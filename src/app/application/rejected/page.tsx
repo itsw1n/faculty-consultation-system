@@ -1,0 +1,2 @@
+import { signOut } from '@/features/auth/actions'
+export default function RejectedPage() { return <main className="status-page"><section className="status-card"><p className="eyebrow">Application reviewed</p><h1>Your application was not approved.</h1><p>Please contact the school administrator if you believe this needs review.</p><form action={signOut}><button className="secondary-button">Sign out</button></form></section></main> }

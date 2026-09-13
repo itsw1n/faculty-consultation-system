@@ -1,15 +1,19 @@
 # Architecture Overview
 
-## Runtime shape
+CampusConnect is a Next.js 16 App Router application backed by Supabase Auth and PostgreSQL.
 
-- Frontend: Next.js
-- Backend/data: Supabase
-- Platform: web
-- Architecture profile: medium
-- Authentication: undecided
+## Runtime boundaries
 
-The generated application is intentionally a small vertical slice. Add domain features only after recording product goals and boundaries in `CONTEXT.md`. Keep entry points thin, validate at trust boundaries, and enforce authorization beside protected data or side effects.
+- Route pages and layouts render on the server by default.
+- Interactive calendars, drawers, dialogs, filters, and infinite lists are client components.
+- Server actions validate `FormData`, authenticate the caller, authorize the required role, and delegate persistence to repositories or database RPCs.
+- Repositories own Supabase queries. Atomic booking and status transitions live in PostgreSQL functions.
+- Row-level security remains the final data-access boundary even when application authorization has already run.
 
-## Verification boundary
+## Feature ownership
 
-The starter is considered healthy when its lint/typecheck/tests/build commands pass. Documentation explains those executable patterns; it does not override working code and tests.
+Application code is organized under `src/features` by domain: auth, applications, availability, booking, consultations, dashboard, notifications, and admin. Shared layout and accessible controls live under `src/components`.
+
+## Reliability and security
+
+Untrusted mutation input is checked with Zod. Availability overlap and double booking are protected by database constraints and transactional RPCs. Browser-visible environment values contain only the project URL, public Supabase key, and canonical site URL.

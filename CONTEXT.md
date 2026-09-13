@@ -1,29 +1,31 @@
-# CONTEXT.md
+# Project Context
 
-## Project
-**Name:** faculty-consultation-system
-**Description:** designed for school system
-**Stack:** nextjs-supabase
-**Styling:** TAILWIND
-**Compatibility profile:** 2026.09
-**Year:** 2026
+## Product
+
+CampusConnect is a web-based faculty consultation and scheduling system for students, faculty, and school administrators.
 
 ## Goals
-<!-- What this project does and who it's for -->
 
-## Key Decisions
-<!-- Architecture and tech decisions made during the project -->
+- Let approved students discover faculty availability and request consultations.
+- Let faculty publish availability and manage consultation requests safely.
+- Let administrators review account applications and inspect school records.
+- Keep booking, status transitions, and access control authoritative in PostgreSQL.
 
-## Out of Scope
-<!-- What this project explicitly does NOT do -->
+## Key decisions
 
-## Notes
-<!-- Anything else agents or contributors should know -->
+- Next.js App Router with Server Components by default and client components only for interactive UI.
+- Supabase Auth uses Google OAuth; Supabase PostgreSQL owns application data and authorization policies.
+- New identities remain pending until an administrator assigns an approved role.
+- State-changing workflows use validated server actions and atomic security-definer database functions.
+- In-app notifications are the v1 notification channel. Resend email is optional and deferred.
+- The UI uses the supplied light palette and login reference; labels pictured in references do not override product specifications.
 
-## Expected Concerns (advisory)
-- validation
-- query
-- state
-- env
-- url-state
-- safe-action
+## Out of scope for v1
+
+- User-editable approved role or department.
+- Administrative deletion of consultation history.
+- Email delivery, payments, dark mode, and native mobile applications.
+
+## Source of truth
+
+Product behavior is defined in `docs/specs/`. Migrations and automated tests are authoritative for database behavior. `docs/plans/implementation-plan.md` records completion status.

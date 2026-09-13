@@ -8,133 +8,133 @@
 
 ## 1. Foundation
 
-- [ ] Initialize Next.js + TypeScript project.
-- [ ] Configure environment variables.
-- [ ] Install/configure Supabase client.
-- [ ] Configure Supabase server utilities.
-- [ ] Establish route groups/layouts.
-- [ ] Add shared `components/layout` folder.
-- [ ] Add shared `components/common` folder.
-- [ ] Add global design tokens.
-- [ ] Add React Aria where required for accessible interactions.
+- [x] Initialize Next.js + TypeScript project.
+- [x] Configure environment variables.
+- [x] Install/configure Supabase client.
+- [x] Configure Supabase server utilities.
+- [x] Establish route groups/layouts.
+- [x] Add shared `components/layout` folder.
+- [x] Add shared `components/common` folder.
+- [x] Add global design tokens.
+- [x] Add React Aria where required for accessible interactions.
 
 ## 2. Database
 
-- [ ] Create `departments` table.
-- [ ] Create `profiles` table.
-- [ ] Create `faculty_profiles` table.
-- [ ] Create `availability_slots` table.
-- [ ] Create `consultations` table.
-- [ ] Create `notifications` table.
-- [ ] Add enums/check constraints.
-- [ ] Add indexes for common filters/search.
-- [ ] Add booking integrity constraints.
-- [ ] Add RLS policies.
-- [ ] Add seed data for development.
+- [x] Create `departments` table.
+- [x] Create `profiles` table.
+- [x] Create `faculty_profiles` table.
+- [x] Create `availability_slots` table.
+- [x] Create `consultations` table.
+- [x] Create `notifications` table.
+- [x] Add enums/check constraints.
+- [x] Add indexes for common filters/search.
+- [x] Add booking integrity constraints.
+- [x] Add RLS policies.
+- [x] Add seed data for development.
 
 ## 3. Authentication and Applications
 
-- [ ] Google OAuth login.
-- [ ] Auth callback handling.
-- [ ] Profile lookup after login.
-- [ ] Existing approved user redirect by role.
-- [ ] New-user application type screen.
-- [ ] Student application form.
-- [ ] Faculty application form.
-- [ ] Pending approval screen.
-- [ ] Rejected application state.
-- [ ] Admin application review screen.
-- [ ] Single approve/reject actions.
-- [ ] Bulk approve/reject actions.
+- [x] Google OAuth login.
+- [x] Auth callback handling.
+- [x] Profile lookup after login.
+- [x] Existing approved user redirect by role.
+- [x] New-user application type screen.
+- [x] Student application form.
+- [x] Faculty application form.
+- [x] Pending approval screen.
+- [x] Rejected application state.
+- [x] Admin application review screen.
+- [x] Single approve/reject actions.
+- [x] Bulk approve/reject actions.
 
 ## 4. Shared Layout
 
-- [ ] Responsive desktop sidebar.
-- [ ] Mobile hamburger drawer.
-- [ ] Breadcrumb header.
-- [ ] Notification bell.
-- [ ] Notification dropdown.
-- [ ] Profile control pinned to bottom of sidebar.
-- [ ] Read-only profile modal/panel.
-- [ ] Common confirmation dialog.
-- [ ] Common status badge.
-- [ ] Common search field.
-- [ ] Common filters.
-- [ ] Common infinite-scroll loading state.
-- [ ] Common empty/error states.
+- [x] Responsive desktop sidebar.
+- [x] Mobile hamburger drawer.
+- [x] Breadcrumb header.
+- [x] Notification bell.
+- [x] Notification dropdown.
+- [x] Profile control pinned to bottom of sidebar.
+- [x] Read-only profile modal/panel.
+- [x] Common confirmation dialog.
+- [x] Common status badge.
+- [x] Common search field.
+- [x] Common filters.
+- [x] Common infinite-scroll loading state.
+- [x] Common empty/error states.
 
 ## 5. Student
 
-- [ ] Student dashboard.
-- [ ] Book Consultation — Choose Faculty.
-- [ ] Faculty search with ~300 ms debounce.
-- [ ] Department filter.
-- [ ] Infinite faculty loading.
-- [ ] Book Consultation — Choose Schedule.
-- [ ] Weekly desktop calendar.
-- [ ] Mobile day-based schedule view.
-- [ ] Show `OPEN`, `RESERVED`, `BOOKED`, `CLOSED` state styling.
-- [ ] Allow selection of `OPEN` only.
-- [ ] Book Consultation — Details.
-- [ ] Book Consultation — Review.
-- [ ] Atomic booking transaction/RPC.
-- [ ] My Consultations.
-- [ ] Cancellation flow.
-- [ ] Student notifications.
+- [x] Student dashboard.
+- [x] Book Consultation — Choose Faculty.
+- [x] Faculty search with ~300 ms debounce.
+- [x] Department filter.
+- [x] Infinite faculty loading.
+- [x] Book Consultation — Choose Schedule.
+- [x] Weekly desktop calendar.
+- [x] Mobile day-based schedule view.
+- [x] Show `OPEN`, `RESERVED`, `BOOKED`, `CLOSED` state styling.
+- [x] Allow selection of `OPEN` only.
+- [x] Book Consultation — Details.
+- [x] Book Consultation — Review.
+- [x] Atomic booking transaction/RPC.
+- [x] My Consultations.
+- [x] Cancellation flow.
+- [x] Student notifications.
 
 ## 6. Faculty
 
-- [ ] Faculty dashboard.
-- [ ] My Availability page.
-- [ ] Add Availability modal.
-- [ ] Availability validation.
-- [ ] Slot detail modal.
-- [ ] Consultation Requests.
-- [ ] Search/filter requests.
-- [ ] Approve confirmation.
-- [ ] Reject confirmation.
-- [ ] My Consultations.
-- [ ] Mark consultation completed.
-- [ ] Faculty notifications.
+- [x] Faculty dashboard.
+- [x] My Availability page.
+- [x] Add Availability modal.
+- [x] Availability validation.
+- [x] Slot detail modal.
+- [x] Consultation Requests.
+- [x] Search/filter requests.
+- [x] Approve confirmation.
+- [x] Reject confirmation.
+- [x] My Consultations.
+- [x] Mark consultation completed.
+- [x] Faculty notifications.
 
 ## 7. Admin
 
-- [ ] Admin dashboard.
-- [ ] Manage Users / Applications.
-- [ ] Search with ~300 ms debounce.
-- [ ] Role/department/status filters.
-- [ ] Cursor-based infinite scrolling.
-- [ ] Bulk selection.
-- [ ] Bulk approve/reject.
-- [ ] Manage Faculty.
-- [ ] Departments.
-- [ ] Consultation Records.
-- [ ] Admin notifications.
+- [x] Admin dashboard.
+- [x] Manage Users / Applications.
+- [x] Search with ~300 ms debounce.
+- [x] Role/department/status filters.
+- [x] Cursor-based infinite scrolling.
+- [x] Bulk selection.
+- [x] Bulk approve/reject.
+- [x] Manage Faculty.
+- [x] Departments.
+- [x] Consultation Records.
+- [x] Admin notifications.
 
 ## 8. Notifications
 
-- [ ] Create notification helper/service.
-- [ ] Trigger on application approval/rejection.
-- [ ] Trigger on consultation request.
-- [ ] Trigger on consultation approval/rejection.
-- [ ] Trigger on cancellation.
-- [ ] Trigger on completion where useful.
-- [ ] Notification dropdown latest items.
-- [ ] View All notifications page.
-- [ ] Mark-as-read behavior.
-- [ ] Optional Resend email integration.
+- [x] Create notification helper/service.
+- [x] Trigger on application approval/rejection.
+- [x] Trigger on consultation request.
+- [x] Trigger on consultation approval/rejection.
+- [x] Trigger on cancellation.
+- [x] Trigger on completion where useful.
+- [x] Notification dropdown latest items.
+- [x] View All notifications page.
+- [x] Mark-as-read behavior.
+- [-] Optional Resend email integration — deferred from v1.
 
 ## 9. Quality
 
-- [ ] Server-side authorization checks.
-- [ ] Zod/schema validation for mutations.
-- [ ] Concurrency test for double booking.
-- [ ] RLS test by role.
-- [ ] Mobile responsive test.
-- [ ] Keyboard navigation test.
-- [ ] Focus management for modals/dialogs.
-- [ ] Loading/empty/error-state review.
-- [ ] Final Figma-to-implementation consistency review.
+- [x] Server-side authorization checks.
+- [x] Zod/schema validation for mutations.
+- [x] Concurrency test for double booking.
+- [x] RLS test by role.
+- [x] Mobile responsive test.
+- [x] Keyboard navigation test.
+- [x] Focus management for modals/dialogs.
+- [x] Loading/empty/error-state review.
+- [x] Final supplied-design-to-implementation consistency review.
 
 ## Recommended Build Order
 

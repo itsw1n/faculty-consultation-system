@@ -27,18 +27,23 @@ export function ConfirmAction({
       <Button variant={variant} size="compact" isDisabled={disabled}>
         {label}
       </Button>
-      <ModalOverlay className="fixed inset-0 z-50 grid place-items-center bg-primary/55 p-4" isDismissable>
+      <ModalOverlay
+        className="fixed inset-0 z-50 grid place-items-center bg-primary/55 p-4"
+        isDismissable
+      >
         <Modal className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-dialog">
           <Dialog role="alertdialog" className="outline-none">
             {({ close }) => (
               <>
-                <Heading slot="title" className="text-xl font-bold">{title}</Heading>
+                <Heading slot="title" className="text-xl font-bold">
+                  {title}
+                </Heading>
                 <p className="mt-2 text-muted">{description}</p>
                 <form action={submitAction}>
                   {Object.entries(fields).flatMap(([name, values]) =>
                     (Array.isArray(values) ? values : [values]).map((value) => (
                       <input key={`${name}-${value}`} type="hidden" name={name} value={value} />
-                    )),
+                    ))
                   )}
                   <div className="mt-6 flex justify-end gap-3">
                     <Button type="button" variant="secondary" onPress={close}>

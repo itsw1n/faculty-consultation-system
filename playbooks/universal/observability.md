@@ -26,4 +26,3 @@
 - Test the health endpoint and error response shape.
 - Verify redaction with representative authentication and validation failures.
 - Confirm graceful shutdown stops new work and lets in-flight requests complete within the deployment deadline.
-

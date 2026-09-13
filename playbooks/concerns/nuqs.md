@@ -13,8 +13,8 @@ import { useQueryState, parseAsInteger, parseAsString } from 'nuqs'
 
 export function UserFilters() {
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
-  const [page, setPage]     = useQueryState('page', parseAsInteger.withDefault(1))
-  const [role, setRole]     = useQueryState('role', parseAsString)
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1))
+  const [role, setRole] = useQueryState('role', parseAsString)
 
   return (
     <div>

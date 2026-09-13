@@ -5,6 +5,7 @@
 ---
 
 ## Type of change
+
 - [ ] `feat` — new feature
 - [ ] `fix` — bug fix
 - [ ] `refactor` — restructure without behavior change
@@ -13,6 +14,7 @@
 - [ ] `test` — adding or updating tests
 
 ## Scope
+
 - [ ] `frontend`
 - [ ] `backend`
 - [ ] `mobile`
@@ -23,6 +25,7 @@
 ---
 
 ## How to test?
+
 1.
 2.
 3.
@@ -30,6 +33,7 @@
 ---
 
 ## Checklist
+
 - [ ] Branched off `dev`
 - [ ] Commits follow `type(scope): description`
 - [ ] No `console.log` or debug code

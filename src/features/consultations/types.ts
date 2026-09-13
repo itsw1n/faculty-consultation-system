@@ -1,1 +1,14 @@
-export type ConsultationItem={id:string;student_name:string;faculty_name:string;purpose:string;notes:string|null;consultation_status:'PENDING'|'APPROVED'|'REJECTED'|'CANCELLED'|'COMPLETED';slot_date:string;start_time:string;end_time:string;mode:'IN_PERSON'|'ONLINE';location:string|null;created_at:string}
+export type ConsultationItem = {
+  id: string
+  student_name: string
+  faculty_name: string
+  purpose: string
+  notes: string | null
+  consultation_status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED'
+  slot_date: string
+  start_time: string
+  end_time: string
+  mode: 'IN_PERSON' | 'ONLINE'
+  location: string | null
+  created_at: string
+}

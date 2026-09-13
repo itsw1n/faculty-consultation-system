@@ -4,7 +4,11 @@ import { Button } from './Button'
 
 describe('Button', () => {
   it('applies the selected visual variant and disabled behavior', () => {
-    render(<Button variant="danger" isDisabled>Remove</Button>)
+    render(
+      <Button variant="danger" isDisabled>
+        Remove
+      </Button>
+    )
 
     const button = screen.getByRole('button', { name: 'Remove' })
     expect(button).toBeDisabled()

@@ -2,5 +2,47 @@ import Link from 'next/link'
 import { EmptyState } from '@/components/common/EmptyState'
 import { PageHeading } from '@/components/common/PageHeading'
 import { getFacultyDashboard } from '@/features/dashboard/repositories/dashboardRepository'
-const card='rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
-export default async function FacultyDashboard() { const data=await getFacultyDashboard();return <><PageHeading title="Faculty Dashboard" description="Manage availability and consultation requests."/><div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4"><section className={card}><span>Pending requests</span><strong>{data.pending}</strong><p>Requests needing a decision</p></section><section className={card}><span>Upcoming</span><strong>{data.upcoming}</strong><p>Approved consultations</p></section><section className={card}><span>Open slots</span><strong>{data.openSlots}</strong><p>Available consultation times</p></section></div>{data.openSlots===0&&<EmptyState title="No availability added" description="Add an available time so students can request a consultation." action={<Link className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white" href="/faculty/availability">Add Availability</Link>}/>}</> }
+const card =
+  'rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
+export default async function FacultyDashboard() {
+  const data = await getFacultyDashboard()
+  return (
+    <>
+      <PageHeading
+        title="Faculty Dashboard"
+        description="Manage availability and consultation requests."
+      />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
+        <section className={card}>
+          <span>Pending requests</span>
+          <strong>{data.pending}</strong>
+          <p>Requests needing a decision</p>
+        </section>
+        <section className={card}>
+          <span>Upcoming</span>
+          <strong>{data.upcoming}</strong>
+          <p>Approved consultations</p>
+        </section>
+        <section className={card}>
+          <span>Open slots</span>
+          <strong>{data.openSlots}</strong>
+          <p>Available consultation times</p>
+        </section>
+      </div>
+      {data.openSlots === 0 && (
+        <EmptyState
+          title="No availability added"
+          description="Add an available time so students can request a consultation."
+          action={
+            <Link
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white"
+              href="/faculty/availability"
+            >
+              Add Availability
+            </Link>
+          }
+        />
+      )}
+    </>
+  )
+}

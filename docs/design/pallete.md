@@ -58,6 +58,7 @@ Reserved Surface
 Booked should be clearly visible but disabled for Student booking.
 
 Suggested:
+
 - medium blue surface/text distinct from Open.
 
 ### Danger / Rejected / Cancelled
@@ -159,21 +160,25 @@ Do not overuse elevation.
 ## 9. Layout Notes
 
 ### Sidebar
+
 - Dark navy.
 - Active nav item uses lighter navy highlight.
 - Profile pinned at bottom.
 
 ### Header
+
 - White surface.
 - Breadcrumb/page context left.
 - Notification bell right.
 
 ### Cards
+
 - White surface.
 - Border + subtle shadow.
 - Clear title hierarchy.
 
 ### Search/filters
+
 - Same control height/radius across roles.
 - Search is primary wide field.
 - Desktop filters align in same row where space allows.
@@ -197,11 +202,13 @@ Include a legend when multiple statuses are visible.
 ## 11. Responsive Notes
 
 ### Desktop
+
 - Persistent sidebar.
 - Weekly calendar grid.
 - Table layouts.
 
 ### Mobile
+
 - Hamburger navigation drawer.
 - Day selector + vertical time-slot list instead of squeezed weekly grid.
 - Table rows may become cards.

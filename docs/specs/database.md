@@ -17,10 +17,12 @@ updated_at
 ```
 
 Constraints:
+
 - `code` unique.
 - `name` unique where appropriate.
 
 Example codes:
+
 - IT
 - HM
 - BSBA
@@ -47,16 +49,19 @@ updated_at
 ```
 
 Role values:
+
 - `STUDENT`
 - `FACULTY`
 - `ADMIN`
 
 Account/application status values:
+
 - `PENDING`
 - `APPROVED`
 - `REJECTED`
 
 Notes:
+
 - A new applicant may have `requested_role` while final `role` is null.
 - Google email should be derived from authenticated identity and treated as read-only in UI.
 
@@ -96,16 +101,19 @@ updated_at
 ```
 
 Status:
+
 - `OPEN`
 - `RESERVED`
 - `BOOKED`
 - `CLOSED`
 
 Mode:
+
 - `IN_PERSON`
 - `ONLINE`
 
 Recommended constraints:
+
 - `end_time > start_time`.
 - Mode-specific checks where practical.
 - Index `(faculty_id, date, start_time)`.
@@ -131,6 +139,7 @@ cancelled_at          nullable
 ```
 
 Status:
+
 - `PENDING`
 - `APPROVED`
 - `REJECTED`
@@ -140,6 +149,7 @@ Status:
 `availability_slot_id` should be unique if one slot can belong to at most one consultation record at a time. If historical rejected/cancelled attempts need to be preserved while reopening a slot for a new request, use a different modeling strategy such as allowing multiple consultation records per slot while enforcing only one active record. Choose one strategy before migration is finalized.
 
 Recommended v1 strategy:
+
 - Keep consultation history.
 - Allow multiple historical consultations per slot if a rejected/cancelled slot is reused.
 - Enforce one active (`PENDING`/`APPROVED`) consultation per slot through a partial unique index.
@@ -168,6 +178,7 @@ created_at
 ```
 
 Recommended index:
+
 - `(recipient_id, created_at DESC)`
 - `(recipient_id, read_at)`
 
@@ -188,28 +199,33 @@ profiles     1 ---- * notifications
 RLS must be enabled for user-facing tables.
 
 ### profiles
+
 - User can read own profile.
 - Approved authenticated users may read limited public faculty identity/profile fields as needed for directory views.
 - Users cannot modify their own role/account approval fields.
 - Admin can manage role/status.
 
 ### faculty_profiles
+
 - Approved users can read fields required for faculty directory.
 - Faculty can update allowed own faculty fields only.
 - Admin can manage faculty records.
 
 ### availability_slots
+
 - Approved users can read slots required for booking.
 - Faculty can insert/update/delete own safe slots.
 - Students cannot mutate availability directly.
 
 ### consultations
+
 - Student can read own consultations.
 - Faculty can read consultations assigned to self.
 - Admin can read all.
 - Direct client updates should be tightly restricted; critical state transitions should use controlled server/RPC paths.
 
 ### notifications
+
 - Recipient can read/update read-state of own notifications.
 - Users cannot read other users' notifications.
 - Creation should occur through trusted server/RPC logic.

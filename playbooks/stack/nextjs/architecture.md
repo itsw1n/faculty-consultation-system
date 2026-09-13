@@ -73,14 +73,14 @@ belongs in a Service, not React, an Action, or a Route Handler.
 
 ## Read and Write Decisions
 
-| Need | Preferred boundary |
-|---|---|
-| Initial data for a Server Component | Direct feature Query; do not call the project's own HTTP route |
-| Interaction owned by this Next.js UI | Server Action or Server Function |
-| Incoming request from an external consumer | `app/api/**/route.ts` |
-| Outgoing request to a remote backend | Feature `api/` client |
-| Complex or reused read | Query, optionally backed by a Repository |
-| Meaningful or shared mutation policy | Service, called by the entry point |
+| Need                                       | Preferred boundary                                             |
+| ------------------------------------------ | -------------------------------------------------------------- |
+| Initial data for a Server Component        | Direct feature Query; do not call the project's own HTTP route |
+| Interaction owned by this Next.js UI       | Server Action or Server Function                               |
+| Incoming request from an external consumer | `app/api/**/route.ts`                                          |
+| Outgoing request to a remote backend       | Feature `api/` client                                          |
+| Complex or reused read                     | Query, optionally backed by a Repository                       |
+| Meaningful or shared mutation policy       | Service, called by the entry point                             |
 
 Validate forms, route parameters, query parameters, cookies, webhooks, and external responses at
 their trust boundaries. Hiding a control in the browser is useful UX but is never authorization;

@@ -21,7 +21,7 @@ export const buttonVariants = cva(
       fullWidth: { true: 'w-full' },
     },
     defaultVariants: { variant: 'primary', size: 'default' },
-  },
+  }
 )
 
 type ButtonProps = AriaButtonProps & VariantProps<typeof buttonVariants>

@@ -1,1 +1,4 @@
-export interface StarterStatus { heading: string; profile: 'medium' | 'large' }
+export interface StarterStatus {
+  heading: string
+  profile: 'medium' | 'large'
+}

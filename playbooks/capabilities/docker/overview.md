@@ -14,14 +14,14 @@ Generated Docker files are executable configuration, not tutorial samples. Keep 
 
 ## Dev vs Prod Differences
 
-| Concern | Development | Production |
-|---|---|---|
-| Source | bind-mounted for fast feedback | copied into an immutable image |
-| Command | framework/Maven dev server | optimized server or executable JAR |
-| Dependencies | development dependencies available | runtime-only stage where practical |
-| Ports | exposed for local access | published by the deployment platform |
-| Credentials | local uncommitted environment | managed secret store |
-| Restart | developer-controlled | orchestrator policy |
+| Concern      | Development                        | Production                           |
+| ------------ | ---------------------------------- | ------------------------------------ |
+| Source       | bind-mounted for fast feedback     | copied into an immutable image       |
+| Command      | framework/Maven dev server         | optimized server or executable JAR   |
+| Dependencies | development dependencies available | runtime-only stage where practical   |
+| Ports        | exposed for local access           | published by the deployment platform |
+| Credentials  | local uncommitted environment      | managed secret store                 |
+| Restart      | developer-controlled               | orchestrator policy                  |
 
 Do not deploy the development Compose file. Production needs explicit TLS termination, secret delivery, persistence/backup, resource limits, logging, probes, and rollout policy.
 

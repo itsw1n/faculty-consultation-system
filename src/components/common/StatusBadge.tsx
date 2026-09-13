@@ -13,5 +13,14 @@ const statusColors: Record<string, string> = {
 }
 
 export function StatusBadge({ status }: { status: string | null }) {
-  return <span className={cn('inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold', statusColors[status ?? ''] ?? 'bg-subtle text-primary')}>{status ?? 'Unknown'}</span>
+  return (
+    <span
+      className={cn(
+        'inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold',
+        statusColors[status ?? ''] ?? 'bg-subtle text-primary'
+      )}
+    >
+      {status ?? 'Unknown'}
+    </span>
+  )
 }

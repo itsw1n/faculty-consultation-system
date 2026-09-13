@@ -3,6 +3,7 @@
 ---
 
 ## Template
+
 ```markdown
 ## What does this PR do?
 
@@ -43,6 +44,7 @@
 ## Checklist
 
 ### General
+
 - [ ] Branched off `dev`, not `main`
 - [ ] Branch name follows convention (`feat/`, `fix/`, `refactor/`, `chore/`)
 - [ ] Commits follow `type(scope): description` convention
@@ -50,11 +52,13 @@
 - [ ] No hardcoded secrets or credentials
 
 ### Quality
+
 - [ ] `make lint` passes
 - [ ] `make test` passes
 - [ ] `make build` passes
 
 ### Backend (if applicable)
+
 - [ ] New endpoints documented in `docs/api/endpoints.md`
 - [ ] DTOs used — no raw entity exposed in responses
 - [ ] New Flyway migration created if schema changed
@@ -63,12 +67,14 @@
 - [ ] Integration test added for each new controller endpoint
 
 ### Frontend (if applicable)
+
 - [ ] New API calls live inside `features/[name]/api/`
 - [ ] New hooks live inside `features/[name]/hooks/`
 - [ ] No business logic inside `pages/` or page components
 - [ ] Route added to router if new page
 
 ### Docs
+
 - [ ] `docs/api/endpoints.md` updated if endpoints changed
 - [ ] `docs/api/errors.md` updated if new error codes added
 - [ ] `AGENTS.md` updated if new rules or conventions added
@@ -82,6 +88,7 @@ Closes #
 ---
 
 ## File Location
+
 ```
 .github/PULL_REQUEST_TEMPLATE.md
 ```
@@ -91,6 +98,7 @@ GitHub automatically uses this template for all new PRs in the repo.
 ---
 
 ## Agent Rules
+
 ```
 When told to open a PR?
   → Fill every section of this template

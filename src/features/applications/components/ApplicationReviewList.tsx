@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { reviewApplication, reviewApplications } from '../actions'
 import { loadApplicationPage } from '../loadApplicationPage'
 import type { ApplicationItem } from '../repositories/applicationRepository'
@@ -53,8 +54,8 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
 
   return (
     <>
-      <div className="bulk-actions">
-        <span>{selected.length ? `${selected.length} selected` : 'Select pending applications below'}</span>
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+        <span className="mr-auto text-sm text-muted">{selected.length ? `${selected.length} selected` : 'Select pending applications below'}</span>
         <ConfirmAction
           label="Approve selected"
           title="Approve selected applications?"
@@ -73,12 +74,12 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
           disabled={selected.length === 0}
         />
       </div>
-      <div className="data-list">
+      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
         {page.items.length === 0 ? (
-          <p className="empty-row">No applications match these filters.</p>
+          <p className="p-8 text-center text-muted">No applications match these filters.</p>
         ) : (
           page.items.map((application) => (
-            <article className="application-row" key={application.id}>
+            <article className="grid items-center gap-4 border-b border-border p-4 last:border-0 sm:grid-cols-[auto_2fr_1fr_auto]" key={application.id}>
               {application.account_status === 'PENDING' ? (
                 <input
                   aria-label={`Select ${application.full_name}`}
@@ -91,14 +92,14 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
               )}
               <div>
                 <strong>{application.full_name}</strong>
-                <p>{application.email}</p>
+                <p className="mt-1 text-sm text-muted">{application.email}</p>
               </div>
               <div>
-                <span className="status-badge">{application.requested_role ?? application.account_status}</span>
-                <p>{application.department_name ?? 'No department'}</p>
+                <StatusBadge status={application.requested_role ?? application.account_status} />
+                <p className="mt-1 text-sm text-muted">{application.department_name ?? 'No department'}</p>
               </div>
               {application.account_status === 'PENDING' && (
-                <div className="row-actions">
+                <div className="flex gap-2">
                   <ConfirmAction
                     label="Approve"
                     title={`Approve ${application.full_name}?`}
@@ -120,7 +121,7 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
           ))
         )}
       </div>
-      <div ref={marker} className="loading-more" aria-live="polite">
+      <div ref={marker} className="grid min-h-12 place-items-center text-sm text-muted" aria-live="polite">
         {pending ? 'Loading applications…' : page.hasMore ? 'Scroll for more' : ''}
       </div>
     </>

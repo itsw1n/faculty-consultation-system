@@ -3,6 +3,7 @@
 ---
 
 ## Core Rules
+
 - All targets declared in `.PHONY` — no exceptions
 - Always include a `help` target as default
 - Variables declared at top of file

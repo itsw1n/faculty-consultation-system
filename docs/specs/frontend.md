@@ -19,9 +19,11 @@ components/
 ```
 
 ### `components/layout`
+
 Structural application components only.
 
 Examples:
+
 - `AppShell`
 - `Sidebar`
 - `MobileSidebarDrawer`
@@ -29,9 +31,11 @@ Examples:
 - `Breadcrumbs`
 
 ### `components/common`
+
 Reusable controls and patterns.
 
 Examples:
+
 - `Button`
 - `Input`
 - `SearchField`
@@ -71,6 +75,7 @@ Do not create extra generic folders such as `ui/` or `shared/` unless the projec
 ## 4. Navigation
 
 ### Student
+
 - Dashboard
 - Book Consultation
 - My Consultations
@@ -78,6 +83,7 @@ Do not create extra generic folders such as `ui/` or `shared/` unless the projec
 Profile is pinned separately at sidebar bottom.
 
 ### Faculty
+
 - Dashboard
 - My Availability
 - Consultation Requests
@@ -86,6 +92,7 @@ Profile is pinned separately at sidebar bottom.
 Profile is pinned separately at sidebar bottom.
 
 ### Admin
+
 - Dashboard
 - Manage Users
 - Manage Faculty
@@ -110,12 +117,14 @@ Avoid redundant patterns such as `Home / Dashboard`.
 ## 6. Notifications UI
 
 ### Bell dropdown
+
 - Shows unread indicator.
 - Opens recent notifications.
 - Shows small number of latest items.
 - Provides `View all notifications` action.
 
 ### Notifications page
+
 - Infinite-scroll if dataset grows.
 - Unread/read styling.
 - Optional mark-as-read actions.
@@ -155,6 +164,7 @@ Infinite loading state
 `Filters` opens a bottom sheet/drawer.
 
 ### Search behavior
+
 - ~300 ms debounce for server-backed text search.
 - Do not debounce deliberate select changes.
 - Search change resets loaded collection and cursor.
@@ -178,6 +188,7 @@ sort
 Initial recommended chunk: 20.
 
 States:
+
 - Initial loading.
 - Loaded.
 - Loading more.
@@ -189,6 +200,7 @@ States:
 ## 10. Student Screens
 
 ### Dashboard
+
 - Greeting/context.
 - Upcoming consultation.
 - Recent consultations.
@@ -196,13 +208,16 @@ States:
 - Small status summary cards.
 
 ### Book Consultation — Faculty
+
 - Department select/filter.
 - Search field.
 - Faculty result cards/list.
 - Infinite scrolling.
 
 ### Book Consultation — Schedule
+
 Desktop:
+
 - Weekly calendar grid.
 - Week previous/next controls.
 - Today action.
@@ -210,27 +225,32 @@ Desktop:
 - Legend.
 
 Mobile:
+
 - Horizontal/compact day selector.
 - Vertical slot list for selected day.
 
 Slot states:
+
 - Open: selectable.
 - Reserved: disabled.
 - Booked: disabled.
 - Closed: muted/disabled.
 
 ### Book Consultation — Details
+
 - Purpose/subject.
 - Description.
 - Optional related course if included.
 - Display consultation mode/location.
 
 ### Book Consultation — Review
+
 - Full booking summary.
 - Back.
 - Confirm booking.
 
 ### My Consultations
+
 - Search/filter where useful.
 - Status badges.
 - Contextual actions only.
@@ -238,19 +258,23 @@ Slot states:
 ## 11. Faculty Screens
 
 ### Dashboard
+
 - Upcoming consultations.
 - Pending requests.
 - Availability summary.
 - Add Availability quick action.
 
 ### My Availability
+
 - Weekly calendar.
 - Status legend.
 - Add Availability modal.
 - Slot detail modal when clicking existing slot.
 
 ### Add Availability Modal
+
 Fields:
+
 - Date.
 - Start time.
 - End time.
@@ -258,12 +282,14 @@ Fields:
 - Location or meeting link depending on mode.
 
 ### Consultation Requests
+
 - Search/filter.
 - Infinite scrolling.
 - Approve/reject.
 - Confirmation dialogs.
 
 ### My Consultations
+
 - Approved/upcoming.
 - Completed.
 - Mark completed where eligible.
@@ -271,11 +297,13 @@ Fields:
 ## 12. Admin Screens
 
 ### Dashboard
+
 - Pending applications.
 - Approved user/faculty counts.
 - Recent activity.
 
 ### Manage Users
+
 - Search.
 - Role filter.
 - Department filter.
@@ -285,15 +313,18 @@ Fields:
 - Bulk approve/reject.
 
 ### Manage Faculty
+
 - Search/filter.
 - Faculty records.
 - Infinite scrolling.
 
 ### Departments
+
 - Department cards/table.
 - Add/edit only if included in implementation.
 
 ### Consultation Records
+
 - Search/filter.
 - Infinite scrolling.
 - Read-only by default.
@@ -301,6 +332,7 @@ Fields:
 ## 13. Confirmation Rules
 
 Use shared confirmation dialog for actions such as:
+
 - Student cancellation.
 - Faculty approve/reject.
 - Admin bulk approve/reject.

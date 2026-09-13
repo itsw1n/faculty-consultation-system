@@ -10,7 +10,10 @@ test('presents the branded Google authentication entry point', async ({ page }) 
 
 test('reflows without horizontal overflow', async ({ page }) => {
   await page.goto('/')
-  const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }))
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth,
+  }))
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport)
 })
 

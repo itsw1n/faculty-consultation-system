@@ -23,6 +23,7 @@ The system allows students to request consultation schedules, faculty to manage 
 ## 4. Core Scope
 
 ### Authentication and onboarding
+
 - Google OAuth login through Supabase Auth.
 - Existing approved users go directly to their role dashboard.
 - New users choose whether to apply as Student or Faculty.
@@ -33,6 +34,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Admin role is assigned manually and is never self-selected.
 
 ### Student
+
 - Dashboard.
 - Book Consultation.
 - Search/filter faculty.
@@ -46,6 +48,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - View notifications.
 
 ### Faculty
+
 - Dashboard.
 - Manage weekly availability.
 - Add availability through a modal.
@@ -56,6 +59,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - View notifications.
 
 ### Admin
+
 - Dashboard.
 - Review user applications.
 - Search/filter user applications.
@@ -99,6 +103,7 @@ The system allows students to request consultation schedules, faculty to manage 
 ## 8. Delivery Phases
 
 ### Phase 1 — Foundation
+
 - Project setup.
 - Environment configuration.
 - Supabase connection.
@@ -108,6 +113,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Shared layout/common components.
 
 ### Phase 2 — Account Applications
+
 - First-login flow.
 - Student application.
 - Faculty application.
@@ -116,6 +122,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Bulk approval/rejection.
 
 ### Phase 3 — Student Booking
+
 - Faculty discovery.
 - Search/filter.
 - Weekly availability view.
@@ -124,6 +131,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Student consultation list.
 
 ### Phase 4 — Faculty Workflow
+
 - Availability management.
 - Add availability modal.
 - Consultation request review.
@@ -131,6 +139,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Consultation completion.
 
 ### Phase 5 — Admin Management
+
 - Manage users.
 - Manage faculty.
 - Departments.
@@ -138,6 +147,7 @@ The system allows students to request consultation schedules, faculty to manage 
 - Infinite scrolling.
 
 ### Phase 6 — Notifications and Polish
+
 - Notification dropdown.
 - Notifications page.
 - Confirmation dialogs.

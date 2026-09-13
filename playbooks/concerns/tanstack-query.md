@@ -94,7 +94,7 @@ import { QueryClient } from '@tanstack/react-query'
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,   // 5min — most data
+      staleTime: 1000 * 60 * 5, // 5min — most data
       retry: 1,
       refetchOnWindowFocus: false, // web only; ignored on RN
     },
@@ -103,6 +103,7 @@ export const queryClient = new QueryClient({
 ```
 
 Stale time guide:
+
 ```text
 Real-time (notifications, live status)  → staleTime: 0
 Normal data (products, users, orders)   → staleTime: 1000 * 60 * 5  (5min)

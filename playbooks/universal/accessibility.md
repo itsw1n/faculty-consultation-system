@@ -42,4 +42,3 @@
 ## Primary Reference
 
 - WCAG 2.2: https://www.w3.org/TR/WCAG22/
-

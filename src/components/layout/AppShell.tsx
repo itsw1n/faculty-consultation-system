@@ -47,7 +47,13 @@ function Navigation({ role, mobile = false }: { role: UserRole; mobile?: boolean
   )
 }
 
-export async function AppShell({ children, profile }: { children: ReactNode; profile: AuthProfile }) {
+export async function AppShell({
+  children,
+  profile,
+}: {
+  children: ReactNode
+  profile: AuthProfile
+}) {
   const role = profile.role!
   const notifications = await listNotifications(5)
   const unread = notifications.filter((item) => !item.read_at).length
@@ -59,7 +65,9 @@ export async function AppShell({ children, profile }: { children: ReactNode; pro
           className="mb-8 flex items-center gap-3 rounded-lg text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           href={`/${role.toLowerCase()}`}
         >
-          <span className="grid size-10 place-items-center rounded-lg border border-white font-extrabold">CC</span>
+          <span className="grid size-10 place-items-center rounded-lg border border-white font-extrabold">
+            CC
+          </span>
           <strong>CampusConnect</strong>
         </Link>
         <Navigation role={role} />
@@ -81,28 +89,74 @@ export async function AppShell({ children, profile }: { children: ReactNode; pro
               <dd className="mb-2 text-sm capitalize">{role.toLowerCase()}</dd>
               <dt className="text-xs uppercase opacity-70">Department</dt>
               <dd className="mb-2 text-sm">{profile.departmentName ?? 'Not assigned'}</dd>
-              {profile.positionTitle && <><dt className="text-xs uppercase opacity-70">Position</dt><dd className="mb-2 text-sm">{profile.positionTitle}</dd></>}
+              {profile.positionTitle && (
+                <>
+                  <dt className="text-xs uppercase opacity-70">Position</dt>
+                  <dd className="mb-2 text-sm">{profile.positionTitle}</dd>
+                </>
+              )}
             </dl>
-            <form action={signOut}><button type="submit" className="inline-flex min-h-9 w-full items-center justify-center rounded-lg bg-surface px-3 py-1.5 text-sm font-bold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">Sign out</button></form>
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="inline-flex min-h-9 w-full items-center justify-center rounded-lg bg-surface px-3 py-1.5 text-sm font-bold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              >
+                Sign out
+              </button>
+            </form>
           </div>
         </details>
       </aside>
 
       <div className="min-w-0">
-        <header data-ui="topbar" className="flex h-18 items-center gap-4 border-b border-border bg-surface px-4 sm:px-6 lg:px-10">
+        <header
+          data-ui="topbar"
+          className="flex h-18 items-center gap-4 border-b border-border bg-surface px-4 sm:px-6 lg:px-10"
+        >
           <details className="relative md:hidden">
-            <summary aria-label="Open navigation" className="grid min-h-11 cursor-pointer list-none place-items-center rounded-lg focus-visible:outline-3 focus-visible:outline-focus"><Menu aria-hidden="true" /></summary>
-            <div className="absolute top-12 left-0 z-20 w-64 rounded-xl bg-primary p-3 text-white shadow-card"><Navigation role={role} mobile /></div>
+            <summary
+              aria-label="Open navigation"
+              className="grid min-h-11 cursor-pointer list-none place-items-center rounded-lg focus-visible:outline-3 focus-visible:outline-focus"
+            >
+              <Menu aria-hidden="true" />
+            </summary>
+            <div className="absolute top-12 left-0 z-20 w-64 rounded-xl bg-primary p-3 text-white shadow-card">
+              <Navigation role={role} mobile />
+            </div>
           </details>
           <Breadcrumbs />
           <details className="relative ml-auto">
-            <summary aria-label={`${unread} unread notifications`} className="relative grid min-h-11 cursor-pointer list-none place-items-center rounded-lg px-2 focus-visible:outline-3 focus-visible:outline-focus">
+            <summary
+              aria-label={`${unread} unread notifications`}
+              className="relative grid min-h-11 cursor-pointer list-none place-items-center rounded-lg px-2 focus-visible:outline-3 focus-visible:outline-focus"
+            >
               <Bell aria-hidden="true" />
-              {unread > 0 && <span className="absolute top-0 right-0 min-w-5 rounded-full bg-danger px-1 text-center text-xs text-white">{unread}</span>}
+              {unread > 0 && (
+                <span className="absolute top-0 right-0 min-w-5 rounded-full bg-danger px-1 text-center text-xs text-white">
+                  {unread}
+                </span>
+              )}
             </summary>
             <div className="absolute top-12 right-0 z-20 w-[min(22rem,80vw)] overflow-hidden rounded-xl border border-border bg-surface shadow-card">
-              {notifications.length === 0 ? <p className="p-4 text-sm text-muted">No notifications yet.</p> : notifications.map((item) => <article key={item.id} className={cn('border-b border-border p-3', !item.read_at && 'bg-blue-50')}><strong>{item.title}</strong><p className="mt-1 text-sm text-muted">{item.message}</p></article>)}
-              <Link className="block p-3 text-center font-bold text-primary hover:bg-subtle" href="/notifications">View all notifications</Link>
+              {notifications.length === 0 ? (
+                <p className="p-4 text-sm text-muted">No notifications yet.</p>
+              ) : (
+                notifications.map((item) => (
+                  <article
+                    key={item.id}
+                    className={cn('border-b border-border p-3', !item.read_at && 'bg-blue-50')}
+                  >
+                    <strong>{item.title}</strong>
+                    <p className="mt-1 text-sm text-muted">{item.message}</p>
+                  </article>
+                ))
+              )}
+              <Link
+                className="block p-3 text-center font-bold text-primary hover:bg-subtle"
+                href="/notifications"
+              >
+                View all notifications
+              </Link>
             </div>
           </details>
         </header>

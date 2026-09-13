@@ -9,6 +9,7 @@ No application-managed username/password flow is required for v1.
 ## 2. Google Data
 
 On successful authentication, the application may use available Google identity metadata such as:
+
 - Email.
 - Display name.
 - Avatar.
@@ -59,26 +60,34 @@ Admin is never available as a requested role.
 ## 5. Access Rules
 
 ### Pending
+
 May:
+
 - View pending approval state.
 - Sign out.
 
 May not:
+
 - Access Student/Faculty/Admin application routes.
 
 ### Rejected
+
 May:
+
 - View rejection state.
 - Sign out.
 - Reapply only if business policy explicitly allows it.
 
 ### Approved Student
+
 May access Student routes only.
 
 ### Approved Faculty
+
 May access Faculty routes only.
 
 ### Admin
+
 May access Admin routes.
 
 ## 6. Route Protection
@@ -106,6 +115,7 @@ A server-side role check should reject unauthorized access even if a user manual
 ## 8. Profile Creation
 
 On first successful Google authentication:
+
 - Ensure an application/profile shell can be associated with `auth.users.id`.
 - Store only required school application fields.
 - Do not collect School ID in v1.
@@ -113,6 +123,7 @@ On first successful Google authentication:
 ## 9. Sensitive Role Fields
 
 The following fields are privileged:
+
 - `role`
 - `account_status`
 - approval/rejection metadata
@@ -122,6 +133,7 @@ Normal users must not be able to update these through direct client writes.
 ## 10. Admin Approval
 
 Single approval:
+
 1. Validate current user is Admin.
 2. Validate target is `PENDING`.
 3. Assign role from requested role.
@@ -129,6 +141,7 @@ Single approval:
 5. Create notification.
 
 Bulk approval/rejection:
+
 - Same authorization and validation rules per selected record.
 - Operation should return per-record failures if a subset changed state concurrently.
 

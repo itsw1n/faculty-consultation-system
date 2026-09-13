@@ -4,5 +4,13 @@ import { AvailabilityManager } from '@/features/availability/components/Availabi
 
 export default async function AvailabilityPage() {
   const slots = await listOwnAvailability()
-  return <><PageHeading title="My Availability" description="Create consultation times and review their booking status."/><AvailabilityManager slots={slots}/></>
+  return (
+    <>
+      <PageHeading
+        title="My Availability"
+        description="Create consultation times and review their booking status."
+      />
+      <AvailabilityManager slots={slots} />
+    </>
+  )
 }

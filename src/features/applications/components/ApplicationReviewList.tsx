@@ -15,7 +15,13 @@ type Page = {
 
 type Filters = { search: string; status: string; role: string; department: string }
 
-export function ApplicationReviewList({ initialPage, filters }: { initialPage: Page; filters: Filters }) {
+export function ApplicationReviewList({
+  initialPage,
+  filters,
+}: {
+  initialPage: Page
+  filters: Filters
+}) {
   const [page, setPage] = useState(initialPage)
   const [selected, setSelected] = useState<string[]>([])
   const [pending, startTransition] = useTransition()
@@ -40,7 +46,7 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
           })
         }
       },
-      { rootMargin: '200px' },
+      { rootMargin: '200px' }
     )
     observer.observe(node)
     return () => observer.disconnect()
@@ -48,14 +54,16 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
 
   function toggleSelection(id: string) {
     setSelected((current) =>
-      current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id],
+      current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id]
     )
   }
 
   return (
     <>
       <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-        <span className="mr-auto text-sm text-muted">{selected.length ? `${selected.length} selected` : 'Select pending applications below'}</span>
+        <span className="mr-auto text-sm text-muted">
+          {selected.length ? `${selected.length} selected` : 'Select pending applications below'}
+        </span>
         <ConfirmAction
           label="Approve selected"
           title="Approve selected applications?"
@@ -79,7 +87,10 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
           <p className="p-8 text-center text-muted">No applications match these filters.</p>
         ) : (
           page.items.map((application) => (
-            <article className="grid items-center gap-4 border-b border-border p-4 last:border-0 sm:grid-cols-[auto_2fr_1fr_auto]" key={application.id}>
+            <article
+              className="grid items-center gap-4 border-b border-border p-4 last:border-0 sm:grid-cols-[auto_2fr_1fr_auto]"
+              key={application.id}
+            >
               {application.account_status === 'PENDING' ? (
                 <input
                   aria-label={`Select ${application.full_name}`}
@@ -96,7 +107,9 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
               </div>
               <div>
                 <StatusBadge status={application.requested_role ?? application.account_status} />
-                <p className="mt-1 text-sm text-muted">{application.department_name ?? 'No department'}</p>
+                <p className="mt-1 text-sm text-muted">
+                  {application.department_name ?? 'No department'}
+                </p>
               </div>
               {application.account_status === 'PENDING' && (
                 <div className="flex gap-2">
@@ -121,7 +134,11 @@ export function ApplicationReviewList({ initialPage, filters }: { initialPage: P
           ))
         )}
       </div>
-      <div ref={marker} className="grid min-h-12 place-items-center text-sm text-muted" aria-live="polite">
+      <div
+        ref={marker}
+        className="grid min-h-12 place-items-center text-sm text-muted"
+        aria-live="polite"
+      >
         {pending ? 'Loading applications…' : page.hasMore ? 'Scroll for more' : ''}
       </div>
     </>

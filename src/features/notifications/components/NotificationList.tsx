@@ -1,7 +1,73 @@
 'use client'
-import { useEffect,useRef,useState,useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { markNotificationRead } from '../actions'
 import { loadNotificationPage } from '../loadNotificationPage'
 import type { NotificationItem } from '../types'
-type Page={items:NotificationItem[];hasMore:boolean;nextCursor:{createdAt:string;id:string}|null}
-export function NotificationList({initialPage}:{initialPage:Page}){const[page,setPage]=useState(initialPage);const[pending,startTransition]=useTransition();const marker=useRef<HTMLDivElement>(null);useEffect(()=>{const node=marker.current;if(!node||pending||!page.hasMore)return;const observer=new IntersectionObserver(entries=>{if(entries[0]?.isIntersecting&&page.nextCursor)startTransition(async()=>{const next=await loadNotificationPage({cursor:page.nextCursor});setPage(current=>({...next,items:[...current.items,...next.items]}))})},{rootMargin:'200px'});observer.observe(node);return()=>observer.disconnect()},[page,pending]);return <><section className="overflow-hidden rounded-xl border border-border bg-surface">{page.items.length===0?<p className="p-8 text-center text-muted">No notifications yet.</p>:page.items.map(item=><article className={`flex justify-between gap-4 border-b border-border p-4 last:border-0 ${item.read_at?'':'bg-blue-50'}`} key={item.id}><div><strong>{item.title}</strong><p className="mt-1 text-muted">{item.message}</p><time className="mt-1 text-xs text-muted" dateTime={item.created_at}>{new Intl.DateTimeFormat('en-PH',{dateStyle:'medium',timeStyle:'short'}).format(new Date(item.created_at))}</time></div>{!item.read_at&&<form action={markNotificationRead}><input type="hidden" name="notificationId" value={item.id}/><button className="min-h-11 whitespace-nowrap rounded-lg px-3 font-bold text-primary hover:bg-subtle">Mark read</button></form>}</article>)}</section><div ref={marker} className="grid min-h-12 place-items-center text-sm text-muted" aria-live="polite">{pending?'Loading notifications…':page.hasMore?'Scroll for more':''}</div></>}
+type Page = {
+  items: NotificationItem[]
+  hasMore: boolean
+  nextCursor: { createdAt: string; id: string } | null
+}
+export function NotificationList({ initialPage }: { initialPage: Page }) {
+  const [page, setPage] = useState(initialPage)
+  const [pending, startTransition] = useTransition()
+  const marker = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const node = marker.current
+    if (!node || pending || !page.hasMore) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && page.nextCursor)
+          startTransition(async () => {
+            const next = await loadNotificationPage({ cursor: page.nextCursor })
+            setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
+          })
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [page, pending])
+  return (
+    <>
+      <section className="overflow-hidden rounded-xl border border-border bg-surface">
+        {page.items.length === 0 ? (
+          <p className="p-8 text-center text-muted">No notifications yet.</p>
+        ) : (
+          page.items.map((item) => (
+            <article
+              className={`flex justify-between gap-4 border-b border-border p-4 last:border-0 ${item.read_at ? '' : 'bg-blue-50'}`}
+              key={item.id}
+            >
+              <div>
+                <strong>{item.title}</strong>
+                <p className="mt-1 text-muted">{item.message}</p>
+                <time className="mt-1 text-xs text-muted" dateTime={item.created_at}>
+                  {new Intl.DateTimeFormat('en-PH', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  }).format(new Date(item.created_at))}
+                </time>
+              </div>
+              {!item.read_at && (
+                <form action={markNotificationRead}>
+                  <input type="hidden" name="notificationId" value={item.id} />
+                  <button className="min-h-11 whitespace-nowrap rounded-lg px-3 font-bold text-primary hover:bg-subtle">
+                    Mark read
+                  </button>
+                </form>
+              )}
+            </article>
+          ))
+        )}
+      </section>
+      <div
+        ref={marker}
+        className="grid min-h-12 place-items-center text-sm text-muted"
+        aria-live="polite"
+      >
+        {pending ? 'Loading notifications…' : page.hasMore ? 'Scroll for more' : ''}
+      </div>
+    </>
+  )
+}

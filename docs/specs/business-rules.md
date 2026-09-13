@@ -40,15 +40,19 @@ Allowed statuses:
 Meaning:
 
 ### OPEN
+
 Faculty is available and no consultation request currently holds the slot.
 
 ### RESERVED
+
 A student submitted a request for the slot and it is waiting for faculty decision. The slot is temporarily unavailable to other students.
 
 ### BOOKED
+
 Faculty approved the consultation. The schedule is confirmed.
 
 ### CLOSED
+
 The consultation is finished or the time slot is no longer reusable.
 
 ## 4. Consultation Status
@@ -143,9 +147,11 @@ Availability may define:
 - `ONLINE`
 
 If `IN_PERSON`:
+
 - location/room is required.
 
 If `ONLINE`:
+
 - meeting link may be supplied.
 
 Students should see mode/location before confirming a booking.

@@ -29,30 +29,30 @@ src/
 
 ## Profile Differences
 
-| Profile | Start with | Add when earned |
-|---|---|---|
-| Small | Route composition and a simple feature read or mutation | Query/Action when it names useful behavior |
-| Medium | Feature-owned UI, Queries, Actions, schemas, and Services where policy exists | Repository for owned persistence; `api` for a remote service |
-| Large | Medium vocabulary plus an explicit `index.ts` boundary | Domain policies, jobs/events, contract tests, and enforced imports |
+| Profile | Start with                                                                    | Add when earned                                                    |
+| ------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Small   | Route composition and a simple feature read or mutation                       | Query/Action when it names useful behavior                         |
+| Medium  | Feature-owned UI, Queries, Actions, schemas, and Services where policy exists | Repository for owned persistence; `api` for a remote service       |
+| Large   | Medium vocabulary plus an explicit `index.ts` boundary                        | Domain policies, jobs/events, contract tests, and enforced imports |
 
 Large is the complete reference, not permission to create placeholders. Medium defines ownership
 and dependency direction; it does not demand every directory.
 
 ## File Placement
 
-| Responsibility | Location |
-|---|---|
-| URL, layout, metadata, loading/error UI | `app/` |
-| Incoming HTTP endpoint | `app/api/**/route.ts` |
-| Structural or page-wide UI | `components/layout/` |
-| Reusable domain-free control | `components/common/` |
-| Feature-specific UI | `features/<feature>/components/` |
-| Server read shaped for application UI | `features/<feature>/queries/` |
-| UI-triggered server write | `features/<feature>/actions/` |
-| Meaningful business/application operation | `features/<feature>/services/` |
-| Next-owned database access | `features/<feature>/repositories/` |
-| Outgoing remote HTTP client | `features/<feature>/api/` |
-| Runtime input or response validation | `features/<feature>/schemas/` |
+| Responsibility                            | Location                           |
+| ----------------------------------------- | ---------------------------------- |
+| URL, layout, metadata, loading/error UI   | `app/`                             |
+| Incoming HTTP endpoint                    | `app/api/**/route.ts`              |
+| Structural or page-wide UI                | `components/layout/`               |
+| Reusable domain-free control              | `components/common/`               |
+| Feature-specific UI                       | `features/<feature>/components/`   |
+| Server read shaped for application UI     | `features/<feature>/queries/`      |
+| UI-triggered server write                 | `features/<feature>/actions/`      |
+| Meaningful business/application operation | `features/<feature>/services/`     |
+| Next-owned database access                | `features/<feature>/repositories/` |
+| Outgoing remote HTTP client               | `features/<feature>/api/`          |
+| Runtime input or response validation      | `features/<feature>/schemas/`      |
 
 ## Layout Composition
 
@@ -73,12 +73,12 @@ Incoming HTTP routes live in `app/api` because the App Router owns URL discovery
 thin: authenticate, authorize, validate, call a feature operation, and translate the result.
 Outgoing HTTP clients live inside the owning feature's `api` directory.
 
-| Data owner | Feature boundary | Example |
-|---|---|---|
-| Next.js + Prisma | `repositories/` | `userRepository.ts` |
-| Next.js + Supabase | `repositories/` using the server client | `userRepository.ts` |
-| Spring/external API | `api/` | `usersApi.ts` |
-| Browser-only SDK | feature `api/` or `data/` | never server secrets |
+| Data owner          | Feature boundary                        | Example              |
+| ------------------- | --------------------------------------- | -------------------- |
+| Next.js + Prisma    | `repositories/`                         | `userRepository.ts`  |
+| Next.js + Supabase  | `repositories/` using the server client | `userRepository.ts`  |
+| Spring/external API | `api/`                                  | `usersApi.ts`        |
+| Browser-only SDK    | feature `api/` or `data/`               | never server secrets |
 
 Do not call a Next Route Handler from a Server Component merely to reach code in the same process.
 

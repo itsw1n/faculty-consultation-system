@@ -2,5 +2,47 @@ import Link from 'next/link'
 import { EmptyState } from '@/components/common/EmptyState'
 import { PageHeading } from '@/components/common/PageHeading'
 import { getAdminDashboard } from '@/features/dashboard/repositories/dashboardRepository'
-const card='rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
-export default async function AdminDashboard() { const data=await getAdminDashboard();return <><PageHeading title="Admin Dashboard" description="Review applications and oversee consultation activity."/><div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4"><section className={card}><span>Pending applications</span><strong>{data.pending}</strong><p>Users awaiting review</p></section><section className={card}><span>Active faculty</span><strong>{data.faculty}</strong><p>Approved faculty accounts</p></section><section className={card}><span>Consultations</span><strong>{data.consultations}</strong><p>All consultation records</p></section></div>{data.pending===0&&<EmptyState title="No pending applications" description="New student and faculty applications will appear here." action={<Link className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white" href="/admin/users">Manage Users</Link>}/>}</> }
+const card =
+  'rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
+export default async function AdminDashboard() {
+  const data = await getAdminDashboard()
+  return (
+    <>
+      <PageHeading
+        title="Admin Dashboard"
+        description="Review applications and oversee consultation activity."
+      />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
+        <section className={card}>
+          <span>Pending applications</span>
+          <strong>{data.pending}</strong>
+          <p>Users awaiting review</p>
+        </section>
+        <section className={card}>
+          <span>Active faculty</span>
+          <strong>{data.faculty}</strong>
+          <p>Approved faculty accounts</p>
+        </section>
+        <section className={card}>
+          <span>Consultations</span>
+          <strong>{data.consultations}</strong>
+          <p>All consultation records</p>
+        </section>
+      </div>
+      {data.pending === 0 && (
+        <EmptyState
+          title="No pending applications"
+          description="New student and faculty applications will appear here."
+          action={
+            <Link
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white"
+              href="/admin/users"
+            >
+              Manage Users
+            </Link>
+          }
+        />
+      )}
+    </>
+  )
+}

@@ -2,14 +2,14 @@
 
 ## Test Layers
 
-| Risk | Test |
-|---|---|
-| Schema or pure policy | Vitest unit test |
-| Component behavior/accessibility | React Testing Library |
-| Service orchestration | Unit test with boundary fakes |
-| Repository/API contract | Integration or contract test |
+| Risk                                   | Test                                    |
+| -------------------------------------- | --------------------------------------- |
+| Schema or pure policy                  | Vitest unit test                        |
+| Component behavior/accessibility       | React Testing Library                   |
+| Service orchestration                  | Unit test with boundary fakes           |
+| Repository/API contract                | Integration or contract test            |
 | Route Handler/Server Function security | Unauthenticated, forbidden, valid tests |
-| Critical user journey | Playwright |
+| Critical user journey                  | Playwright                              |
 
 Test observable behavior rather than implementation call counts. Repository tests use the
 real database engine when query behavior matters. Remote API clients use contract fixtures

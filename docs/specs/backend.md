@@ -41,6 +41,7 @@ All mutations should validate payloads server-side.
 Recommended validation library: Zod or equivalent schema validation already selected by project rules.
 
 Examples:
+
 - Date/time formats.
 - Required department.
 - Valid requested role.
@@ -56,7 +57,9 @@ Every server mutation must validate the authenticated user and role.
 Examples:
 
 ### Student
+
 May:
+
 - Read eligible faculty.
 - Read availability.
 - Create own consultation request.
@@ -64,19 +67,24 @@ May:
 - Cancel own eligible consultation.
 
 May not:
+
 - Approve requests.
 - Modify faculty availability.
 - Read other students' private consultation records.
 
 ### Faculty
+
 May:
+
 - Manage own availability.
 - Read consultation requests assigned to self.
 - Approve/reject own assigned requests.
 - Complete own approved consultations.
 
 ### Admin
+
 May:
+
 - Review applications.
 - Assign approved roles.
 - Manage faculty/department records according to policy.
@@ -96,6 +104,7 @@ Required sequence:
 6. Create faculty notification.
 
 Preferred implementation:
+
 - PostgreSQL function/RPC or transaction-capable server-side operation.
 
 Do not implement as two unrelated client-side Supabase mutations because that creates race conditions.
@@ -103,6 +112,7 @@ Do not implement as two unrelated client-side Supabase mutations because that cr
 ## 6. Consultation Decision Mutation
 
 ### Approve
+
 1. Validate Faculty owns consultation's slot/request.
 2. Validate consultation `PENDING`.
 3. Validate slot `RESERVED`.
@@ -111,6 +121,7 @@ Do not implement as two unrelated client-side Supabase mutations because that cr
 6. Notify Student.
 
 ### Reject
+
 1. Validate ownership.
 2. Validate pending state.
 3. Set consultation `REJECTED`.
@@ -120,10 +131,12 @@ Do not implement as two unrelated client-side Supabase mutations because that cr
 ## 7. Cancellation Mutation
 
 ### Student pending cancellation
+
 - Consultation `PENDING -> CANCELLED`.
 - Slot `RESERVED -> OPEN`.
 
 ### Student approved cancellation
+
 - Consultation `APPROVED -> CANCELLED`.
 - Slot `BOOKED -> OPEN`.
 - Notify Faculty.
@@ -140,6 +153,7 @@ Faculty only:
 ## 9. Availability Mutation
 
 Create availability:
+
 - Authenticated Faculty only.
 - Faculty id comes from session/profile, not trusted client input.
 - Validate date/time.
@@ -147,6 +161,7 @@ Create availability:
 - Initial status is `OPEN`.
 
 Delete availability:
+
 - Faculty owns slot.
 - Only allowed for safe status such as `OPEN`.
 - `RESERVED` or `BOOKED` must not be silently deleted.
@@ -182,6 +197,7 @@ Exact route shape may change based on chosen Next.js architecture.
 Prefer cursor-based pagination.
 
 Cursor must be based on deterministic ordering, for example:
+
 - `created_at DESC, id DESC`
 
 Avoid relying on offset pagination for large/changing admin datasets when cursor pagination is practical.
@@ -189,6 +205,7 @@ Avoid relying on offset pagination for large/changing admin datasets when cursor
 ## 12. Notifications
 
 Notification service should support creating records for:
+
 - New application -> Admin.
 - Application approved/rejected -> applicant.
 - New consultation request -> Faculty.
@@ -200,6 +217,7 @@ Email through Resend is optional/secondary to in-app notification unless require
 ## 13. Error Contract
 
 Server responses/actions should distinguish:
+
 - Validation error.
 - Unauthorized.
 - Forbidden.

@@ -13,3 +13,9 @@ test('reflows without horizontal overflow', async ({ page }) => {
   const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }))
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport)
 })
+
+test('makes the sign-in action reachable by keyboard', async ({ page }) => {
+  await page.goto('/')
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeFocused()
+})

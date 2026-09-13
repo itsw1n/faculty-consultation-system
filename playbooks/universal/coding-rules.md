@@ -5,6 +5,7 @@ Applies to every project regardless of stack.
 ---
 
 ## Core Principle
+
 ```
 simple + explicit + consistent
 over
@@ -18,6 +19,7 @@ Complexity must earn abstraction. Start simple. Add layers only when justified.
 ## Naming
 
 ### Files
+
 ```
 React components:   PascalCase    UserCard.tsx
 Hooks:              camelCase     useUserData.ts
@@ -30,6 +32,7 @@ SQL migrations:     snake_case    V1__create_users_table.sql
 ```
 
 ### Variables and Functions
+
 ```
 Variables:          camelCase     userName, isLoading, hasError
 Functions:          camelCase     getUser(), createOrder(), formatDate()
@@ -40,12 +43,14 @@ Enums:              PascalCase    UserRole, OrderStatus
 ```
 
 ### Name for what it does, not what it is
+
 ```
 ❌ getData(), handleThing(), doStuff(), temp, x
 ✅ getUserById(), handleLoginSubmit(), formatCurrency()
 ```
 
 ### Boolean naming
+
 ```
 ❌ user, loading, error
 ✅ isLoading, hasError, isAuthenticated, canEdit
@@ -54,6 +59,7 @@ Enums:              PascalCase    UserRole, OrderStatus
 ---
 
 ## Functions
+
 - One responsibility per function
 - Max 3 parameters — if more, use an options object
 - Return early to avoid deep nesting
@@ -87,6 +93,7 @@ function getUser(id) {
 ## Imports
 
 ### Frontend
+
 - Always use absolute imports with `@/` prefix
 - Never use relative `../../` imports
 - Barrel exports (`index.ts`) for public API of a feature only
@@ -100,6 +107,7 @@ import { UserCard } from '@/components/ui/UserCard'
 ```
 
 ### Import Order (enforced by ESLint)
+
 ```
 1. External libraries
 2. Internal absolute (@/)
@@ -110,6 +118,7 @@ import { UserCard } from '@/components/ui/UserCard'
 ---
 
 ## Constants
+
 - No magic numbers or strings in logic
 - All constants in `src/constants/index.ts` or feature-level constants file
 
@@ -129,13 +138,16 @@ setTimeout(fn, TOKEN_EXPIRY.ACCESS)
 ## Async / Error Handling
 
 ### Frontend
+
 - Always async/await — never `.then()` chains
 - Always handle errors at the hook level, not component level
 - Never swallow errors silently
 
 ```typescript
 // ❌
-fetchUser().then(data => setUser(data)).catch(e => console.log(e))
+fetchUser()
+  .then((data) => setUser(data))
+  .catch((e) => console.log(e))
 
 // ✅
 try {
@@ -148,6 +160,7 @@ try {
 ```
 
 ### Backend
+
 - Always throw `AppException` — never raw `RuntimeException`
 - Never expose stack traces in API responses
 - Always catch at the `GlobalExceptionHandler` level
@@ -163,6 +176,7 @@ throw new AppException("USER_NOT_FOUND", HttpStatus.NOT_FOUND);
 ---
 
 ## Logging
+
 - NEVER use `console.log` directly
 - Always use `lib/logger.ts` on frontend
 - Always use SLF4J logger on backend
@@ -191,6 +205,7 @@ log.error("fetch failed for userId: {}", userId, e);
 ---
 
 ## Comments
+
 - Comment WHY, not WHAT
 - Code should be readable enough to not need WHAT comments
 - Remove all debug/TODO comments before committing
@@ -208,6 +223,7 @@ await retry(fetchUser, { times: 1, delay: 300 })
 ---
 
 ## No Debug Code in Commits
+
 ```
 ❌ console.log
 ❌ debugger
@@ -221,6 +237,7 @@ ESLint and Husky enforce this — build fails if present.
 ---
 
 ## One Thing Per File
+
 ```
 ❌ UserCardAndForm.tsx — two components in one file
 ❌ userUtils.ts — 30 unrelated utility functions
@@ -238,6 +255,7 @@ Exception: small helper types or constants directly related to the file.
 ## Exports
 
 ### Frontend
+
 - Named exports everywhere except page/route components
 - Page components use default export (Next.js / React Router requirement)
 
@@ -253,12 +271,14 @@ export default function UserPage() { ... }
 ```
 
 ### Backend
+
 - Spring-managed beans: `@Service`, `@Repository`, `@RestController` — Spring handles export
 - Utility classes: `public static` methods
 
 ---
 
 ## Agent Rules
+
 ```
 Before writing any code:
   1. Check if the functionality already exists

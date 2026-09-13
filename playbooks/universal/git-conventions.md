@@ -5,8 +5,9 @@ Applies to every project regardless of stack.
 ---
 
 ## Branch Structure
+
 | Branch       | Purpose                                       |
-|--------------|-----------------------------------------------|
+| ------------ | --------------------------------------------- |
 | `main`       | Production — always stable, always deployable |
 | `dev`        | Integration — all features merge here first   |
 | `feature/*`  | New capability                                |
@@ -17,6 +18,7 @@ Applies to every project regardless of stack.
 | `test/*`     | Adding or updating tests only                 |
 
 ## Branch Rules
+
 - NEVER commit directly to `main` or `dev`
 - ALWAYS branch off `dev` — never off `main`
 - NEVER merge or create PRs unless explicitly asked
@@ -24,6 +26,7 @@ Applies to every project regardless of stack.
 - One logical change per branch — keep branches small and focused
 
 ## Starting a Branch
+
 ```bash
 git checkout dev
 git pull origin dev
@@ -31,6 +34,7 @@ git checkout -b <type>/<short-description>
 ```
 
 ### Examples
+
 ```bash
 git checkout -b feature/user-profile-page
 git checkout -b fix/token-expiry-race
@@ -44,11 +48,13 @@ git checkout -b docs/update-api-endpoints
 ## Commit Convention
 
 ### Format
+
 ```
 type(scope): short description
 ```
 
 ### Rules
+
 - Lowercase only — no uppercase anywhere
 - No period at the end
 - Present tense — "add" not "added", "fix" not "fixed"
@@ -56,8 +62,9 @@ type(scope): short description
 - One logical change per commit
 
 ### Types
+
 | Type       | When to use                                       |
-|------------|---------------------------------------------------|
+| ---------- | ------------------------------------------------- |
 | `feat`     | New feature or capability                         |
 | `fix`      | Bug fix                                           |
 | `refactor` | Restructure without behavior change               |
@@ -68,27 +75,30 @@ type(scope): short description
 | `style`    | Formatting, whitespace — no logic change          |
 
 ### Scopes (React + Spring Boot)
-| Scope      | When to use                        |
-|------------|------------------------------------|
-| `frontend` | Anything inside /frontend          |
-| `backend`  | Anything inside /backend           |
-| `docker`   | Dockerfile or docker-compose       |
-| `ci`       | GitHub Actions workflows           |
-| `docs`     | Anything inside /docs              |
-| `deps`     | Dependency updates (either side)   |
+
+| Scope      | When to use                      |
+| ---------- | -------------------------------- |
+| `frontend` | Anything inside /frontend        |
+| `backend`  | Anything inside /backend         |
+| `docker`   | Dockerfile or docker-compose     |
+| `ci`       | GitHub Actions workflows         |
+| `docs`     | Anything inside /docs            |
+| `deps`     | Dependency updates (either side) |
 
 ### Scopes (Next.js projects)
-| Scope      | When to use                        |
-|------------|------------------------------------|
-| `app`      | Next.js app router, pages, layouts |
-| `api`      | API routes or server actions       |
-| `db`       | Database schema, migrations        |
-| `auth`     | Authentication logic               |
-| `ci`       | GitHub Actions workflows           |
-| `docs`     | Anything inside /docs              |
-| `deps`     | Dependency updates                 |
+
+| Scope  | When to use                        |
+| ------ | ---------------------------------- |
+| `app`  | Next.js app router, pages, layouts |
+| `api`  | API routes or server actions       |
+| `db`   | Database schema, migrations        |
+| `auth` | Authentication logic               |
+| `ci`   | GitHub Actions workflows           |
+| `docs` | Anything inside /docs              |
+| `deps` | Dependency updates                 |
 
 ### Examples
+
 ```bash
 feat(frontend): add user profile page
 feat(backend): add paper download endpoint
@@ -107,6 +117,7 @@ ci(backend): add postgresql service to ci workflow
 ---
 
 ## Daily Workflow
+
 ```bash
 # 1. Always start from updated dev
 git checkout dev
@@ -129,6 +140,7 @@ git push origin <branch-name>
 ---
 
 ## .gitignore — Always Include
+
 ```
 # Environment
 .env
@@ -165,6 +177,7 @@ postgres-data/
 ---
 
 ## Agent Rules
+
 ```
 Never:
   → commit directly to main or dev

@@ -5,6 +5,7 @@ Applies to every TypeScript project.
 ---
 
 ## Strict Mode — Always On
+
 ```json
 // tsconfig.json
 {
@@ -23,6 +24,7 @@ These flags catch real bugs. Never disable them.
 ---
 
 ## No `any`
+
 - Never use `any` unless absolutely unavoidable
 - When unavoidable: add `// reason:` comment explaining why
 
@@ -41,17 +43,19 @@ const chart = new (window as any).ChartLib()
 ```
 
 ### Alternatives to `any`
-| Instead of `any` | Use                     |
-|------------------|-------------------------|
-| Unknown data     | `unknown`               |
+
+| Instead of `any` | Use                       |
+| ---------------- | ------------------------- |
+| Unknown data     | `unknown`                 |
 | Flexible object  | `Record<string, unknown>` |
-| Multiple types   | Union `string \| number` |
-| Optional         | `T \| undefined`        |
-| Nullable         | `T \| null`             |
+| Multiple types   | Union `string \| number`  |
+| Optional         | `T \| undefined`          |
+| Nullable         | `T \| null`               |
 
 ---
 
 ## Type vs Interface
+
 ```typescript
 // Interface — for objects that may be extended or implemented
 interface User {
@@ -68,6 +72,7 @@ type UserWithRole = User & { role: UserRole }
 ```
 
 ### Rule
+
 - Objects → `interface` (extends naturally, better error messages)
 - Everything else → `type`
 - Never use `I` prefix for interfaces (`IUser` → `User`)
@@ -75,6 +80,7 @@ type UserWithRole = User & { role: UserRole }
 ---
 
 ## Discriminated Unions for State
+
 ```typescript
 // ❌ scattered boolean flags
 type State = {
@@ -96,6 +102,7 @@ type State =
 ---
 
 ## Unknown Over Any for Errors
+
 ```typescript
 // ❌
 } catch (error: any) {
@@ -112,6 +119,7 @@ type State =
 ---
 
 ## Generics
+
 Use when genuinely reusable — not for ceremony.
 
 ```typescript
@@ -155,6 +163,7 @@ const user = UserSchema.parse(apiResponse.data)
 ```
 
 ### When to use Zod
+
 - Form validation (via React Hook Form resolver)
 - API response parsing
 - Environment variable validation (t3-env)
@@ -165,6 +174,7 @@ const user = UserSchema.parse(apiResponse.data)
 ## Where Types Live
 
 ### Decision tree
+
 ```
 Is this type used across multiple features?
   → src/types/[name].ts
@@ -180,10 +190,17 @@ Is this type shared by several transport clients?
 ```
 
 ### Global types (src/types/)
+
 ```typescript
 // src/types/transport.ts
 // Successful endpoints return their normal DTO. Model only genuinely shared shapes.
-export type ProblemDetails = { type: string; title: string; status: number; detail?: string; traceId?: string }
+export type ProblemDetails = {
+  type: string
+  title: string
+  status: number
+  detail?: string
+  traceId?: string
+}
 
 // src/types/pagination.ts
 export type PaginatedResponse<T> = {
@@ -197,6 +214,7 @@ export type PaginatedResponse<T> = {
 ---
 
 ## Type Assertions
+
 Avoid `as` unless justified.
 
 ```typescript
@@ -214,6 +232,7 @@ const input = inputRef.current as HTMLInputElement
 ---
 
 ## Enums vs Union Types
+
 Prefer union types over enums for most cases.
 
 ```typescript
@@ -229,13 +248,14 @@ export const ROLES = {
   USER: 'USER',
 } as const
 
-export type UserRole = typeof ROLES[keyof typeof ROLES]
+export type UserRole = (typeof ROLES)[keyof typeof ROLES]
 // → 'ADMIN' | 'USER'
 ```
 
 ---
 
 ## Null vs Undefined
+
 ```typescript
 // Use null: explicitly absent (API returns null, user cleared a field)
 type User = { avatar: string | null }
@@ -249,6 +269,7 @@ type Options = { timeout?: number }
 ---
 
 ## Agent Rules
+
 ```
 strict: true — never disable, never add ts-ignore without // reason:
 

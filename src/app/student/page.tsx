@@ -1,0 +1,54 @@
+import Link from 'next/link'
+import { EmptyState } from '@/components/common/EmptyState'
+import { PageHeading } from '@/components/common/PageHeading'
+import { StatusBadge } from '@/components/common/StatusBadge'
+import { getStudentDashboard } from '@/features/dashboard/repositories/dashboardRepository'
+const card =
+  'rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
+export default async function StudentDashboard() {
+  const data = await getStudentDashboard()
+  return (
+    <>
+      <PageHeading title="Student Dashboard" description="Manage your faculty consultations." />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
+        <section className={card}>
+          <span>Upcoming</span>
+          <strong>{data.upcoming}</strong>
+          <p>Confirmed consultations</p>
+        </section>
+        <section className={card}>
+          <span>Pending</span>
+          <strong>{data.pending}</strong>
+          <p>Requests awaiting review</p>
+        </section>
+      </div>
+      {data.recent.length ? (
+        <section className="mt-4 rounded-xl border border-border bg-surface p-5">
+          <h2 className="text-xl font-bold">Recent consultations</h2>
+          {data.recent.map((item) => (
+            <article
+              className="flex items-center justify-between border-b border-border py-3 last:border-0"
+              key={item.id}
+            >
+              <strong>{item.purpose}</strong>
+              <StatusBadge status={item.status} />
+            </article>
+          ))}
+        </section>
+      ) : (
+        <EmptyState
+          title="No consultations yet"
+          description="Choose a faculty member and request a suitable schedule."
+          action={
+            <Link
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white"
+              href="/student/book"
+            >
+              Book Consultation
+            </Link>
+          }
+        />
+      )}
+    </>
+  )
+}

@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ['CI — Next.js']
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+  checks: read
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Secure Release
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Wait for required checks on the validated commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          expected='["Lint, Test, Build","Database Migrations and RLS","Secret Scan","NPM Audit"]'
+          deadline=$(( $(date +%s) + 1800 ))
+          while true; do
+            report="$(gh api --method GET "repos/${{ github.repository }}/commits/$RELEASE_SHA/check-runs?per_page=100" | \
+              jq --argjson expected "$expected" '
+                .check_runs as $runs | {
+                  seen: ([$expected[] as $name | $runs[] | select(.name == $name) | .name] | unique | length),
+                  pending: ([$expected[] as $name | $runs[] | select(.name == $name and .status != "completed")] | length),
+                  failed: ([$expected[] as $name | $runs[] | select(.name == $name and .status == "completed" and (.conclusion != "success" and .conclusion != "skipped" and .conclusion != "neutral")) | .name] | unique)
+                }')"
+            seen="$(echo "$report" | jq -r .seen)"
+            pending="$(echo "$report" | jq -r .pending)"
+            failed="$(echo "$report" | jq -c .failed)"
+            if [ "$seen" -eq 4 ] && [ "$pending" -eq 0 ]; then
+              if [ "$failed" = "[]" ]; then
+                echo 'All required checks passed.'
+                break
+              fi
+              echo "Release blocked by checks: $failed"
+              exit 1
+            fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "Timed out waiting for required checks: $report"
+              exit 1
+            fi
+            echo "Waiting for required checks ($seen/4 present, $pending pending)..."
+            sleep 30
+          done
+
+      - name: Compute next semantic version
+        id: version
+        env:
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          last="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)"
+          if [ -z "$last" ]; then
+            next='1.0.0'
+          elif [ "$(git rev-list -n 1 "$last")" = "$RELEASE_SHA" ]; then
+            next="${last#v}"
+          else
+            changes="$(git log "$last".."$RELEASE_SHA" --format='%s%n%b')"
+            major="$(echo "$last" | cut -d. -f1 | tr -dc '0-9')"
+            minor="$(echo "$last" | cut -d. -f2)"
+            patch="$(echo "$last" | cut -d. -f3)"
+            if echo "$changes" | grep -qiE 'BREAKING CHANGE|^[a-z]+(\([^)]*\))?!:'; then
+              major=$((major + 1)); minor=0; patch=0
+            elif echo "$changes" | grep -qiE '^feat(\([^)]*\))?:'; then
+              minor=$((minor + 1)); patch=0
+            else
+              patch=$((patch + 1))
+            fi
+            next="$major.$minor.$patch"
+          fi
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      - name: Tag validated commit and publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERSION: ${{ steps.version.outputs.next }}
+        run: |
+          tag="v$VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "$tag is already published."
+            exit 0
+          fi
+          gh release create "$tag" --target "$RELEASE_SHA" --title "$tag" --generate-notes

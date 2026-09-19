@@ -2,6 +2,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
+import { Select } from '@/components/ui/select/Select'
+
+const statusOptions = [
+  { id: 'PENDING', label: 'Pending' },
+  { id: 'APPROVED', label: 'Approved' },
+  { id: 'REJECTED', label: 'Rejected' },
+  { id: 'all', label: 'All statuses' },
+]
+
+const roleOptions = [
+  { id: 'all', label: 'All roles' },
+  { id: 'STUDENT', label: 'Student' },
+  { id: 'FACULTY', label: 'Faculty' },
+]
+
 export function ApplicationFilters({
   departments,
 }: {
@@ -26,9 +41,10 @@ export function ApplicationFilters({
     }, 300)
     return () => clearTimeout(timeout)
   }, [search, current, update])
-  const label = 'grid flex-1 gap-1.5 text-xs font-bold'
-  const select =
-    'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
+  const departmentOptions = [
+    { id: 'all', label: 'All departments' },
+    ...departments.map((item) => ({ id: item.id, label: item.code })),
+  ]
   return (
     <div className="grid items-end gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-2 lg:flex">
       <SearchInput
@@ -37,46 +53,24 @@ export function ApplicationFilters({
         onChange={setSearch}
         placeholder="Search name or email"
       />
-      <label className={label}>
-        <span>Status</span>
-        <select
-          className={select}
-          value={current.get('status') ?? 'PENDING'}
-          onChange={(event) => update('status', event.target.value)}
-        >
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-          <option value="">All</option>
-        </select>
-      </label>
-      <label className={label}>
-        <span>Role</span>
-        <select
-          className={select}
-          value={current.get('role') ?? ''}
-          onChange={(event) => update('role', event.target.value)}
-        >
-          <option value="">All</option>
-          <option value="STUDENT">Student</option>
-          <option value="FACULTY">Faculty</option>
-        </select>
-      </label>
-      <label className={label}>
-        <span>Department</span>
-        <select
-          className={select}
-          value={current.get('department') ?? ''}
-          onChange={(event) => update('department', event.target.value)}
-        >
-          <option value="">All</option>
-          {departments.map((item) => (
-            <option value={item.id} key={item.id}>
-              {item.code}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Status"
+        options={statusOptions}
+        value={current.get('status') ?? 'PENDING'}
+        onChange={(value) => update('status', value === 'all' ? '' : value)}
+      />
+      <Select
+        label="Role"
+        options={roleOptions}
+        value={current.get('role') ?? 'all'}
+        onChange={(value) => update('role', value === 'all' ? '' : value)}
+      />
+      <Select
+        label="Department"
+        options={departmentOptions}
+        value={current.get('department') ?? 'all'}
+        onChange={(value) => update('department', value === 'all' ? '' : value)}
+      />
     </div>
   )
 }

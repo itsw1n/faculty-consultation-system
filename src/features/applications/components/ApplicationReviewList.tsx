@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { reviewApplication, reviewApplications } from '../actions'
 import { loadApplicationPage } from '../loadApplicationPage'
@@ -64,7 +64,7 @@ export function ApplicationReviewList({
         <span className="mr-auto text-sm text-muted">
           {selected.length ? `${selected.length} selected` : 'Select pending applications below'}
         </span>
-        <ConfirmAction
+        <AlertDialog
           label="Approve selected"
           title="Approve selected applications?"
           description="The selected applicants will gain access using their requested roles."
@@ -72,7 +72,7 @@ export function ApplicationReviewList({
           submitAction={reviewApplications}
           disabled={selected.length === 0}
         />
-        <ConfirmAction
+        <AlertDialog
           label="Reject selected"
           title="Reject selected applications?"
           description="The selected applicants will not be able to access the system."
@@ -113,14 +113,14 @@ export function ApplicationReviewList({
               </div>
               {application.account_status === 'PENDING' && (
                 <div className="flex gap-2">
-                  <ConfirmAction
+                  <AlertDialog
                     label="Approve"
                     title={`Approve ${application.full_name}?`}
                     description="This applicant will gain access using the requested role."
                     fields={{ userId: application.id, decision: 'APPROVED' }}
                     submitAction={reviewApplication}
                   />
-                  <ConfirmAction
+                  <AlertDialog
                     label="Reject"
                     title={`Reject ${application.full_name}?`}
                     description="This applicant will not be able to access the system."

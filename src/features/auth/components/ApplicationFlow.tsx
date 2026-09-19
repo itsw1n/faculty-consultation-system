@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import { GraduationCap, Users } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
+import { Select } from '@/components/ui/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { submitApplication } from '../actions'
 
@@ -81,17 +82,17 @@ export function ApplicationFlow({
           School email
           <input className={controlClass} value={email} readOnly />
         </label>
-        <label className={fieldClass}>
-          Department
-          <select className={controlClass} name="departmentId" required>
-            <option value="">Select a department</option>
-            {departments.map((department) => (
-              <option key={department.id} value={department.id}>
-                {department.code} — {department.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Department"
+          name="departmentId"
+          placeholder="Select a department"
+          options={departments.map((department) => ({
+            id: department.id,
+            label: `${department.code} — ${department.name}`,
+          }))}
+          isRequired
+          className="grid gap-1.5 text-sm font-bold"
+        />
         {role === 'FACULTY' && (
           <label className={fieldClass}>
             Position title

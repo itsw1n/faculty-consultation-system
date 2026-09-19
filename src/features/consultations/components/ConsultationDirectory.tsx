@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { Select } from '@/components/ui/select/Select'
 import { cancelConsultation, completeConsultation, decideConsultation } from '../actions'
 import { loadConsultationPage } from '../loadConsultationPage'
 import type { ConsultationItem } from '../types'
@@ -71,19 +72,18 @@ export function ConsultationDirectory({
           />
         </label>
         {!fixedStatus && (
-          <label className={field}>
-            <span>Status</span>
-            <select
-              className={control}
-              value={status}
-              onChange={(event) => setStatus(event.target.value as Status | '')}
-            >
-              <option value="">All statuses</option>
-              {['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label="Status"
+            options={[
+              { id: 'all', label: 'All statuses' },
+              ...['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => ({
+                id: value,
+                label: value,
+              })),
+            ]}
+            value={status || 'all'}
+            onChange={(value) => setStatus(value === 'all' ? '' : (value as Status | ''))}
+          />
         )}
       </div>
       <section className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">

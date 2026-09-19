@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { Dialog, DialogTrigger, Heading, Modal, ModalOverlay } from 'react-aria-components'
 import { Button } from '@/components/common/Button'
-import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { initialActionState } from '@/lib/actionState'
@@ -129,7 +129,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
               <StatusBadge status={slot.status} />
               <span>{slot.mode === 'IN_PERSON' ? slot.location : 'Online'}</span>
               {slot.status === 'OPEN' && (
-                <ConfirmAction
+                <AlertDialog
                   label="Remove"
                   title="Remove availability?"
                   description="Students will no longer be able to request this time."

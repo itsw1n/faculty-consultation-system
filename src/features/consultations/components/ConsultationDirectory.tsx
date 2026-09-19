@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { cancelConsultation, completeConsultation, decideConsultation } from '../actions'
 import { loadConsultationPage } from '../loadConsultationPage'
@@ -109,14 +109,14 @@ export function ConsultationDirectory({
               <div className="flex gap-2">
                 {viewer === 'FACULTY' && item.consultation_status === 'PENDING' && (
                   <>
-                    <ConfirmAction
+                    <AlertDialog
                       label="Approve"
                       title="Approve consultation?"
                       description="This confirms the selected schedule."
                       fields={{ consultationId: item.id, approve: 'true' }}
                       submitAction={decideConsultation}
                     />
-                    <ConfirmAction
+                    <AlertDialog
                       label="Reject"
                       title="Reject consultation?"
                       description="The slot will reopen."
@@ -127,7 +127,7 @@ export function ConsultationDirectory({
                   </>
                 )}
                 {viewer === 'FACULTY' && item.consultation_status === 'APPROVED' && (
-                  <ConfirmAction
+                  <AlertDialog
                     label="Complete"
                     title="Complete consultation?"
                     description="This closes the schedule."
@@ -137,7 +137,7 @@ export function ConsultationDirectory({
                 )}{' '}
                 {viewer === 'STUDENT' &&
                   ['PENDING', 'APPROVED'].includes(item.consultation_status) && (
-                    <ConfirmAction
+                    <AlertDialog
                       label="Cancel"
                       title="Cancel consultation?"
                       description="The slot will reopen."

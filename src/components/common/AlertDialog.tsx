@@ -3,7 +3,7 @@
 import { Dialog, DialogTrigger, Heading, Modal, ModalOverlay } from 'react-aria-components'
 import { Button } from './Button'
 
-type ConfirmActionProps = {
+type AlertDialogProps = {
   label: string
   title: string
   description: string
@@ -13,7 +13,7 @@ type ConfirmActionProps = {
   disabled?: boolean
 }
 
-export function ConfirmAction({
+export function AlertDialog({
   label,
   title,
   description,
@@ -21,7 +21,7 @@ export function ConfirmAction({
   submitAction,
   variant = 'primary',
   disabled = false,
-}: ConfirmActionProps) {
+}: AlertDialogProps) {
   return (
     <DialogTrigger>
       <Button variant={variant} size="compact" isDisabled={disabled}>

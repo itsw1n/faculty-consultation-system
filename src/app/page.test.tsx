@@ -4,6 +4,8 @@ import HomePage from './page'
 
 test('renders the Google authentication entry point', () => {
   render(<HomePage />)
-  expect(screen.getByRole('heading', { name: 'Welcome to Assumption College of Davao' })).toBeInTheDocument()
+  expect(
+    screen.getByRole('heading', { name: 'Welcome to Assumption College of Davao' })
+  ).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Sign in with Google' })).toBeInTheDocument()
 })

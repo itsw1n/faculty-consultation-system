@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 export function PageHeading({
   title,
   description,
-  eyebrow = 'CampusConnect workspace',
+  eyebrow = 'ACD workspace',
   action,
 }: {
   title: string

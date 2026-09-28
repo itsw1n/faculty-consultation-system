@@ -1,6 +1,6 @@
 # Architecture Overview
 
-CampusConnect is a Next.js 16 App Router application backed by Supabase Auth and PostgreSQL.
+Assumption College of Davao is a Next.js 16 App Router application backed by Supabase Auth and PostgreSQL.
 
 ## Runtime boundaries
 

@@ -29,9 +29,9 @@ export async function AppShell({
           href={`/${role.toLowerCase()}`}
         >
           <span className="grid size-10 place-items-center rounded-lg border border-white font-extrabold">
-            CC
+            ACD
           </span>
-          <strong>CampusConnect</strong>
+          <strong>Assumption College of Davao</strong>
         </Link>
         <Navigation role={role} />
         <details className="group relative mt-auto">

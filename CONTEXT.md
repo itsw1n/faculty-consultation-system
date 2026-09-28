@@ -2,7 +2,7 @@
 
 ## Product
 
-CampusConnect is a web-based faculty consultation and scheduling system for students, faculty, and school administrators.
+Assumption College of Davao is a web-based faculty consultation and scheduling system for students, faculty, and school administrators.
 
 ## Goals
 

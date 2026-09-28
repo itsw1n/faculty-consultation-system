@@ -21,7 +21,7 @@ export default function HomePage() {
             id="welcome-title"
             className="my-3 max-w-xl text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl lg:text-[4.4rem]"
           >
-            Welcome to <span className="block text-accent-hover">CampusConnect</span>
+            Welcome to <span className="block text-accent-hover">Assumption College of Davao</span>
           </h1>
           <p className="text-base font-bold text-primary sm:text-lg">
             Connect. Consult. Create progress.
@@ -69,9 +69,9 @@ export default function HomePage() {
               className="grid size-14 place-items-center rounded-xl border-2 border-white/90 text-lg font-extrabold"
               aria-hidden="true"
             >
-              CC
+              ACD
             </p>
-            <p className="mt-4 text-2xl font-extrabold sm:text-3xl">CampusConnect</p>
+            <p className="mt-4 text-2xl font-extrabold sm:text-3xl">Assumption College of Davao</p>
             <p className="mt-1 text-base text-blue-50 sm:text-lg">
               Faculty Consultation &amp; Scheduling System
             </p>

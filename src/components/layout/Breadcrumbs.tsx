@@ -23,7 +23,7 @@ export function Breadcrumbs() {
     return (
       <div className="mr-auto">
         <strong>Dashboard</strong>
-        <small className="block text-muted">CampusConnect</small>
+        <small className="block text-muted">Assumption College of Davao</small>
       </div>
     )
 

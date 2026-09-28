@@ -19,8 +19,8 @@ export async function sendConsultationEmail(input: {
   const date = `${input.date}, ${input.start.slice(0, 5)}–${input.end.slice(0, 5)} (Philippine time)`
   const text =
     input.event === 'APPROVED' || input.event === 'REMINDER'
-      ? `${subject}. Your consultation is scheduled for ${date}. Sign in to CampusConnect for details.`
-      : `${subject}. Sign in to CampusConnect to check your consultation status.`
+      ? `${subject}. Your consultation is scheduled for ${date}. Sign in to the ACD consultation system for details.`
+      : `${subject}. Sign in to the ACD consultation system to check your consultation status.`
   const { error } = await new Resend(key).emails.send(
     { from, to: input.recipient, subject, text },
     { idempotencyKey: input.id }

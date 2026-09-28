@@ -50,11 +50,11 @@ export async function getAdminDashboard() {
       .select('*', { count: 'exact', head: true })
       .eq('role', 'FACULTY')
       .eq('account_status', 'APPROVED'),
-    supabase.from('consultations').select('*', { count: 'exact', head: true }),
+    supabase.rpc('admin_consultation_count'),
   ])
   return {
     pending: pending.count ?? 0,
     faculty: faculty.count ?? 0,
-    consultations: consultations.count ?? 0,
+    consultations: Number(consultations.data ?? 0),
   }
 }

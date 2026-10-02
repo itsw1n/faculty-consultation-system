@@ -26,11 +26,11 @@ dev   (integration, all PRs target this)
 
 ## Guides in this folder
 
-| Guide | What it covers |
-| ----- | -------------- |
-| [branching.md](./branching.md) | Branch roles, naming, and the exact commands to start a branch |
-| [commits.md](./commits.md) | Commit message format, types, scopes, good/bad examples |
-| [pull-requests.md](./pull-requests.md) | How to open a PR and fill in the PR template step by step |
+| Guide                                  | What it covers                                                 |
+| -------------------------------------- | -------------------------------------------------------------- |
+| [branching.md](./branching.md)         | Branch roles, naming, and the exact commands to start a branch |
+| [commits.md](./commits.md)             | Commit message format, types, scopes, good/bad examples        |
+| [pull-requests.md](./pull-requests.md) | How to open a PR and fill in the PR template step by step      |
 
 ## Quick start (daily loop)
 

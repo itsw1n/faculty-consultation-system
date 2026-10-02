@@ -2,10 +2,11 @@
 
 ## HTTP routes
 
-| Method | Route            | Purpose                                                               |
-| ------ | ---------------- | --------------------------------------------------------------------- |
-| `GET`  | `/api/health`    | Returns application readiness information                             |
-| `GET`  | `/auth/callback` | Exchanges the Supabase OAuth code and redirects into the account flow |
+| Method | Route                                      | Purpose                                                               |
+| ------ | ------------------------------------------ | --------------------------------------------------------------------- |
+| `GET`  | `/api/health`                              | Returns application readiness information                             |
+| `GET`  | `/api/faculty/[facultyId]/availability`    | Returns scheduling slots for one faculty member (approved students)   |
+| `GET`  | `/auth/callback`                           | Exchanges the Supabase OAuth code and redirects into the account flow |
 
 ## Server actions
 

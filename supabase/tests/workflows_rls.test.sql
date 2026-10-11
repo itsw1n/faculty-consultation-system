@@ -19,7 +19,7 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
 select results_eq('select email from public.profiles order by email',array['student@school.edu'::text],'student can read only own profile');
-select lives_ok($$select public.book_consultation('40000000-0000-0000-0000-000000000004','Academic guidance',null)$$,'student can atomically reserve an open slot');
+select lives_ok($$select public.book_consultation('40000000-0000-0000-0000-000000000004','ACADEMIC',null)$$,'student can atomically reserve an open slot');
 reset role;
 
 select results_eq($$select status::text from public.availability_slots where id='40000000-0000-0000-0000-000000000004'$$,array['RESERVED'::text],'booking reserves the slot');
@@ -27,7 +27,7 @@ select results_eq($$select status::text from public.consultations where availabi
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"30000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
-select throws_ok($$select public.book_consultation('40000000-0000-0000-0000-000000000004','Second request',null)$$,'40001','Slot is no longer available','a second student cannot reserve the same slot');
+select throws_ok($$select public.book_consultation('40000000-0000-0000-0000-000000000004','GRADE',null)$$,'40001','Slot is no longer available','a second student cannot reserve the same slot');
 select is_empty('select id from public.consultations','another student cannot read the consultation');
 reset role;
 

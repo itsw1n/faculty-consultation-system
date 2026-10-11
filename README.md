@@ -1,4 +1,4 @@
-# CampusConnect
+# Assumption College of Davao
 
 A faculty consultation and scheduling system for students, faculty, and school administrators. It uses Next.js 16, Supabase Auth/PostgreSQL, TypeScript, React Aria, and Tailwind CSS.
 

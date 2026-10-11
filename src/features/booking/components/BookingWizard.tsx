@@ -5,6 +5,11 @@ import { initialActionState } from '@/lib/actionState'
 import { bookConsultation } from '../actions'
 import type { SlotResult } from '../types'
 import { cn } from '@/lib/cn'
+import {
+  categories,
+  categoryLabel,
+  type ConsultationCategory,
+} from '@/features/consultations/categories'
 type Step = 'schedule' | 'details' | 'review'
 const iso = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -28,7 +33,7 @@ export function BookingWizard({
   const [refreshError, setRefreshError] = useState<string | null>(null)
   const [step, setStep] = useState<Step>('schedule')
   const [selectedId, setSelectedId] = useState('')
-  const [purpose, setPurpose] = useState('')
+  const [purpose, setPurpose] = useState<ConsultationCategory | ''>('')
   const [notes, setNotes] = useState('')
   const [weekOffset, setWeekOffset] = useState(0)
   const [mobileDay, setMobileDay] = useState(0)
@@ -226,16 +231,22 @@ export function BookingWizard({
           </button>
           <label className={cn(field, 'mt-5')}>
             Purpose
-            <input
+            <select
               className={control}
               value={purpose}
-              onChange={(event) => setPurpose(event.target.value)}
+              onChange={(event) => setPurpose(event.target.value as ConsultationCategory | '')}
               required
-              maxLength={200}
-            />
+            >
+              <option value="">Select a concern</option>
+              {Object.entries(categories).map(([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </label>
           <label className={cn(field, 'mt-4')}>
-            Details
+            Short description (optional)
             <textarea
               className={cn(control, 'min-h-32 resize-y')}
               value={notes}
@@ -275,7 +286,7 @@ export function BookingWizard({
             </div>
             <div>
               <dt>Purpose</dt>
-              <dd>{purpose}</dd>
+              <dd>{categoryLabel(purpose)}</dd>
             </div>
           </dl>
           <form action={formAction}>

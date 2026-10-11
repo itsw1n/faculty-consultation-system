@@ -1,6 +1,6 @@
 # API Overview
 
-CampusConnect primarily uses authenticated Next.js server actions and Supabase PostgreSQL RPCs rather than a public REST API.
+Assumption College of Davao primarily uses authenticated Next.js server actions and Supabase PostgreSQL RPCs rather than a public REST API.
 
 ## HTTP health endpoint
 

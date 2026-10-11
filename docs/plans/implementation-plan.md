@@ -125,7 +125,13 @@
 - [x] Notification dropdown latest items.
 - [x] View All notifications page.
 - [x] Mark-as-read behavior.
-- [-] Optional Resend email integration — deferred from v1.
+- [x] Resend status email integration and daily next-day reminders through an outbox.
+
+## 10. Interview follow-up
+
+- [x] Consultation categories and participant-only details/outcomes.
+- [x] Admin metadata-only summary CSV.
+- [x] Private email delivery queue and Vercel daily scheduler.
 
 ## 9. Quality
 

@@ -3,9 +3,11 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Select } from '@/components/ui/select/Select'
-import { cancelConsultation, completeConsultation, decideConsultation } from '../actions'
+import { cancelConsultation, decideConsultation } from '../actions'
 import { loadConsultationPage } from '../loadConsultationPage'
 import type { ConsultationItem } from '../types'
+import { categoryLabel } from '../categories'
+import Link from 'next/link'
 type Status = ConsultationItem['consultation_status']
 type Page = {
   items: ConsultationItem[]
@@ -97,7 +99,7 @@ export function ConsultationDirectory({
             >
               <div>
                 <strong>{viewer === 'STUDENT' ? item.faculty_name : item.student_name}</strong>
-                <p className="mt-1 text-sm text-muted">{item.purpose}</p>
+                <p className="mt-1 text-sm text-muted">{categoryLabel(item.purpose)}</p>
               </div>
               <div>
                 <time>{item.slot_date}</time>
@@ -107,6 +109,14 @@ export function ConsultationDirectory({
               </div>
               <StatusBadge status={item.consultation_status} />
               <div className="flex gap-2">
+                {viewer !== 'ADMIN' && (
+                  <Link
+                    className="font-bold text-primary underline"
+                    href={`/${viewer.toLowerCase()}/consultations/${item.id}`}
+                  >
+                    Details
+                  </Link>
+                )}
                 {viewer === 'FACULTY' && item.consultation_status === 'PENDING' && (
                   <>
                     <AlertDialog
@@ -127,14 +137,13 @@ export function ConsultationDirectory({
                   </>
                 )}
                 {viewer === 'FACULTY' && item.consultation_status === 'APPROVED' && (
-                  <AlertDialog
-                    label="Complete"
-                    title="Complete consultation?"
-                    description="This closes the schedule."
-                    fields={{ consultationId: item.id }}
-                    submitAction={completeConsultation}
-                  />
-                )}{' '}
+                  <Link
+                    className="font-bold text-primary underline"
+                    href={`/faculty/consultations/${item.id}`}
+                  >
+                    Complete
+                  </Link>
+                )}
                 {viewer === 'STUDENT' &&
                   ['PENDING', 'APPROVED'].includes(item.consultation_status) && (
                     <AlertDialog

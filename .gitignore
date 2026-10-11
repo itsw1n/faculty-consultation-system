@@ -41,3 +41,5 @@ postgres-data/
 .supabase/
 supabase/.branches/
 supabase/.temp/
+supabase/.env
+supabase/.env.local

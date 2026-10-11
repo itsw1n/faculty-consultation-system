@@ -1,20 +1,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-export type FacultyResult = {
-  id: string
-  full_name: string
-  department_name: string
-  position_title: string
-}
-export type SlotResult = {
-  id: string
-  slot_date: string
-  start_time: string
-  end_time: string
-  slot_status: 'OPEN' | 'RESERVED' | 'BOOKED' | 'CLOSED'
-  mode: 'IN_PERSON' | 'ONLINE'
-  location: string | null
-}
+import type { FacultyResult, SlotResult } from '../types'
+export type { FacultyResult, SlotResult }
 export async function listFaculty(search = '', departmentId?: string) {
   const { data, error } = await (
     await createClient()

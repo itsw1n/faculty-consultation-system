@@ -1,51 +1,14 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { Bell, CalendarDays, ClipboardList, GraduationCap, Home, Menu, Users } from 'lucide-react'
+import { Bell, Menu } from 'lucide-react'
 import { signOut } from '@/features/auth/actions'
-import type { AuthProfile, UserRole } from '@/features/auth/types'
+import type { AuthProfile } from '@/features/auth/types'
 import { listNotifications } from '@/features/notifications/repositories/notificationRepository'
 import { cn } from '@/lib/cn'
 import { Breadcrumbs } from './Breadcrumbs'
 import { Container } from './Container'
 import { Section } from './Section'
-
-const links: Record<UserRole, { href: string; label: string; icon: typeof Home }[]> = {
-  STUDENT: [
-    { href: '/student', label: 'Dashboard', icon: Home },
-    { href: '/student/book', label: 'Book Consultation', icon: CalendarDays },
-    { href: '/student/consultations', label: 'My Consultations', icon: ClipboardList },
-  ],
-  FACULTY: [
-    { href: '/faculty', label: 'Dashboard', icon: Home },
-    { href: '/faculty/availability', label: 'My Availability', icon: CalendarDays },
-    { href: '/faculty/requests', label: 'Consultation Requests', icon: ClipboardList },
-    { href: '/faculty/consultations', label: 'My Consultations', icon: GraduationCap },
-  ],
-  ADMIN: [
-    { href: '/admin', label: 'Dashboard', icon: Home },
-    { href: '/admin/users', label: 'Manage Users', icon: Users },
-    { href: '/admin/faculty', label: 'Manage Faculty', icon: GraduationCap },
-    { href: '/admin/departments', label: 'Departments', icon: ClipboardList },
-    { href: '/admin/consultations', label: 'Consultation Records', icon: CalendarDays },
-  ],
-}
-
-function Navigation({ role, mobile = false }: { role: UserRole; mobile?: boolean }) {
-  return (
-    <nav aria-label={mobile ? 'Mobile navigation' : 'Primary navigation'} className="grid gap-1">
-      {links[role].map(({ href, label, icon: Icon }) => (
-        <Link
-          href={href}
-          key={href}
-          className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-white transition-colors hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          <Icon aria-hidden="true" size={18} />
-          <span>{label}</span>
-        </Link>
-      ))}
-    </nav>
-  )
-}
+import { Navigation } from './Navigation'
 
 export async function AppShell({
   children,
@@ -66,9 +29,9 @@ export async function AppShell({
           href={`/${role.toLowerCase()}`}
         >
           <span className="grid size-10 place-items-center rounded-lg border border-white font-extrabold">
-            CC
+            ACD
           </span>
-          <strong>CampusConnect</strong>
+          <strong>Assumption College of Davao</strong>
         </Link>
         <Navigation role={role} />
         <details className="group relative mt-auto">

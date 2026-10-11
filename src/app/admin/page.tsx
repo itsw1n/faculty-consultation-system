@@ -2,31 +2,41 @@ import Link from 'next/link'
 import { EmptyState } from '@/components/common/EmptyState'
 import { PageHeading } from '@/components/common/PageHeading'
 import { getAdminDashboard } from '@/features/dashboard/repositories/dashboardRepository'
-const card =
-  'rounded-xl border border-border bg-surface p-6 shadow-card [&_p]:text-sm [&_p]:text-muted [&_span]:text-muted [&_strong]:my-2 [&_strong]:block [&_strong]:text-3xl'
+import { ClipboardCheck, GraduationCap, History } from 'lucide-react'
+const card = 'rounded-xl border border-border bg-surface p-5 shadow-card'
 export default async function AdminDashboard() {
   const data = await getAdminDashboard()
   return (
     <>
       <PageHeading
+        eyebrow="Administration workspace"
         title="Admin Dashboard"
         description="Review applications and oversee consultation activity."
       />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
         <section className={card}>
-          <span>Pending applications</span>
-          <strong>{data.pending}</strong>
-          <p>Users awaiting review</p>
+          <div className="flex items-center justify-between text-accent">
+            <span className="text-sm font-semibold">Pending applications</span>
+            <ClipboardCheck size={19} aria-hidden="true" />
+          </div>
+          <strong className="mt-4 block text-3xl text-primary">{data.pending}</strong>
+          <p className="mt-1 text-sm text-muted">Users awaiting review</p>
         </section>
         <section className={card}>
-          <span>Active faculty</span>
-          <strong>{data.faculty}</strong>
-          <p>Approved faculty accounts</p>
+          <div className="flex items-center justify-between text-accent">
+            <span className="text-sm font-semibold">Active faculty</span>
+            <GraduationCap size={19} aria-hidden="true" />
+          </div>
+          <strong className="mt-4 block text-3xl text-primary">{data.faculty}</strong>
+          <p className="mt-1 text-sm text-muted">Approved faculty accounts</p>
         </section>
         <section className={card}>
-          <span>Consultations</span>
-          <strong>{data.consultations}</strong>
-          <p>All consultation records</p>
+          <div className="flex items-center justify-between text-accent">
+            <span className="text-sm font-semibold">Consultations</span>
+            <History size={19} aria-hidden="true" />
+          </div>
+          <strong className="mt-4 block text-3xl text-primary">{data.consultations}</strong>
+          <p className="mt-1 text-sm text-muted">All consultation records</p>
         </section>
       </div>
       {data.pending === 0 && (

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
 const schema = z.object({
   slotId: z.uuid(),
-  purpose: z.string().trim().min(1).max(200),
+  purpose: z.enum(['GRADE', 'CAPSTONE', 'ACADEMIC', 'PERSONAL', 'OTHER']),
   notes: z.string().trim().max(2000).optional(),
 })
 export async function bookConsultation(

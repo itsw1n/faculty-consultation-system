@@ -31,7 +31,8 @@ export function ApplicationFlow({
         <p className="text-xs font-bold tracking-[0.12em] text-primary uppercase">Get started</p>
         <h1 className="my-3 text-3xl font-bold sm:text-5xl">Choose application type</h1>
         <p className="text-muted">
-          Tell us how you’ll use CampusConnect so an administrator can review your access.
+          Tell us how you’ll use the ACD consultation system so an administrator can review your
+          access.
         </p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {[

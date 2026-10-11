@@ -2,8 +2,10 @@ import { expect, test } from '@playwright/test'
 
 test('presents the branded Google authentication entry point', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveTitle(/CampusConnect/)
-  await expect(page.getByRole('heading', { name: 'Welcome to CampusConnect' })).toBeVisible()
+  await expect(page).toHaveTitle(/Assumption College of Davao/)
+  await expect(
+    page.getByRole('heading', { name: 'Welcome to Assumption College of Davao' })
+  ).toBeVisible()
   await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeVisible()
   await expect(page.getByText('Faculty Consultation & Scheduling System')).toBeVisible()
 })

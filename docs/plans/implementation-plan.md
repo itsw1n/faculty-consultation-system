@@ -1,5 +1,8 @@
 # Implementation Plan
 
+> Status note: `[x]` below means code present, not runtime-verified.
+> See `ACD_Implementation_Gap_Tracker_v0.2.md` for TESTED status and evidence.
+
 ## Status Legend
 
 - `[ ]` Todo

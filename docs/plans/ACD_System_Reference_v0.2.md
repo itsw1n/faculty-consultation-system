@@ -8,7 +8,7 @@ SCHEDULING SYSTEM
 Planning and development master reference • Version 0.2 • 11 October 2026
 
 | **Document control**  | **Value**                                                                                    |
-|-----------------------|----------------------------------------------------------------------------------------------|
+| --------------------- | -------------------------------------------------------------------------------------------- |
 | Status                | Working specification — requirements agreed by the team; application not yet run or verified |
 | Prepared for          | IT 305 – Integrative Programming and Technologies \| System Integration Mini-Project         |
 | School / setting      | Assumption College of Davao, J.P. Cabaguio, Agdao, Davao City                                |
@@ -23,7 +23,7 @@ Planning and development master reference • Version 0.2 • 11 October 2026
 ## 1.1 System identity
 
 | **Field**      | **Details**                                                               |
-|----------------|---------------------------------------------------------------------------|
+| -------------- | ------------------------------------------------------------------------- |
 | System name    | Faculty Consultation and Scheduling System                                |
 | Platform       | Responsive web application                                                |
 | Institution    | Assumption College of Davao                                               |
@@ -60,7 +60,7 @@ The school’s official vision and mission were not collected in the data-gather
 ## 2.3 Stakeholders
 
 | **Stakeholder**              | **Interest / responsibility**                                                                 |
-|------------------------------|-----------------------------------------------------------------------------------------------|
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
 | Students                     | Find faculty, submit requests, attend consultations, view history and outcome remarks.        |
 | Faculty                      | Publish individual slots, decide on requests, conduct consultations and document outcomes.    |
 | System Admin                 | Manage approved user accounts, roles and departments; maintain platform configuration.        |
@@ -88,7 +88,7 @@ The school’s official vision and mission were not collected in the data-gather
 ## 3.2 Identified problems (PIECES summary)
 
 | **Area**    | **Observed problem**                                                        | **Practical impact**                                             |
-|-------------|-----------------------------------------------------------------------------|------------------------------------------------------------------|
+| ----------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | Performance | Availability is not confirmed per student and faculty commitments conflict. | Waiting, missed windows and schedule clashes.                    |
 | Information | Schedules, email and paper records are separate.                            | Uncertain appointment status and scattered consultation details. |
 | Control     | No dedicated booking control for competing requests.                        | Risk of overlapping attempts and unreliable availability.        |
@@ -109,7 +109,7 @@ A school-focused web application with three main roles. Faculty publish individu
 ## 4.2 Core functional modules
 
 | **Module**           | **Main function**               | **Key behavior / rule**                                                                             |
-|----------------------|---------------------------------|-----------------------------------------------------------------------------------------------------|
+| -------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------- |
 | Authentication       | Google sign-in + access review  | Two approved school email domains; Student/Faculty application; Admin verifies role and department. |
 | Faculty directory    | Find the right faculty          | Show same-department faculty first; students may book across departments.                           |
 | Availability         | Create/manage bookable slots    | Faculty manually sets date/time, Online/In-person and location; no overlapping slots.               |
@@ -156,7 +156,7 @@ A school-focused web application with three main roles. Faculty publish individu
 ## 4.4 Essential business rules
 
 | **Rule**              | **Expected system behavior**                                                                                                |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Cancellation          | Student may cancel own pending/approved consultation before its start; faculty may cancel assigned consultations.           |
 | Slot reopening        | Student cancellation reopens future slots; faculty chooses reopen or block when cancelling.                                 |
 | No-show               | Faculty may mark an elapsed appointment NO_SHOW; not counted as completed; record retained.                                 |
@@ -168,7 +168,7 @@ A school-focused web application with three main roles. Faculty publish individu
 ## 4.5 Scope and limitations
 
 | **Included in target mini-capstone**                | **Outside present scope / deferred**                       |
-|-----------------------------------------------------|------------------------------------------------------------|
+| --------------------------------------------------- | ---------------------------------------------------------- |
 | Booking, faculty decisions, manual slots, histories | Built-in video calls / automatic Google Meet creation      |
 | Two institutional Google domains and role approval  | Direct connection to school SIS without ICTC authorization |
 | In-app/email updates, manual walk-ins, No-show      | School-wide PAASCU submission portal                       |
@@ -182,7 +182,7 @@ A school-focused web application with three main roles. Faculty publish individu
 ## 5.1 Chosen technologies (existing repository)
 
 | **Layer**      | **Technology**                                  | **Responsibility**                                          |
-|----------------|-------------------------------------------------|-------------------------------------------------------------|
+| -------------- | ----------------------------------------------- | ----------------------------------------------------------- |
 | UI             | Next.js 16 / React 19 / TypeScript / Tailwind 4 | Pages, role dashboards, responsive controls.                |
 | Server         | Next.js Server Actions and API Routes           | Input validation and server-side workflows.                 |
 | Database       | Supabase PostgreSQL, SQL RPC, RLS               | Profiles, departments, slots, consultations, notifications. |
@@ -194,7 +194,7 @@ A school-focused web application with three main roles. Faculty publish individu
 ## 5.2 Key integration points
 
 | **From → To**             | **Method**                                | **Purpose**                                                |
-|---------------------------|-------------------------------------------|------------------------------------------------------------|
+| ------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
 | Browser → Next.js server  | Server Actions / HTTP API                 | Apply, request booking, read response and update UI.       |
 | Next.js → Supabase Auth   | Supabase SDK, OAuth                       | Google sign-in and session verification.                   |
 | Next.js → PostgreSQL      | Supabase client / parameterized RPC calls | Persist and retrieve authorized records.                   |
@@ -214,7 +214,7 @@ Keep the two approved institutional domains and the designated initial Admin ema
 ## 6.1 Primary entities
 
 | **Entity**         | **Purpose / relationship**                                                                          |
-|--------------------|-----------------------------------------------------------------------------------------------------|
+| ------------------ | --------------------------------------------------------------------------------------------------- |
 | DEPARTMENTS        | A department may have many users; each approved user is associated with the appropriate department. |
 | PROFILES           | Supabase-linked user identity, role, department and account-approval state.                         |
 | FACULTY_PROFILES   | Faculty-specific settings; one record per faculty user.                                             |
@@ -240,7 +240,7 @@ Keep the two approved institutional domains and the designated initial Admin ema
 ## 6.3 Planned data extensions (not yet implemented)
 
 | **Need**                     | **Design direction**                                                                                            |
-|------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Walk-in unregistered student | Record type BOOKED/WALK_IN; manual student name and department; nullable account link only with safe migration. |
 | No-show / reschedule         | Add new status(s) and record proposal history with reservation protections.                                     |
 | Default room                 | Add faculty default location; retain slot-specific override.                                                    |
@@ -258,7 +258,7 @@ Professional school-facing interface: simple navigation, responsive tables/cards
 ## 7.2 Existing application palette (from globals.css)
 
 | **Role**   | **Hex**  | **Usage**                                       |
-|------------|----------|-------------------------------------------------|
+| ---------- | -------- | ----------------------------------------------- |
 | Primary    | \#062E61 | Major headings, navigation and primary elements |
 | Accent     | \#1769E8 | Links and selected actions                      |
 | Background | \#F6F8FC | Page backdrop                                   |
@@ -271,7 +271,7 @@ Professional school-facing interface: simple navigation, responsive tables/cards
 ## 7.3 Pages and main navigation
 
 | **Student**             | **Faculty**                             | **System Admin**            |
-|-------------------------|-----------------------------------------|-----------------------------|
+| ----------------------- | --------------------------------------- | --------------------------- |
 | Dashboard / Directory   | Dashboard / Availability                | Dashboard / Applications    |
 | Book / My Consultations | Requests / Consultations                | Users / Departments         |
 | History / Notifications | History / Walk-ins (planned)            | Faculty directory / Summary |
@@ -292,7 +292,7 @@ Professional school-facing interface: simple navigation, responsive tables/cards
 # 8. Non-Functional Requirements
 
 | **Requirement** | **Specification / verification**                                                                                         |
-|-----------------|--------------------------------------------------------------------------------------------------------------------------|
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Security        | All privileged operations require server checks and database RLS; institutional-domain allowlist; no self-granted Admin. |
 | Data accuracy   | No overlapping faculty slots and no double-booking under simultaneous requests.                                          |
 | Privacy         | Only the concerned student and assigned faculty see consultation details by default; limit email content.                |
@@ -325,7 +325,7 @@ To design and implement a web-based Faculty Consultation and Scheduling System f
 ## 9.3 Scope of automation
 
 | **Process**                    | **Automation level**           | **Remaining human action**                                          |
-|--------------------------------|--------------------------------|---------------------------------------------------------------------|
+| ------------------------------ | ------------------------------ | ------------------------------------------------------------------- |
 | Account identity               | Partial                        | Google authenticates; Admin verifies applicant role and department. |
 | Slot booking / conflict checks | Full for supported rules       | Faculty publishes available slots.                                  |
 | Appointment approval           | Partial                        | Faculty accepts/rejects.                                            |
@@ -380,7 +380,7 @@ Actual approved email domains; approved initial Admin identity; official consult
 ## 12.1 Role responsibilities
 
 | **Role**              | **Permitted responsibilities**                                                                                        |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------|
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Student               | Submit consultation request; cancel own future request; respond to reschedules; read own history and remarks.         |
 | Faculty               | Manage own availability; approve/reject assigned requests; record walk-ins, outcomes and No-show; export own history. |
 | System Admin          | Review applications, correct department/role within policy, manage departments and authorized system users.           |
@@ -389,7 +389,7 @@ Actual approved email domains; approved initial Admin identity; official consult
 ## 12.2 Permission highlights
 
 | **Action**                 | **Student**      | **Faculty**   | **Admin**      |
-|----------------------------|------------------|---------------|----------------|
+| -------------------------- | ---------------- | ------------- | -------------- |
 | Request appointment        | Own only         | —             | —              |
 | Create/edit open slots     | —                | Own only      | —              |
 | Approve consultation       | —                | Assigned only | —              |
@@ -443,7 +443,7 @@ Keep features under existing src/features and routes under src/app. Place schema
 ## 14.1 Test approach
 
 | **Test area**  | **What to demonstrate**                                                             |
-|----------------|-------------------------------------------------------------------------------------|
+| -------------- | ----------------------------------------------------------------------------------- |
 | Unit/component | Validation functions and status buttons accept correct and reject invalid input.    |
 | Integration    | API response changes UI; RPC updates database; notification events are recorded.    |
 | Security       | Gmail cannot apply; authorized domain can apply; Student cannot access Admin route. |
@@ -454,7 +454,7 @@ Keep features under existing src/features and routes under src/app. Place schema
 ## 14.2 Minimum acceptance scenarios
 
 | **ID** | **Scenario**                         | **Expected result**                                         |
-|--------|--------------------------------------|-------------------------------------------------------------|
+| ------ | ------------------------------------ | ----------------------------------------------------------- |
 | TC-01  | Approved Student books OPEN slot     | Creates one PENDING record and reserves one slot.           |
 | TC-02  | Faculty approves ONLINE request      | Confirms appointment and safely shares manual meeting link. |
 | TC-03  | Faculty edits BOOKED slot directly   | Denied; rescheduling required.                              |

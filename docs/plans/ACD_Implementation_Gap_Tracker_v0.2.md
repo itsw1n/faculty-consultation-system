@@ -1,4 +1,5 @@
 # Faculty Consultation and Scheduling System
+
 ## Implementation Gap Tracker — v0.2
 
 **Project:** Assumption College of Davao · IT 305 Mini-Capstone  
@@ -21,15 +22,15 @@
 
 ## A. Start here: Midterm checkpoint (P0)
 
-| ID | Requirement | Current status | Next action / passing evidence |
-|---|---|---|---|
-| **P0-01** | Run the existing system | **VERIFY** | Preserve ZIP and Git history; configure test Supabase/Google; successfully start Next.js and sign in with test accounts. |
-| **P0-02** | Week 1 Integration Plan v2 | **DRAFT** | Align architecture/data flows with *running* code; prepare the short midterm document and dependency table. |
-| **P0-03** | Week 2 API call | **PARTIAL** | Demonstrate one authorized HTTP request whose JSON response is visibly used by the app; capture method, status and response in DevTools/Postman. Suggested route: `GET /api/faculty/[facultyId]/availability`. |
-| **P0-04** | Week 3 complete database CRUD | **PARTIAL** | Faculty availability currently has Create/Read/Delete but no Update. Add update on unreserved slots, test all four operations on one resource, collect DB before/after evidence. |
-| **P0-05** | Week 4 login + role restriction | **CODE PRESENT — UNTESTED** | Test Google OAuth, approved Student/Faculty access, unauthorized Admin route blocking and row-level rules. Enforce two approved institutional domains at application, approval and protected-access stages. |
-| **P0-06** | Admin review and identity rules | **PARTIAL** | Support Admin correction of role and department; verify single/bulk approval cannot approve outside-domain accounts; safely bootstrap first Admin once. |
-| **P0-07** | Midterm evidence package | **NOT COLLECTED** | Gather member Git commits, unedited 3–5 minute app video, API screenshot, CRUD evidence, authentication evidence, individual YouTube walkthroughs and signed AI declarations. |
+| ID        | Requirement                     | Current status              | Next action / passing evidence                                                                                                                                                                                 |
+| --------- | ------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P0-01** | Run the existing system         | **VERIFY**                  | Preserve ZIP and Git history; configure test Supabase/Google; successfully start Next.js and sign in with test accounts.                                                                                       |
+| **P0-02** | Week 1 Integration Plan v2      | **DRAFT**                   | Align architecture/data flows with _running_ code; prepare the short midterm document and dependency table.                                                                                                    |
+| **P0-03** | Week 2 API call                 | **PARTIAL**                 | Demonstrate one authorized HTTP request whose JSON response is visibly used by the app; capture method, status and response in DevTools/Postman. Suggested route: `GET /api/faculty/[facultyId]/availability`. |
+| **P0-04** | Week 3 complete database CRUD   | **PARTIAL**                 | Faculty availability currently has Create/Read/Delete but no Update. Add update on unreserved slots, test all four operations on one resource, collect DB before/after evidence.                               |
+| **P0-05** | Week 4 login + role restriction | **CODE PRESENT — UNTESTED** | Test Google OAuth, approved Student/Faculty access, unauthorized Admin route blocking and row-level rules. Enforce two approved institutional domains at application, approval and protected-access stages.    |
+| **P0-06** | Admin review and identity rules | **PARTIAL**                 | Support Admin correction of role and department; verify single/bulk approval cannot approve outside-domain accounts; safely bootstrap first Admin once.                                                        |
+| **P0-07** | Midterm evidence package        | **NOT COLLECTED**           | Gather member Git commits, unedited 3–5 minute app video, API screenshot, CRUD evidence, authentication evidence, individual YouTube walkthroughs and signed AI declarations.                                  |
 
 ### P0 acceptance checks
 
@@ -46,21 +47,21 @@
 
 ## B. Target mini-capstone feature gaps (P1, after Week 1–4 baseline)
 
-| ID | Feature | Source-code assessment | Concrete acceptance test |
-|---|---|---|---|
-| **P1-01** | Faculty slot creation and mode | Code present; **untested** | Faculty creates one IN_PERSON and one ONLINE slot; Student cannot alter mode. |
-| **P1-02** | Faculty default consultation location | **PLANNED** | Profile default room pre-fills in-person slot; specific slot may override. |
-| **P1-03** | Manual meeting link at approval | **PARTIAL** | Online Faculty enters Meet/Zoom URL while approving; involved Student can open link. |
-| **P1-04** | Department-first directory | **PARTIAL / VERIFY** | Same-department Faculty appear first but cross-department searches and bookings work. |
-| **P1-05** | Student cancellation and slot reopening | Code present; rules **need testing** | Future student cancellation is retained in history and opens the slot; past slot never reopens. |
-| **P1-06** | Faculty cancellation choice | **PLANNED** | Faculty cancels assigned consultation, chooses `Reopen` or `Block`, and student is notified. |
-| **P1-07** | Rescheduling proposal + response | **PLANNED** | Faculty holds proposed slot; student accepts/declines; decline releases proposed slot and keeps request `Needs Rescheduling`. |
-| **P1-08** | No-show status | **PLANNED** | After appointment has elapsed, Faculty records `NO_SHOW`; it is not counted as completed. |
-| **P1-09** | Walk-in consultation records | **PLANNED** | Faculty records registered OR unregistered student name + department without student number or application login. |
-| **P1-10** | Faculty consultation-history export | **PLANNED** | Faculty exports **own** records only (CSV sufficient initially), never another faculty's private outcomes. |
-| **P1-11** | Optional student-visible outcomes | Code present; **untested** | Faculty may complete with blank remarks; involved Student can view all saved remarks. |
-| **P1-12** | In-app and institutional email updates | Code present; **untested** | Approval/cancel/reschedule/no-show events notify appropriate users without sensitive outcomes in email. |
-| **P1-13** | Approved user department correction | **PLANNED** | Admin can correct an approved account's department without bypassing access checks. |
+| ID        | Feature                                 | Source-code assessment               | Concrete acceptance test                                                                                                      |
+| --------- | --------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **P1-01** | Faculty slot creation and mode          | Code present; **untested**           | Faculty creates one IN_PERSON and one ONLINE slot; Student cannot alter mode.                                                 |
+| **P1-02** | Faculty default consultation location   | **PLANNED**                          | Profile default room pre-fills in-person slot; specific slot may override.                                                    |
+| **P1-03** | Manual meeting link at approval         | **PARTIAL**                          | Online Faculty enters Meet/Zoom URL while approving; involved Student can open link.                                          |
+| **P1-04** | Department-first directory              | **PARTIAL / VERIFY**                 | Same-department Faculty appear first but cross-department searches and bookings work.                                         |
+| **P1-05** | Student cancellation and slot reopening | Code present; rules **need testing** | Future student cancellation is retained in history and opens the slot; past slot never reopens.                               |
+| **P1-06** | Faculty cancellation choice             | **PLANNED**                          | Faculty cancels assigned consultation, chooses `Reopen` or `Block`, and student is notified.                                  |
+| **P1-07** | Rescheduling proposal + response        | **PLANNED**                          | Faculty holds proposed slot; student accepts/declines; decline releases proposed slot and keeps request `Needs Rescheduling`. |
+| **P1-08** | No-show status                          | **PLANNED**                          | After appointment has elapsed, Faculty records `NO_SHOW`; it is not counted as completed.                                     |
+| **P1-09** | Walk-in consultation records            | **PLANNED**                          | Faculty records registered OR unregistered student name + department without student number or application login.             |
+| **P1-10** | Faculty consultation-history export     | **PLANNED**                          | Faculty exports **own** records only (CSV sufficient initially), never another faculty's private outcomes.                    |
+| **P1-11** | Optional student-visible outcomes       | Code present; **untested**           | Faculty may complete with blank remarks; involved Student can view all saved remarks.                                         |
+| **P1-12** | In-app and institutional email updates  | Code present; **untested**           | Approval/cancel/reschedule/no-show events notify appropriate users without sensitive outcomes in email.                       |
+| **P1-13** | Approved user department correction     | **PLANNED**                          | Admin can correct an approved account's department without bypassing access checks.                                           |
 
 **Current code entry points:** `src/features/auth/`, `src/features/availability/`, `src/features/booking/`, `src/features/consultations/`, `src/features/notifications/`, `src/app/admin/`, `src/app/faculty/`, `src/app/student/`, and `supabase/migrations/`. Specific paths and migrations must be confirmed before editing.
 
@@ -68,21 +69,21 @@
 
 ## C. Not required now (P2 / school approval)
 
-| Item | Reason to defer |
-|---|---|
-| Program Head departmental reporting | Agreed faculty-first scope; separate authorized reporting permission needs institutional validation. |
-| Special PAASCU PDF format | Interviews support preserving evidence but did not provide a mandatory institutional report template. |
-| Direct SIS integration | No ICTC approval or integration contract gathered. |
-| Full messaging / document upload | Additional storage, privacy and development burden for a mini-capstone. |
-| Built-in video calling or automatic Google Meet creation | Faculty will manually provide an external link. |
-| Expiration of unanswered reschedule proposals | Team still needs a simple operational policy; temporary hold is agreed provisionally. |
-| Formal digital retention period | Interview mentioned approximately three years, but official policy is not supplied. |
+| Item                                                     | Reason to defer                                                                                       |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Program Head departmental reporting                      | Agreed faculty-first scope; separate authorized reporting permission needs institutional validation.  |
+| Special PAASCU PDF format                                | Interviews support preserving evidence but did not provide a mandatory institutional report template. |
+| Direct SIS integration                                   | No ICTC approval or integration contract gathered.                                                    |
+| Full messaging / document upload                         | Additional storage, privacy and development burden for a mini-capstone.                               |
+| Built-in video calling or automatic Google Meet creation | Faculty will manually provide an external link.                                                       |
+| Expiration of unanswered reschedule proposals            | Team still needs a simple operational policy; temporary hold is agreed provisionally.                 |
+| Formal digital retention period                          | Interview mentioned approximately three years, but official policy is not supplied.                   |
 
 ---
 
 ## D. Practical work order
 
-**First:** Get the existing ZIP running with disposable test accounts. Log reproducible errors *before* fixing them.  
+**First:** Get the existing ZIP running with disposable test accounts. Log reproducible errors _before_ fixing them.  
 **Second:** Meet the API + complete CRUD + role-denial midterm demonstrations.  
 **Third:** Fix the main booking lifecycle and test conflicts/cancellation.  
 **Fourth:** Add faculty cancellation, rescheduling, No-show, walk-in and faculty export.  
@@ -112,4 +113,4 @@ Open issue: [if any]
 
 ---
 
-*Static audit only. No live app, migration, OAuth, API or database flow has been executed in producing v0.2.*
+_Static audit only. No live app, migration, OAuth, API or database flow has been executed in producing v0.2._

@@ -4,22 +4,7 @@ import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
-
-const availabilitySchema = z
-  .object({
-    date: z.iso.date(),
-    startTime: z.iso.time(),
-    endTime: z.iso.time(),
-    mode: z.enum(['IN_PERSON', 'ONLINE']),
-    location: z.string().trim().max(160).optional(),
-    meetingLink: z.union([z.url(), z.literal('')]).optional(),
-  })
-  .superRefine((value, context) => {
-    if (value.endTime <= value.startTime)
-      context.addIssue({ code: 'custom', path: ['endTime'], message: 'End time must be later.' })
-    if (value.mode === 'IN_PERSON' && !value.location)
-      context.addIssue({ code: 'custom', path: ['location'], message: 'Location is required.' })
-  })
+import { availabilitySchema } from './schemas/availabilitySchema'
 export async function createAvailability(
   _state: ActionState,
   formData: FormData

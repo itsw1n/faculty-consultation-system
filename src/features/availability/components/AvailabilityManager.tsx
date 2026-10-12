@@ -8,7 +8,7 @@ import { SubmitButton } from '@/components/common/SubmitButton'
 import { Modal } from '@/components/layout/modal/Modal'
 import { Select } from '@/components/ui/select/Select'
 import { initialActionState } from '@/lib/actionState'
-import { createAvailability, deleteAvailability } from '../actions'
+import { createAvailability, deleteAvailability, updateAvailability } from '../actions'
 import type { AvailabilityItem } from '../repositories/availabilityRepository'
 
 const fieldClass = 'grid gap-1.5 text-xs font-bold'
@@ -22,7 +22,9 @@ const modeOptions = [
 
 export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
   const [state, formAction] = useActionState(createAvailability, initialActionState)
+  const [editState, editAction] = useActionState(updateAvailability, initialActionState)
   const [addOpen, setAddOpen] = useState(false)
+  const [editSlot, setEditSlot] = useState<AvailabilityItem | null>(null)
   const [detailsSlot, setDetailsSlot] = useState<AvailabilityItem | null>(null)
 
   return (
@@ -106,19 +108,109 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
               <StatusBadge status={slot.status} />
               <span>{slot.mode === 'IN_PERSON' ? slot.location : 'Online'}</span>
               {slot.status === 'OPEN' && (
-                <AlertDialog
-                  label="Remove"
-                  title="Remove availability?"
-                  description="Students will no longer be able to request this time."
-                  fields={{ slotId: slot.id }}
-                  submitAction={deleteAvailability}
-                  variant="danger"
-                />
+                <>
+                  <Button variant="secondary" onPress={() => setEditSlot(slot)}>
+                    Edit
+                  </Button>
+                  <AlertDialog
+                    label="Remove"
+                    title="Remove availability?"
+                    description="Students will no longer be able to request this time."
+                    fields={{ slotId: slot.id }}
+                    submitAction={deleteAvailability}
+                    variant="danger"
+                  />
+                </>
               )}
             </article>
           ))
         )}
       </section>
+      <Modal
+        title="Edit availability"
+        isOpen={editSlot !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditSlot(null)
+        }}
+        className="max-w-3xl"
+      >
+        {editSlot ? (
+          <form
+            key={editSlot.id}
+            action={editAction}
+            className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            <input type="hidden" name="slotId" value={editSlot.id} />
+            <label className={fieldClass}>
+              Date
+              <input
+                className={controlClass}
+                name="date"
+                type="date"
+                required
+                defaultValue={editSlot.date}
+              />
+            </label>
+            <label className={fieldClass}>
+              Start
+              <input
+                className={controlClass}
+                name="startTime"
+                type="time"
+                required
+                defaultValue={editSlot.start_time.slice(0, 5)}
+              />
+            </label>
+            <label className={fieldClass}>
+              End
+              <input
+                className={controlClass}
+                name="endTime"
+                type="time"
+                required
+                defaultValue={editSlot.end_time.slice(0, 5)}
+              />
+            </label>
+            <Select
+              label="Mode"
+              name="mode"
+              options={modeOptions}
+              defaultValue={editSlot.mode}
+              isRequired
+            />
+            <label className={fieldClass}>
+              Location
+              <input
+                className={controlClass}
+                name="location"
+                maxLength={160}
+                defaultValue={editSlot.location ?? ''}
+              />
+            </label>
+            <label className={fieldClass}>
+              Meeting link
+              <input
+                className={controlClass}
+                name="meetingLink"
+                type="url"
+                defaultValue={editSlot.meeting_link ?? ''}
+              />
+            </label>
+            <p
+              className="min-h-5 text-sm font-semibold text-danger sm:col-span-2 lg:col-span-3"
+              role="alert"
+            >
+              {editState.error}
+            </p>
+            <div className="flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
+              <Button type="button" variant="secondary" onPress={() => setEditSlot(null)}>
+                Cancel
+              </Button>
+              <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
+            </div>
+          </form>
+        ) : null}
+      </Modal>
       <Modal
         title="Availability details"
         isOpen={detailsSlot !== null}

@@ -43,6 +43,12 @@ npm run supabase:reset
 npm run dev
 ```
 
+Local `supabase:reset` applies `supabase/seed.sql`, which allows any email
+domain so the team can sign in with personal Google accounts. Hosted
+environments never receive the seed — only school domains work there. To test
+strict domain checks locally, run
+`delete from public.approved_email_domains where domain = '*';`.
+
 ## Validate
 
 ```bash

@@ -8,6 +8,8 @@ export type ApplicationItem = {
   account_status: 'PENDING' | 'APPROVED' | 'REJECTED' | null
   department_name: string | null
   created_at: string
+  role: 'STUDENT' | 'FACULTY' | 'ADMIN' | null
+  department_id: string | null
 }
 export type ApplicationFilters = {
   search?: string

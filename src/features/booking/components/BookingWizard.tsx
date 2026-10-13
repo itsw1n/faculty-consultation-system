@@ -1,6 +1,8 @@
 'use client'
 import { useActionState, useMemo, useState } from 'react'
+import { Button } from '@/components/common/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
+import { Select } from '@/components/ui/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { bookConsultation } from '../actions'
 import type { SlotResult } from '../types'
@@ -64,13 +66,11 @@ export function BookingWizard({
       return { date, dateKey, slots: slots.filter((slot) => slot.slot_date === dateKey) }
     })
   }, [slots, weekOffset])
-  const navButton =
-    'min-h-10 rounded-lg border border-border bg-surface px-3 text-sm font-bold text-primary disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus'
   const refreshControl = (
     <div className="mb-3 flex flex-wrap items-center gap-2">
-      <button className={navButton} onClick={refreshSchedules} disabled={isRefreshing}>
+      <Button variant="secondary" onPress={refreshSchedules} isDisabled={isRefreshing}>
         {isRefreshing ? 'Refreshing…' : 'Refresh schedules'}
-      </button>
+      </Button>
       {refreshError && (
         <p className="text-sm font-semibold text-danger" role="alert">
           {refreshError}
@@ -87,8 +87,6 @@ export function BookingWizard({
         {refreshControl}
       </>
     )
-  const nextButton =
-    'mt-4 ml-auto block min-h-11 rounded-lg bg-primary px-5 py-2 font-bold text-white disabled:opacity-50 focus-visible:outline-3 focus-visible:outline-focus'
   const field = 'grid gap-2 font-bold'
   const control =
     'rounded-lg border border-border bg-surface p-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
@@ -116,35 +114,35 @@ export function BookingWizard({
         <>
           {refreshControl}
           <div className="mb-3 flex justify-between gap-2 sm:justify-end">
-            <button
-              className={navButton}
-              disabled={weekOffset === 0}
-              onClick={() => {
+            <Button
+              variant="secondary"
+              isDisabled={weekOffset === 0}
+              onPress={() => {
                 setWeekOffset((value) => value - 1)
                 setMobileDay(0)
               }}
             >
               Previous week
-            </button>
-            <button
-              className={navButton}
-              onClick={() => {
+            </Button>
+            <Button
+              variant="secondary"
+              onPress={() => {
                 setWeekOffset(0)
                 setMobileDay(0)
               }}
             >
               Today
-            </button>
-            <button
-              className={navButton}
-              disabled={weekOffset >= 3}
-              onClick={() => {
+            </Button>
+            <Button
+              variant="secondary"
+              isDisabled={weekOffset >= 3}
+              onPress={() => {
                 setWeekOffset((value) => value + 1)
                 setMobileDay(0)
               }}
             >
               Next week
-            </button>
+            </Button>
           </div>
           <div
             className="mb-3 flex gap-1 overflow-x-auto sm:hidden"
@@ -154,9 +152,11 @@ export function BookingWizard({
             {week.map((day, index) => (
               <button
                 className={cn(
-                  navButton,
+                  'min-h-10 cursor-pointer rounded-lg border border-border px-3 text-sm font-bold transition-colors hover:bg-subtle disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus',
                   'min-w-17',
-                  mobileDay === index && 'bg-primary text-white'
+                  mobileDay === index
+                    ? 'bg-primary text-white hover:bg-primary-hover'
+                    : 'bg-surface text-primary'
                 )}
                 role="tab"
                 aria-selected={mobileDay === index}
@@ -194,7 +194,7 @@ export function BookingWizard({
                       disabled={slot.slot_status !== 'OPEN'}
                       aria-pressed={selectedId === slot.id}
                       className={cn(
-                        'my-2 grid w-full gap-1 rounded-lg border border-border p-3 text-left text-success disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
+                        'my-2 grid w-full cursor-pointer gap-1 rounded-lg border border-border p-3 text-left text-success transition hover:brightness-95 disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
                         slot.slot_status === 'OPEN' && 'bg-emerald-50',
                         slot.slot_status === 'RESERVED' && 'bg-amber-50 text-warning',
                         slot.slot_status === 'BOOKED' && 'bg-blue-50 text-blue-800',
@@ -219,32 +219,25 @@ export function BookingWizard({
             <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-800">Booked</span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-muted">Closed</span>
           </div>
-          <button className={nextButton} disabled={!selected} onClick={() => setStep('details')}>
+          <Button className="mt-4 w-full" isDisabled={!selected} onPress={() => setStep('details')}>
             Continue
-          </button>
+          </Button>
         </>
       )}
       {step === 'details' && (
         <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
-          <button className="font-bold text-primary" onClick={() => setStep('schedule')}>
+          <Button variant="ghost" onPress={() => setStep('schedule')}>
             Back to schedule
-          </button>
-          <label className={cn(field, 'mt-5')}>
-            Purpose
-            <select
-              className={control}
-              value={purpose}
-              onChange={(event) => setPurpose(event.target.value as ConsultationCategory | '')}
-              required
-            >
-              <option value="">Select a concern</option>
-              {Object.entries(categories).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
+          </Button>
+          <Select
+            label="Purpose"
+            options={Object.entries(categories).map(([value, label]) => ({ id: value, label }))}
+            value={purpose}
+            placeholder="Select a concern"
+            onChange={(value) => setPurpose(value as ConsultationCategory | '')}
+            isRequired
+            className="mt-5"
+          />
           <label className={cn(field, 'mt-4')}>
             Short description (optional)
             <textarea
@@ -254,20 +247,20 @@ export function BookingWizard({
               maxLength={2000}
             />
           </label>
-          <button
-            className={nextButton}
-            disabled={!purpose.trim()}
-            onClick={() => setStep('review')}
+          <Button
+            className="mt-4 w-full"
+            isDisabled={!purpose.trim()}
+            onPress={() => setStep('review')}
           >
             Review request
-          </button>
+          </Button>
         </div>
       )}
       {step === 'review' && selected && (
         <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
-          <button className="font-bold text-primary" onClick={() => setStep('details')}>
+          <Button variant="ghost" onPress={() => setStep('details')}>
             Back to details
-          </button>
+          </Button>
           <h2 className="mt-4 text-xl font-bold">Review your request</h2>
           <dl className="mt-3 [&>div]:grid [&>div]:grid-cols-1 [&>div]:border-b [&>div]:border-border [&>div]:py-3 sm:[&>div]:grid-cols-[8rem_1fr] [&_dd]:m-0 [&_dt]:font-bold">
             <div>

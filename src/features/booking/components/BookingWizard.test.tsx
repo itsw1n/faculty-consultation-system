@@ -41,6 +41,17 @@ function mockFetchOnce(slots: SlotResult[], ok = true) {
   return fetchMock
 }
 
+describe('BookingWizard details', () => {
+  it('shows the shared purpose selector after choosing a slot', () => {
+    render(<BookingWizard facultyId={FACULTY_ID} initialSlots={[slot()]} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /09:00/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByText('Select a concern')).toBeInTheDocument()
+  })
+})
+
 describe('BookingWizard refresh', () => {
   it('requests fresh availability for the displayed faculty member', async () => {
     const fetchMock = mockFetchOnce([slot()])

@@ -13,3 +13,13 @@ export function getPublicEnvironment() {
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   })
 }
+
+const serverEnvironmentSchema = z.object({
+  INITIAL_ADMIN_EMAIL: z.email(),
+})
+
+export function getServerEnvironment() {
+  return serverEnvironmentSchema.parse({
+    INITIAL_ADMIN_EMAIL: process.env.INITIAL_ADMIN_EMAIL,
+  })
+}

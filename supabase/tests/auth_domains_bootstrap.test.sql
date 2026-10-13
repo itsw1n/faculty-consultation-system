@@ -14,7 +14,9 @@ values
 ('d3000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','boss@faculty.acd.edu.ph','',now(),'{}','{}',now(),now()),
 ('d4000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000000','authenticated','authenticated','legacy@gmail.com','',now(),'{}','{}',now(),now());
 insert into public.profiles (id, email, full_name, requested_role, department_id, account_status)
-values ('d4000000-0000-0000-0000-000000000004','legacy@gmail.com','Legacy Applicant','STUDENT',(select id from public.departments where code='IT'),'PENDING');
+values ('d4000000-0000-0000-0000-000000000004','legacy@gmail.com','Legacy Applicant','STUDENT',(select id from public.departments where code='IT'),'PENDING')
+on conflict (id) do update set requested_role = excluded.requested_role,
+  department_id = excluded.department_id, account_status = excluded.account_status;
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"d1000000-0000-0000-0000-000000000001","role":"authenticated"}',true);

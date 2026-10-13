@@ -51,7 +51,7 @@ export function ApplicationFlow({
           ].map(({ role: option, icon: Icon, title, description }) => (
             <button
               key={option}
-              className="grid justify-items-center gap-3 rounded-xl border border-border bg-surface p-8 text-foreground shadow-card transition-colors hover:border-accent focus-visible:outline-3 focus-visible:outline-focus"
+              className="grid cursor-pointer justify-items-center gap-3 rounded-xl border border-border bg-surface p-8 text-foreground shadow-card transition-colors hover:border-accent focus-visible:outline-3 focus-visible:outline-focus"
               onClick={() => setRole(option)}
             >
               <Icon className="size-12 text-accent" aria-hidden="true" />

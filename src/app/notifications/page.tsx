@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { Button } from '@/components/common/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { AppShell } from '@/components/layout/AppShell'
 import { getAuthenticatedProfile } from '@/features/auth/repositories/authRepository'
@@ -17,9 +18,9 @@ export default async function NotificationsPage() {
       />
       {page.items.some((item) => !item.read_at) && (
         <form action={markAllNotificationsRead} className="mb-3 text-right">
-          <button className="min-h-11 rounded-lg px-3 font-bold text-primary hover:bg-subtle">
+          <Button variant="ghost" type="submit">
             Mark all as read
-          </button>
+          </Button>
         </form>
       )}
       <NotificationList initialPage={page} />

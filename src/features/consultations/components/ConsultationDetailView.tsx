@@ -1,5 +1,6 @@
 import { categoryLabel } from '../categories'
 import type { ConsultationDetail } from '../repositories/consultationDetailRepository'
+import { Button } from '@/components/common/Button'
 import { completeConsultation } from '../actions'
 import Link from 'next/link'
 
@@ -68,12 +69,7 @@ export function ConsultationDetailView({
             rows={5}
             className="rounded border border-border bg-surface p-3"
           />
-          <button
-            type="submit"
-            className="min-h-11 rounded bg-primary px-4 font-semibold text-white"
-          >
-            Mark completed
-          </button>
+          <Button type="submit">Mark completed</Button>
         </form>
       )}
     </main>

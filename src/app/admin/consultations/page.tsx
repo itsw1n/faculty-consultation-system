@@ -1,3 +1,4 @@
+import { Button } from '@/components/common/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { ConsultationDirectory } from '@/features/consultations/components/ConsultationDirectory'
 import { getConsultationPage } from '@/features/consultations/repositories/consultationRepository'
@@ -35,9 +36,7 @@ export default async function ConsultationRecords() {
             required
           />
         </label>
-        <button type="submit" className="min-h-11 rounded bg-primary px-4 font-semibold text-white">
-          Download summary CSV
-        </button>
+        <Button type="submit">Download summary CSV</Button>
       </form>
       <ConsultationDirectory initialPage={await getConsultationPage({})} viewer="ADMIN" />
     </>

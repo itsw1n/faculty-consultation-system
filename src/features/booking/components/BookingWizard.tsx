@@ -2,7 +2,7 @@
 import { useActionState, useMemo, useState } from 'react'
 import { Button } from '@/components/common/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { bookConsultation } from '../actions'
 import type { SlotResult } from '../types'

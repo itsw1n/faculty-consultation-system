@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/select/Select'
 import { loadFacultyPage } from '../loadFacultyPage'
 import type { FacultyResult } from '../repositories/bookingRepository'
 

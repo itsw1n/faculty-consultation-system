@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/select/Select'
 import { cancelConsultation, decideConsultation } from '../actions'
 import { loadConsultationPage } from '../loadConsultationPage'
 import type { ConsultationItem } from '../types'

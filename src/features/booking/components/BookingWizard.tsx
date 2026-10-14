@@ -1,9 +1,11 @@
 'use client'
 import { useActionState, useMemo, useState } from 'react'
+import { Button } from '@/components/common/button/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
+import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { bookConsultation } from '../actions'
-import type { SlotResult } from '../repositories/bookingRepository'
+import type { SlotResult } from '../types'
 import { cn } from '@/lib/cn'
 import {
   categories,
@@ -20,14 +22,39 @@ function monday(date: Date) {
   value.setHours(0, 0, 0, 0)
   return value
 }
-export function BookingWizard({ slots }: { slots: SlotResult[] }) {
+export function BookingWizard({
+  facultyId,
+  initialSlots,
+}: {
+  facultyId: string
+  initialSlots: SlotResult[]
+}) {
   const [state, formAction] = useActionState(bookConsultation, initialActionState)
+  const [slots, setSlots] = useState(initialSlots)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [refreshError, setRefreshError] = useState<string | null>(null)
   const [step, setStep] = useState<Step>('schedule')
   const [selectedId, setSelectedId] = useState('')
   const [purpose, setPurpose] = useState<ConsultationCategory | ''>('')
   const [notes, setNotes] = useState('')
   const [weekOffset, setWeekOffset] = useState(0)
   const [mobileDay, setMobileDay] = useState(0)
+  async function refreshSchedules() {
+    setIsRefreshing(true)
+    setRefreshError(null)
+    try {
+      const response = await fetch(`/api/faculty/${facultyId}/availability`)
+      const body = (await response.json()) as { slots?: unknown }
+      if (!response.ok || !Array.isArray(body.slots)) throw new Error('refresh failed')
+      const fresh = body.slots as SlotResult[]
+      setSlots(fresh)
+      setSelectedId((current) => (fresh.some((slot) => slot.id === current) ? current : ''))
+    } catch {
+      setRefreshError('Could not refresh schedules. Showing last loaded times.')
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
   const selected = slots.find((slot) => slot.id === selectedId)
   const week = useMemo(() => {
     const start = monday(new Date())
@@ -39,16 +66,27 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
       return { date, dateKey, slots: slots.filter((slot) => slot.slot_date === dateKey) }
     })
   }, [slots, weekOffset])
+  const refreshControl = (
+    <div className="mb-3 flex flex-wrap items-center gap-2">
+      <Button variant="secondary" onPress={refreshSchedules} isDisabled={isRefreshing}>
+        {isRefreshing ? 'Refreshing…' : 'Refresh schedules'}
+      </Button>
+      {refreshError && (
+        <p className="text-sm font-semibold text-danger" role="alert">
+          {refreshError}
+        </p>
+      )}
+    </div>
+  )
   if (!slots.length)
     return (
-      <p className="rounded-xl border border-border bg-surface p-8 text-center text-muted">
-        No schedules in the next four weeks.
-      </p>
+      <>
+        <p className="rounded-xl border border-border bg-surface p-8 text-center text-muted">
+          No schedules in the next four weeks.
+        </p>
+        {refreshControl}
+      </>
     )
-  const navButton =
-    'min-h-10 rounded-lg border border-border bg-surface px-3 text-sm font-bold text-primary disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus'
-  const nextButton =
-    'mt-4 ml-auto block min-h-11 rounded-lg bg-primary px-5 py-2 font-bold text-white disabled:opacity-50 focus-visible:outline-3 focus-visible:outline-focus'
   const field = 'grid gap-2 font-bold'
   const control =
     'rounded-lg border border-border bg-surface p-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
@@ -74,36 +112,37 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
       </ol>
       {step === 'schedule' && (
         <>
+          {refreshControl}
           <div className="mb-3 flex justify-between gap-2 sm:justify-end">
-            <button
-              className={navButton}
-              disabled={weekOffset === 0}
-              onClick={() => {
+            <Button
+              variant="secondary"
+              isDisabled={weekOffset === 0}
+              onPress={() => {
                 setWeekOffset((value) => value - 1)
                 setMobileDay(0)
               }}
             >
               Previous week
-            </button>
-            <button
-              className={navButton}
-              onClick={() => {
+            </Button>
+            <Button
+              variant="secondary"
+              onPress={() => {
                 setWeekOffset(0)
                 setMobileDay(0)
               }}
             >
               Today
-            </button>
-            <button
-              className={navButton}
-              disabled={weekOffset >= 3}
-              onClick={() => {
+            </Button>
+            <Button
+              variant="secondary"
+              isDisabled={weekOffset >= 3}
+              onPress={() => {
                 setWeekOffset((value) => value + 1)
                 setMobileDay(0)
               }}
             >
               Next week
-            </button>
+            </Button>
           </div>
           <div
             className="mb-3 flex gap-1 overflow-x-auto sm:hidden"
@@ -113,9 +152,11 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
             {week.map((day, index) => (
               <button
                 className={cn(
-                  navButton,
+                  'min-h-10 cursor-pointer rounded-lg border border-border px-3 text-sm font-bold transition-colors hover:bg-subtle disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus',
                   'min-w-17',
-                  mobileDay === index && 'bg-primary text-white'
+                  mobileDay === index
+                    ? 'bg-primary text-white hover:bg-primary-hover'
+                    : 'bg-surface text-primary'
                 )}
                 role="tab"
                 aria-selected={mobileDay === index}
@@ -153,7 +194,7 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
                       disabled={slot.slot_status !== 'OPEN'}
                       aria-pressed={selectedId === slot.id}
                       className={cn(
-                        'my-2 grid w-full gap-1 rounded-lg border border-border p-3 text-left text-success disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
+                        'my-2 grid w-full cursor-pointer gap-1 rounded-lg border border-border p-3 text-left text-success transition hover:brightness-95 disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
                         slot.slot_status === 'OPEN' && 'bg-emerald-50',
                         slot.slot_status === 'RESERVED' && 'bg-amber-50 text-warning',
                         slot.slot_status === 'BOOKED' && 'bg-blue-50 text-blue-800',
@@ -178,32 +219,25 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
             <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-800">Booked</span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-muted">Closed</span>
           </div>
-          <button className={nextButton} disabled={!selected} onClick={() => setStep('details')}>
+          <Button className="mt-4 w-full" isDisabled={!selected} onPress={() => setStep('details')}>
             Continue
-          </button>
+          </Button>
         </>
       )}
       {step === 'details' && (
         <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
-          <button className="font-bold text-primary" onClick={() => setStep('schedule')}>
+          <Button variant="ghost" onPress={() => setStep('schedule')}>
             Back to schedule
-          </button>
-          <label className={cn(field, 'mt-5')}>
-            Purpose
-            <select
-              className={control}
-              value={purpose}
-              onChange={(event) => setPurpose(event.target.value as ConsultationCategory | '')}
-              required
-            >
-              <option value="">Select a concern</option>
-              {Object.entries(categories).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
+          </Button>
+          <Select
+            label="Purpose"
+            options={Object.entries(categories).map(([value, label]) => ({ id: value, label }))}
+            value={purpose}
+            placeholder="Select a concern"
+            onChange={(value) => setPurpose(value as ConsultationCategory | '')}
+            isRequired
+            className="mt-5"
+          />
           <label className={cn(field, 'mt-4')}>
             Short description (optional)
             <textarea
@@ -213,20 +247,20 @@ export function BookingWizard({ slots }: { slots: SlotResult[] }) {
               maxLength={2000}
             />
           </label>
-          <button
-            className={nextButton}
-            disabled={!purpose.trim()}
-            onClick={() => setStep('review')}
+          <Button
+            className="mt-4 w-full"
+            isDisabled={!purpose.trim()}
+            onPress={() => setStep('review')}
           >
             Review request
-          </button>
+          </Button>
         </div>
       )}
       {step === 'review' && selected && (
         <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
-          <button className="font-bold text-primary" onClick={() => setStep('details')}>
+          <Button variant="ghost" onPress={() => setStep('details')}>
             Back to details
-          </button>
+          </Button>
           <h2 className="mt-4 text-xl font-bold">Review your request</h2>
           <dl className="mt-3 [&>div]:grid [&>div]:grid-cols-1 [&>div]:border-b [&>div]:border-border [&>div]:py-3 sm:[&>div]:grid-cols-[8rem_1fr] [&_dd]:m-0 [&_dt]:font-bold">
             <div>

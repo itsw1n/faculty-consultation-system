@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
-import { summaryCsv, type SummaryRow } from '@/features/reports/services/summaryCsv'
+import { summaryCsv, type SummaryRow } from '@/features/consultations/services/summaryCsv'
 
 export async function GET(request: Request) {
   await requireRole('ADMIN')

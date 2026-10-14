@@ -19,30 +19,30 @@ The space after the colon is required.
 
 ## Types
 
-| Type | When to use |
-| ---- | ----------- |
-| `feat` | New feature or capability |
-| `fix` | Bug fix |
-| `refactor` | Restructure without behavior change |
-| `chore` | Deps, config, tooling — no production code change |
-| `docs` | Documentation only |
-| `test` | Adding or updating tests |
-| `ci` | GitHub Actions or CI/CD workflow changes |
-| `style` | Formatting, whitespace — no logic change |
+| Type       | When to use                                       |
+| ---------- | ------------------------------------------------- |
+| `feat`     | New feature or capability                         |
+| `fix`      | Bug fix                                           |
+| `refactor` | Restructure without behavior change               |
+| `chore`    | Deps, config, tooling — no production code change |
+| `docs`     | Documentation only                                |
+| `test`     | Adding or updating tests                          |
+| `ci`       | GitHub Actions or CI/CD workflow changes          |
+| `style`    | Formatting, whitespace — no logic change          |
 
 ## Scopes (Next.js projects)
 
-The scope says *where* the change lives, not what the feature is called.
+The scope says _where_ the change lives, not what the feature is called.
 
-| Scope | When to use |
-| ----- | ----------- |
-| `app` | App Router, pages, layouts, UI components |
-| `api` | API routes or server actions |
-| `db` | Database schema, migrations, seeds |
-| `auth` | Authentication / authorization logic |
-| `ci` | GitHub Actions workflows |
-| `docs` | Anything inside `docs/` |
-| `deps` | Dependency updates |
+| Scope  | When to use                               |
+| ------ | ----------------------------------------- |
+| `app`  | App Router, pages, layouts, UI components |
+| `api`  | API routes or server actions              |
+| `db`   | Database schema, migrations, seeds        |
+| `auth` | Authentication / authorization logic      |
+| `ci`   | GitHub Actions workflows                  |
+| `docs` | Anything inside `docs/`                   |
+| `deps` | Dependency updates                        |
 
 Avoid generic scopes like `misc`, `code`, or `stuff`.
 

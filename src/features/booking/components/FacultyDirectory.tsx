@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
-import { loadFacultyPage } from '../loadFacultyPage'
+import { Select } from '@/components/common/select/Select'
+import { getFacultyPage } from '../queries/getFacultyPage'
 import type { FacultyResult } from '../repositories/bookingRepository'
 
 type Page = {
@@ -43,7 +44,7 @@ export function FacultyDirectory({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor)
           startTransition(async () => {
-            const next = await loadFacultyPage({
+            const next = await getFacultyPage({
               search,
               departmentId: department,
               cursor: page.nextCursor,
@@ -72,21 +73,15 @@ export function FacultyDirectory({
           onChange={setSearch}
           placeholder="Search faculty"
         />
-        <label className="grid flex-1 gap-1.5 text-xs font-bold">
-          <span>Department</span>
-          <select
-            className="min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
-            value={department}
-            onChange={(event) => changeDepartment(event.target.value)}
-          >
-            <option value="">All departments</option>
-            {departments.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.code}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Department"
+          options={[
+            { id: 'all', label: 'All departments' },
+            ...departments.map((item) => ({ id: item.id, label: item.code })),
+          ]}
+          value={department || 'all'}
+          onChange={(value) => changeDepartment(value === 'all' ? '' : value)}
+        />
       </div>
       <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4">
         {page.items.map((member) => (

@@ -1,7 +1,7 @@
 'use server'
 import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
-import { getFacultyPage } from './repositories/bookingRepository'
+import { getFacultyPage as fetchFacultyPage } from '../repositories/bookingRepository'
 const inputSchema = z.object({
   search: z.string().max(160),
   departmentId: z.union([z.uuid(), z.literal('')]),
@@ -10,5 +10,5 @@ const inputSchema = z.object({
 export async function getFacultyPage(input: unknown) {
   await requireRole('STUDENT')
   const value = inputSchema.parse(input)
-  return getFacultyPage(value.search, value.departmentId, value.cursor ?? undefined)
+  return fetchFacultyPage(value.search, value.departmentId, value.cursor ?? undefined)
 }

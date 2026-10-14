@@ -1,15 +1,14 @@
 'use server'
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
 import { accountCorrectionSchema } from './schemas/accountCorrectionSchema'
+import { bulkReviewSchema, reviewDecisionSchema } from './schemas/reviewSchema'
 
-const reviewSchema = z.object({ userId: z.uuid(), decision: z.enum(['APPROVED', 'REJECTED']) })
 export async function reviewApplication(formData: FormData) {
   await requireRole('ADMIN')
-  const input = reviewSchema.parse({
+  const input = reviewDecisionSchema.parse({
     userId: formData.get('userId'),
     decision: formData.get('decision'),
   })
@@ -22,8 +21,10 @@ export async function reviewApplication(formData: FormData) {
 
 export async function reviewApplications(formData: FormData) {
   await requireRole('ADMIN')
-  const userIds = z.array(z.uuid()).min(1).max(50).parse(formData.getAll('userIds'))
-  const decision = z.enum(['APPROVED', 'REJECTED']).parse(formData.get('decision'))
+  const { userIds, decision } = bulkReviewSchema.parse({
+    userIds: formData.getAll('userIds'),
+    decision: formData.get('decision'),
+  })
   const { data, error } = await (
     await createClient()
   ).rpc('review_applications', { target_user_ids: userIds, decision })

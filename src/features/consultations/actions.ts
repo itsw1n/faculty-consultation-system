@@ -1,10 +1,13 @@
 'use server'
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import { deliverEmails } from '@/features/email/services/deliverEmails'
-const idSchema = z.uuid()
+import {
+  approvalDecisionSchema,
+  consultationIdSchema,
+  outcomeSchema,
+} from './schemas/consultationSchema'
 const refresh = () => {
   revalidatePath('/faculty/requests')
   revalidatePath('/faculty/consultations')
@@ -14,8 +17,8 @@ const refresh = () => {
 }
 export async function decideConsultation(formData: FormData) {
   await requireRole('FACULTY')
-  const id = idSchema.parse(formData.get('consultationId'))
-  const approve = z.enum(['true', 'false']).parse(formData.get('approve')) === 'true'
+  const id = consultationIdSchema.parse(formData.get('consultationId'))
+  const approve = approvalDecisionSchema.parse(formData.get('approve')) === 'true'
   const { error } = await (
     await createClient()
   ).rpc('decide_consultation', { target_consultation_id: id, approve })
@@ -25,7 +28,7 @@ export async function decideConsultation(formData: FormData) {
 }
 export async function cancelConsultation(formData: FormData) {
   await requireRole('STUDENT')
-  const id = idSchema.parse(formData.get('consultationId'))
+  const id = consultationIdSchema.parse(formData.get('consultationId'))
   const { error } = await (
     await createClient()
   ).rpc('cancel_consultation', { target_consultation_id: id })
@@ -35,12 +38,8 @@ export async function cancelConsultation(formData: FormData) {
 }
 export async function completeConsultation(formData: FormData) {
   await requireRole('FACULTY')
-  const id = idSchema.parse(formData.get('consultationId'))
-  const outcome = z
-    .string()
-    .trim()
-    .max(2000)
-    .parse(formData.get('outcome') ?? '')
+  const id = consultationIdSchema.parse(formData.get('consultationId'))
+  const outcome = outcomeSchema.parse(formData.get('outcome') ?? '')
   const { error } = await (
     await createClient()
   ).rpc('complete_consultation_with_outcome', {

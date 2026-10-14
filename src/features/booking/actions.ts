@@ -1,20 +1,15 @@
 'use server'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
-const schema = z.object({
-  slotId: z.uuid(),
-  purpose: z.enum(['GRADE', 'CAPSTONE', 'ACADEMIC', 'PERSONAL', 'OTHER']),
-  notes: z.string().trim().max(2000).optional(),
-})
+import { bookingSchema } from './schemas/bookingSchema'
 export async function bookConsultation(
   _state: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   await requireRole('STUDENT')
-  const result = schema.safeParse({
+  const result = bookingSchema.safeParse({
     slotId: formData.get('slotId'),
     purpose: formData.get('purpose'),
     notes: formData.get('notes') || undefined,

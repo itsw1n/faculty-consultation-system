@@ -15,9 +15,9 @@ const profile = (overrides: Partial<AuthProfile> = {}): AuthProfile => ({
 
 describe('getAuthDestination', () => {
   test.each([
-    [profile(), '/apply'],
-    [profile({ accountStatus: 'PENDING', requestedRole: 'STUDENT' }), '/application/pending'],
-    [profile({ accountStatus: 'REJECTED', requestedRole: 'FACULTY' }), '/application/rejected'],
+    [profile(), '/'],
+    [profile({ accountStatus: 'PENDING' }), '/application/pending'],
+    [profile({ accountStatus: 'REJECTED' }), '/application/rejected'],
     [profile({ accountStatus: 'APPROVED', role: 'STUDENT' }), '/student'],
     [profile({ accountStatus: 'APPROVED', role: 'FACULTY' }), '/faculty'],
     [profile({ accountStatus: 'APPROVED', role: 'ADMIN' }), '/admin'],

@@ -1,4 +1,5 @@
 import { signInWithGoogle } from '@/features/auth/actions'
+import { Button } from '@/components/common/Button'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 import { CalendarClock, MessageCircle, ShieldCheck } from 'lucide-react'
@@ -84,9 +85,9 @@ export default function HomePage() {
               Use your school Google account to sign in securely and get started.
             </p>
             <form className="mt-7" action={signInWithGoogle}>
-              <button
-                className="inline-flex min-h-13 w-full items-center justify-center rounded-lg bg-accent px-4 py-3 font-bold text-white shadow-sm transition-colors hover:bg-accent-hover focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              <Button
                 type="submit"
+                className="min-h-13 w-full bg-accent py-3 shadow-sm hover:bg-accent-hover"
               >
                 <span
                   className="mr-3 grid size-7 place-items-center rounded bg-white text-sm font-extrabold text-accent"
@@ -95,7 +96,7 @@ export default function HomePage() {
                   G
                 </span>{' '}
                 Sign in with Google
-              </button>
+              </Button>
             </form>
           </div>
         </Container>

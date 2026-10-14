@@ -1,3 +1,4 @@
+import { SubmitButton } from '@/components/common/SubmitButton'
 import { signOut } from '@/features/auth/actions'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
@@ -18,9 +19,7 @@ export default function RejectedPage() {
               Please contact the school administrator if you believe this needs review.
             </p>
             <form className="mx-auto mt-8 max-w-64" action={signOut}>
-              <button className="min-h-11 w-full rounded-lg bg-primary px-4 font-bold text-white hover:bg-primary-hover focus-visible:outline-3 focus-visible:outline-focus">
-                Sign out
-              </button>
+              <SubmitButton pendingLabel="Signing out…">Sign out</SubmitButton>
             </form>
           </div>
         </Container>

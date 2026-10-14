@@ -35,7 +35,7 @@ export function Modal({ title, isOpen, onOpenChange, children, className }: Moda
             <Button
               slot="close"
               aria-label="Close"
-              className="grid size-9 shrink-0 place-items-center rounded-lg text-muted outline-none hover:bg-subtle hover:text-foreground focus-visible:ring-3 focus-visible:ring-focus"
+              className="grid size-9 shrink-0 min-w-0 place-items-center rounded-lg text-muted outline-none hover:bg-subtle hover:text-foreground focus-visible:ring-3 focus-visible:ring-focus"
             >
               <X size={18} aria-hidden="true" />
             </Button>

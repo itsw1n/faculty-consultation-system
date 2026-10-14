@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { Button } from '@/components/common/Button'
 import { markNotificationRead } from '../actions'
 import { loadNotificationPage } from '../loadNotificationPage'
 import type { NotificationItem } from '../types'
@@ -52,9 +53,9 @@ export function NotificationList({ initialPage }: { initialPage: Page }) {
               {!item.read_at && (
                 <form action={markNotificationRead}>
                   <input type="hidden" name="notificationId" value={item.id} />
-                  <button className="min-h-11 whitespace-nowrap rounded-lg px-3 font-bold text-primary hover:bg-subtle">
+                  <Button variant="ghost" type="submit">
                     Mark read
-                  </button>
+                  </Button>
                 </form>
               )}
             </article>

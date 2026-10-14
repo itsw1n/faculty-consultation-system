@@ -1,3 +1,4 @@
+import { Button } from '@/components/common/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { listFacultyRecords } from '@/features/admin/repositories/adminRepository'
@@ -23,7 +24,7 @@ export default async function FacultyPage({
             defaultValue={p.search}
           />
         </label>
-        <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-white">Search</button>
+        <Button type="submit">Search</Button>
       </form>
       <section className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
         {faculty.length === 0 ? (

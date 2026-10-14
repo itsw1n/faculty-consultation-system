@@ -1,4 +1,4 @@
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { createDepartment, updateDepartment } from '@/features/admin/actions'
 import { listDepartments } from '@/features/admin/repositories/adminRepository'

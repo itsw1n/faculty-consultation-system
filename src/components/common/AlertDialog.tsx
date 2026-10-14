@@ -1,7 +1,7 @@
 'use client'
 
 import { Dialog, DialogTrigger, Heading, Modal, ModalOverlay } from 'react-aria-components'
-import { Button } from './Button'
+import { Button } from './button/Button'
 
 type AlertDialogProps = {
   label: string

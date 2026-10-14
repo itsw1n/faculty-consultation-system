@@ -1,6 +1,6 @@
 import { categoryLabel } from '../categories'
 import type { ConsultationDetail } from '../repositories/consultationDetailRepository'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { completeConsultation } from '../actions'
 import Link from 'next/link'
 

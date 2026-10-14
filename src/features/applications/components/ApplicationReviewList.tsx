@@ -2,14 +2,14 @@
 
 import { useActionState, useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
-import { Modal } from '@/components/layout/modal/Modal'
-import { Select } from '@/components/ui/select/Select'
+import { Modal } from '@/components/common/modal/Modal'
+import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { correctUserAccount, reviewApplication, reviewApplications } from '../actions'
-import { loadApplicationPage } from '../loadApplicationPage'
+import { getApplicationPage } from '../queries/getApplicationPage'
 import type { ApplicationItem } from '../repositories/applicationRepository'
 
 type Page = {
@@ -45,7 +45,7 @@ export function ApplicationReviewList({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor) {
           startTransition(async () => {
-            const next = await loadApplicationPage({
+            const next = await getApplicationPage({
               search: filters.search,
               status: filters.status || null,
               role: filters.role || null,

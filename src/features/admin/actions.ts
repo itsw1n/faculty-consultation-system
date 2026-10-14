@@ -1,21 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
-
-const departmentSchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .min(2)
-    .max(20)
-    .transform((value) => value.toUpperCase()),
-  name: z.string().trim().min(2).max(120),
-})
-
-const departmentUpdateSchema = departmentSchema.extend({ id: z.string().uuid() })
+import { departmentSchema, departmentUpdateSchema } from './schemas/departmentSchema'
 
 export async function createDepartment(formData: FormData) {
   await requireRole('ADMIN')

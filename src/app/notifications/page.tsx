@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { AppShell } from '@/components/layout/AppShell'
 import { getAuthenticatedProfile } from '@/features/auth/repositories/authRepository'

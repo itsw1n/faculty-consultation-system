@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
-import { Select } from '@/components/ui/select/Select'
+import { Select } from '@/components/common/select/Select'
 import { cancelConsultation, decideConsultation } from '../actions'
-import { loadConsultationPage } from '../loadConsultationPage'
+import { getConsultationPage } from '../queries/getConsultationPage'
 import type { ConsultationItem } from '../types'
 import { categoryLabel } from '../categories'
 import Link from 'next/link'
@@ -32,7 +32,7 @@ export function ConsultationDirectory({
     const timeout = setTimeout(
       () =>
         startTransition(async () =>
-          setPage(await loadConsultationPage({ search, status: status || null, cursor: null }))
+          setPage(await getConsultationPage({ search, status: status || null, cursor: null }))
         ),
       300
     )
@@ -45,7 +45,7 @@ export function ConsultationDirectory({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor)
           startTransition(async () => {
-            const next = await loadConsultationPage({
+            const next = await getConsultationPage({
               search,
               status: status || null,
               cursor: page.nextCursor,

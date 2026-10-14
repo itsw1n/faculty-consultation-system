@@ -1,26 +1,10 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import { getPublicEnvironment, getServerEnvironment } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
-
-const applicationSchema = z
-  .object({
-    requestedRole: z.enum(['STUDENT', 'FACULTY']),
-    departmentId: z.uuid(),
-    positionTitle: z.string().trim().max(120).optional(),
-  })
-  .superRefine((value, context) => {
-    if (value.requestedRole === 'FACULTY' && !value.positionTitle) {
-      context.addIssue({
-        code: 'custom',
-        path: ['positionTitle'],
-        message: 'Position title is required.',
-      })
-    }
-  })
+import { applicationSchema } from './schemas/applicationSchema'
 
 export async function signInWithGoogle() {
   const supabase = await createClient()

@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
 

@@ -9,7 +9,7 @@ const schema = z.object({
   department: z.uuid().nullable(),
   cursor: z.object({ createdAt: z.iso.datetime(), id: z.uuid() }).nullable(),
 })
-export async function loadApplicationPage(input: unknown) {
+export async function getApplicationPage(input: unknown) {
   await requireRole('ADMIN')
   const value = schema.parse(input)
   return getApplicationPage({

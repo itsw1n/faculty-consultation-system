@@ -9,8 +9,8 @@ vi.mock('../actions', () => ({
   correctUserAccount: vi.fn(async () => ({ error: null })),
 }))
 
-vi.mock('../loadApplicationPage', () => ({
-  loadApplicationPage: vi.fn(async () => ({ items: [], hasMore: false, nextCursor: null })),
+vi.mock('../queries/getApplicationPage', () => ({
+  getApplicationPage: vi.fn(async () => ({ items: [], hasMore: false, nextCursor: null })),
 }))
 
 afterEach(cleanup)

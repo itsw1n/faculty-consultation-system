@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { Button } from '@/components/common/button/Button'
 import { markNotificationRead } from '../actions'
-import { loadNotificationPage } from '../loadNotificationPage'
+import { getNotificationPage } from '../queries/getNotificationPage'
 import type { NotificationItem } from '../types'
 type Page = {
   items: NotificationItem[]
@@ -20,7 +20,7 @@ export function NotificationList({ initialPage }: { initialPage: Page }) {
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor)
           startTransition(async () => {
-            const next = await loadNotificationPage({ cursor: page.nextCursor })
+            const next = await getNotificationPage({ cursor: page.nextCursor })
             setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
           })
       },

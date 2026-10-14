@@ -7,7 +7,7 @@ const inputSchema = z.object({
   departmentId: z.union([z.uuid(), z.literal('')]),
   cursor: z.object({ name: z.string(), id: z.uuid() }).nullable(),
 })
-export async function loadFacultyPage(input: unknown) {
+export async function getFacultyPage(input: unknown) {
   await requireRole('STUDENT')
   const value = inputSchema.parse(input)
   return getFacultyPage(value.search, value.departmentId, value.cursor ?? undefined)

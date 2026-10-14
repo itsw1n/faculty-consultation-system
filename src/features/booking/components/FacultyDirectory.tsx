@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
 import { Select } from '@/components/common/select/Select'
-import { loadFacultyPage } from '../loadFacultyPage'
+import { getFacultyPage } from '../queries/getFacultyPage'
 import type { FacultyResult } from '../repositories/bookingRepository'
 
 type Page = {
@@ -44,7 +44,7 @@ export function FacultyDirectory({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor)
           startTransition(async () => {
-            const next = await loadFacultyPage({
+            const next = await getFacultyPage({
               search,
               departmentId: department,
               cursor: page.nextCursor,

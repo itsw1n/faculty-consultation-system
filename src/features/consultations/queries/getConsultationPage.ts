@@ -8,7 +8,7 @@ const schema = z.object({
   status: status.nullable(),
   cursor: z.object({ createdAt: z.iso.datetime(), id: z.uuid() }).nullable(),
 })
-export async function loadConsultationPage(input: unknown) {
+export async function getConsultationPage(input: unknown) {
   const profile = await getAuthenticatedProfile()
   if (!profile || profile.accountStatus !== 'APPROVED') throw new Error('Authentication required')
   const value = schema.parse(input)

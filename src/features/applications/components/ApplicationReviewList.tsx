@@ -9,7 +9,7 @@ import { Modal } from '@/components/common/modal/Modal'
 import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { correctUserAccount, reviewApplication, reviewApplications } from '../actions'
-import { loadApplicationPage } from '../loadApplicationPage'
+import { getApplicationPage } from '../queries/getApplicationPage'
 import type { ApplicationItem } from '../repositories/applicationRepository'
 
 type Page = {
@@ -45,7 +45,7 @@ export function ApplicationReviewList({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor) {
           startTransition(async () => {
-            const next = await loadApplicationPage({
+            const next = await getApplicationPage({
               search: filters.search,
               status: filters.status || null,
               role: filters.role || null,

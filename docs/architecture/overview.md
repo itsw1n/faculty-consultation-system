@@ -14,6 +14,8 @@ Assumption College of Davao is a Next.js 16 App Router application backed by Sup
 
 Application code is organized under `src/features` by domain: auth, applications, availability, booking, consultations, dashboard, notifications, and admin. Shared layout and accessible controls live under `src/components`.
 
+Repositories named `list*`/`get*` are the query layer for thin reads — pages call them directly. Add a `queries/` module only when a read gains policy (merging sources, extra permission logic). Pages never call RPCs or table clients directly.
+
 ## Reliability and security
 
 Untrusted mutation input is checked with Zod. Availability overlap and double booking are protected by database constraints and transactional RPCs. Browser-visible environment values contain only the project URL, public Supabase key, and canonical site URL.

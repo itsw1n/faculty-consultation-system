@@ -15,7 +15,7 @@ export default async function ChooseSchedule({
         title="Choose Schedule"
         description="Choose an open time, add details, then review your request."
       />
-      <BookingWizard slots={await listFacultySlots(facultyId)} />
+      <BookingWizard facultyId={facultyId} initialSlots={await listFacultySlots(facultyId)} />
     </>
   )
 }

@@ -1,3 +1,4 @@
+import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { createDepartment, updateDepartment } from '@/features/admin/actions'
 import { listDepartments } from '@/features/admin/repositories/adminRepository'
@@ -37,9 +38,7 @@ export default async function DepartmentsPage() {
               maxLength={120}
             />
           </label>
-          <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-white">
-            Add department
-          </button>
+          <Button type="submit">Add department</Button>
         </form>
       </section>
       <section
@@ -72,9 +71,7 @@ export default async function DepartmentsPage() {
                   maxLength={120}
                 />
               </label>
-              <button className="min-h-11 rounded-lg bg-primary px-4 font-bold text-white">
-                Save changes
-              </button>
+              <Button type="submit">Save changes</Button>
             </form>
           </article>
         ))}

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Bell, Menu } from 'lucide-react'
 import { signOut } from '@/features/auth/actions'
 import type { AuthProfile } from '@/features/auth/types'
+import { Button } from '@/components/common/button/Button'
 import { listNotifications } from '@/features/notifications/repositories/notificationRepository'
 import { cn } from '@/lib/cn'
 import { Breadcrumbs } from './Breadcrumbs'
@@ -60,12 +61,9 @@ export async function AppShell({
               )}
             </dl>
             <form action={signOut}>
-              <button
-                type="submit"
-                className="inline-flex min-h-9 w-full items-center justify-center rounded-lg bg-surface px-3 py-1.5 text-sm font-bold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
-              >
+              <Button type="submit" variant="secondary" size="compact" className="w-full text-sm">
                 Sign out
-              </button>
+              </Button>
             </form>
           </div>
         </details>

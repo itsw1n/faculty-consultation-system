@@ -107,7 +107,7 @@ Check every box honestly before requesting review. The key ones:
 If a box does not apply (e.g. no migration), leave it unchecked only if the
 template allows — otherwise check it and write `N/A` reasoning in the PR body.
 
-### 6. Closes #
+### 6. Closes
 
 Link the issue so it auto-closes on merge:
 
@@ -183,11 +183,11 @@ Closes #45
 
 ## Common mistakes
 
-| Mistake | Fix |
-| ------- | --- |
-| Base set to `main` | Change base to `dev` before requesting review |
-| Empty "What does this PR do?" | Write what + why in 2–3 sentences |
-| "How to test?" left as `1. 2. 3.` | Write real numbered steps |
-| Checklist left unchecked | Run lint/tests, update docs, then check |
-| No `Closes #` link | Add `Closes #<issue>` so the issue closes on merge |
-| One PR with 5 unrelated changes | Split into one branch + PR per change |
+| Mistake                           | Fix                                                |
+| --------------------------------- | -------------------------------------------------- |
+| Base set to `main`                | Change base to `dev` before requesting review      |
+| Empty "What does this PR do?"     | Write what + why in 2–3 sentences                  |
+| "How to test?" left as `1. 2. 3.` | Write real numbered steps                          |
+| Checklist left unchecked          | Run lint/tests, update docs, then check            |
+| No `Closes #` link                | Add `Closes #<issue>` so the issue closes on merge |
+| One PR with 5 unrelated changes   | Split into one branch + PR per change              |

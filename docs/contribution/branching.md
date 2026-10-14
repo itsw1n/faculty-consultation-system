@@ -2,10 +2,10 @@
 
 ## The two permanent branches
 
-| Branch | Purpose | Who writes to it |
-| ------ | ------- | ---------------- |
+| Branch | Purpose                                       | Who writes to it                            |
+| ------ | --------------------------------------------- | ------------------------------------------- |
 | `main` | Production — always stable, always deployable | Only via `dev` → `main` promotion (release) |
-| `dev`  | Integration — all features merge here first | Only via merged PRs, never direct commits |
+| `dev`  | Integration — all features merge here first   | Only via merged PRs, never direct commits   |
 
 There are no other long-lived branches. Everything else is short-lived and deleted after merge.
 
@@ -22,15 +22,15 @@ There are no other long-lived branches. Everything else is short-lived and delet
 
 Format: `<type>/<short-description>`
 
-| Prefix | Use for | Example |
-| ------ | ------- | ------- |
-| `feature/` | New capability | `feature/student-booking-page` |
-| `fix/` | Bug fix | `fix/token-expiry-race` |
-| `refactor/` | Restructure, no behavior change | `refactor/auth-feature-module` |
-| `chore/` | Deps, config, tooling | `chore/update-dependencies` |
-| `docs/` | Documentation only | `docs/update-api-endpoints` |
-| `test/` | Adding or updating tests only | `test/add-booking-service-tests` |
-| `ci/` | GitHub Actions / CI changes | `ci/add-e2e-workflow` |
+| Prefix      | Use for                         | Example                          |
+| ----------- | ------------------------------- | -------------------------------- |
+| `feature/`  | New capability                  | `feature/student-booking-page`   |
+| `fix/`      | Bug fix                         | `fix/token-expiry-race`          |
+| `refactor/` | Restructure, no behavior change | `refactor/auth-feature-module`   |
+| `chore/`    | Deps, config, tooling           | `chore/update-dependencies`      |
+| `docs/`     | Documentation only              | `docs/update-api-endpoints`      |
+| `test/`     | Adding or updating tests only   | `test/add-booking-service-tests` |
+| `ci/`       | GitHub Actions / CI changes     | `ci/add-e2e-workflow`            |
 
 Rules for the description part:
 
@@ -93,10 +93,10 @@ Prefer `merge` over `rebase` if you are unsure — it is safer for shared branch
 
 ## Common mistakes
 
-| Mistake | Why it hurts | Do this instead |
-| ------- | ------------ | --------------- |
-| Branching off `main` | Misses unreleased `dev` work, causes conflicts | `git checkout dev` first, then branch |
-| Opening PR to `main` | Skips integration testing in `dev` | Set PR base to `dev` |
-| Committing straight to `dev` | Breaks integration for everyone | Make a `feature/*` branch |
-| One giant branch for everything | Unreviewable, blocks the team | One branch per logical change |
-| Reusing an old merged branch | Drags in stale history | Delete after merge, make a fresh branch |
+| Mistake                         | Why it hurts                                   | Do this instead                         |
+| ------------------------------- | ---------------------------------------------- | --------------------------------------- |
+| Branching off `main`            | Misses unreleased `dev` work, causes conflicts | `git checkout dev` first, then branch   |
+| Opening PR to `main`            | Skips integration testing in `dev`             | Set PR base to `dev`                    |
+| Committing straight to `dev`    | Breaks integration for everyone                | Make a `feature/*` branch               |
+| One giant branch for everything | Unreviewable, blocks the team                  | One branch per logical change           |
+| Reusing an old merged branch    | Drags in stale history                         | Delete after merge, make a fresh branch |

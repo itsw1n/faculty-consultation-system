@@ -2,8 +2,9 @@
 
 import { useActionState, useState } from 'react'
 import { GraduationCap, Users } from 'lucide-react'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
+import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
 import { submitApplication } from '../actions'
 
@@ -50,7 +51,7 @@ export function ApplicationFlow({
           ].map(({ role: option, icon: Icon, title, description }) => (
             <button
               key={option}
-              className="grid justify-items-center gap-3 rounded-xl border border-border bg-surface p-8 text-foreground shadow-card transition-colors hover:border-accent focus-visible:outline-3 focus-visible:outline-focus"
+              className="grid cursor-pointer justify-items-center gap-3 rounded-xl border border-border bg-surface p-8 text-foreground shadow-card transition-colors hover:border-accent focus-visible:outline-3 focus-visible:outline-focus"
               onClick={() => setRole(option)}
             >
               <Icon className="size-12 text-accent" aria-hidden="true" />
@@ -82,17 +83,17 @@ export function ApplicationFlow({
           School email
           <input className={controlClass} value={email} readOnly />
         </label>
-        <label className={fieldClass}>
-          Department
-          <select className={controlClass} name="departmentId" required>
-            <option value="">Select a department</option>
-            {departments.map((department) => (
-              <option key={department.id} value={department.id}>
-                {department.code} — {department.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Department"
+          name="departmentId"
+          placeholder="Select a department"
+          options={departments.map((department) => ({
+            id: department.id,
+            label: `${department.code} — ${department.name}`,
+          }))}
+          isRequired
+          className="grid gap-1.5 text-sm font-bold"
+        />
         {role === 'FACULTY' && (
           <label className={fieldClass}>
             Position title

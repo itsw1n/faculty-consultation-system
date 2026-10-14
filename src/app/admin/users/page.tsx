@@ -30,6 +30,7 @@ export default async function ManageUsersPage({
           role: parameters.role ?? '',
           department: parameters.department ?? '',
         }}
+        departments={departments}
       />
     </>
   )

@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { ConfirmAction } from '@/components/common/ConfirmAction'
+import { AlertDialog } from '@/components/common/AlertDialog'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { Select } from '@/components/common/select/Select'
 import { cancelConsultation, decideConsultation } from '../actions'
-import { loadConsultationPage } from '../loadConsultationPage'
+import { getConsultationPage } from '../queries/getConsultationPage'
 import type { ConsultationItem } from '../types'
 import { categoryLabel } from '../categories'
 import Link from 'next/link'
@@ -31,7 +32,7 @@ export function ConsultationDirectory({
     const timeout = setTimeout(
       () =>
         startTransition(async () =>
-          setPage(await loadConsultationPage({ search, status: status || null, cursor: null }))
+          setPage(await getConsultationPage({ search, status: status || null, cursor: null }))
         ),
       300
     )
@@ -44,7 +45,7 @@ export function ConsultationDirectory({
       (entries) => {
         if (entries[0]?.isIntersecting && page.nextCursor)
           startTransition(async () => {
-            const next = await loadConsultationPage({
+            const next = await getConsultationPage({
               search,
               status: status || null,
               cursor: page.nextCursor,
@@ -73,19 +74,18 @@ export function ConsultationDirectory({
           />
         </label>
         {!fixedStatus && (
-          <label className={field}>
-            <span>Status</span>
-            <select
-              className={control}
-              value={status}
-              onChange={(event) => setStatus(event.target.value as Status | '')}
-            >
-              <option value="">All statuses</option>
-              {['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label="Status"
+            options={[
+              { id: 'all', label: 'All statuses' },
+              ...['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => ({
+                id: value,
+                label: value,
+              })),
+            ]}
+            value={status || 'all'}
+            onChange={(value) => setStatus(value === 'all' ? '' : (value as Status | ''))}
+          />
         )}
       </div>
       <section className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
@@ -119,14 +119,14 @@ export function ConsultationDirectory({
                 )}
                 {viewer === 'FACULTY' && item.consultation_status === 'PENDING' && (
                   <>
-                    <ConfirmAction
+                    <AlertDialog
                       label="Approve"
                       title="Approve consultation?"
                       description="This confirms the selected schedule."
                       fields={{ consultationId: item.id, approve: 'true' }}
                       submitAction={decideConsultation}
                     />
-                    <ConfirmAction
+                    <AlertDialog
                       label="Reject"
                       title="Reject consultation?"
                       description="The slot will reopen."
@@ -146,7 +146,7 @@ export function ConsultationDirectory({
                 )}
                 {viewer === 'STUDENT' &&
                   ['PENDING', 'APPROVED'].includes(item.consultation_status) && (
-                    <ConfirmAction
+                    <AlertDialog
                       label="Cancel"
                       title="Cancel consultation?"
                       description="The slot will reopen."

@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import { GraduationCap, Users } from 'lucide-react'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'

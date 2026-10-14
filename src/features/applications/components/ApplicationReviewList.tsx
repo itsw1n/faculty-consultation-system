@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState, useTransition } from 'react'
 import { AlertDialog } from '@/components/common/AlertDialog'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Modal } from '@/components/common/modal/Modal'

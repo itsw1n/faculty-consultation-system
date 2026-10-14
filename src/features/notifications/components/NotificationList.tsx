@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { markNotificationRead } from '../actions'
 import { loadNotificationPage } from '../loadNotificationPage'
 import type { NotificationItem } from '../types'

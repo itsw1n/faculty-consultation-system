@@ -1,6 +1,6 @@
 'use client'
 import { useFormStatus } from 'react-dom'
-import { buttonVariants } from './Button'
+import { buttonVariants } from './button/Button'
 import { cn } from '@/lib/cn'
 
 export function SubmitButton({

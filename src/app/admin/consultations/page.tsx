@@ -1,4 +1,4 @@
-import { Button } from '@/components/common/Button'
+import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { ConsultationDirectory } from '@/features/consultations/components/ConsultationDirectory'
 import { getConsultationPage } from '@/features/consultations/repositories/consultationRepository'

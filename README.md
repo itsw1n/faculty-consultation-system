@@ -1,8 +1,20 @@
-# Assumption College of Davao
+# Faculty Consultation and Scheduling System
 
-A faculty consultation and scheduling system for students, faculty, and school administrators. It uses Next.js 16, Supabase Auth/PostgreSQL, TypeScript, React Aria, and Tailwind CSS.
+Web app for Assumption College of Davao: students request consultations, faculty manage availability and requests, admins manage accounts. Next.js 16 · Supabase Auth + PostgreSQL · TypeScript · React Aria · Tailwind CSS.
 
-## Local development
+## Start here
+
+| I want to…                          | Go to                                                                                                                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Run it locally                      | [`docs/guides/setup.md`](docs/guides/setup.md)                                                                                                                                      |
+| Configure env (local vs prod)       | [`docs/guides/env-variables.md`](docs/guides/env-variables.md)                                                                                                                      |
+| Deploy it                           | [`docs/guides/deployment.md`](docs/guides/deployment.md)                                                                                                                            |
+| Understand the system               | [`docs/architecture/overview.md`](docs/architecture/overview.md)                                                                                                                    |
+| Know what it must do                | [`docs/specs/`](docs/specs/) (source of truth)                                                                                                                                      |
+| Check what is built / left          | [`docs/plans/implementation-plan.md`](docs/plans/implementation-plan.md) + [`docs/plans/ACD_Implementation_Gap_Tracker_v0.2.md`](docs/plans/ACD_Implementation_Gap_Tracker_v0.2.md) |
+| Contribute (branches, commits, PRs) | [`docs/contribution/`](docs/contribution/)                                                                                                                                          |
+
+## Run locally
 
 ```bash
 cp .env.example .env.local
@@ -12,21 +24,22 @@ npm run supabase:reset
 npm run dev
 ```
 
-Configure Google OAuth in Supabase to exercise the full account flow. Local seed data and database tests live under `supabase/`.
+Full steps (Google OAuth, seed data, school-domain behavior): [`docs/guides/setup.md`](docs/guides/setup.md).
 
-## Validation
+## Work on it
+
+- Branch off `dev`, never `main`. Open PRs against `dev`: [`docs/contribution/branching.md`](docs/contribution/branching.md), [`docs/contribution/pull-requests.md`](docs/contribution/pull-requests.md).
+- Commits follow `type(scope): description`: [`docs/contribution/commits.md`](docs/contribution/commits.md).
+
+## Validate
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
+npm run check    # format + lint + typecheck + tests
 npm run build
 npm run supabase:test
 npm run test:e2e
 ```
 
-See [CONTEXT.md](CONTEXT.md), [the product specifications](docs/specs/product-requirements.md), and [the implementation plan](docs/plans/implementation-plan.md) for system behavior and status.
-
 ## Releases
 
-After frontend, database, dependency, secret, and audit checks succeed for a change on `main`, the release workflow analyzes Conventional Commits, selects the next semantic version, tags the exact validated commit, and publishes generated GitHub release notes. `feat` commits produce minor releases, `fix` commits produce patch releases, and breaking changes produce major releases. The first automated release is `v1.0.0`.
+Merging `dev` → `main` runs full CI; on green, the release workflow tags the next semantic version from Conventional Commits (`feat` → minor, `fix` → patch) and publishes generated notes. Production database pushes and hosting deploys are separate, explicitly approved steps.

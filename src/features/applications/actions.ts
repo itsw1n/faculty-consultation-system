@@ -4,37 +4,33 @@ import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
 import { accountCorrectionSchema } from './schemas/accountCorrectionSchema'
-import { bulkReviewSchema, reviewDecisionSchema } from './schemas/reviewSchema'
+import { inviteFacultySchema } from './schemas/inviteFacultySchema'
 
-export async function reviewApplication(formData: FormData) {
-  await requireRole('ADMIN')
-  const input = reviewDecisionSchema.parse({
-    userId: formData.get('userId'),
-    decision: formData.get('decision'),
-  })
-  const { error } = await (
-    await createClient()
-  ).rpc('review_application', { target_user_id: input.userId, decision: input.decision })
-  if (error) throw new Error('The application could not be reviewed. Refresh and try again.')
-  revalidatePath('/admin/users')
-}
+export type InviteResult = { email: string; invited: boolean; reason: string | null }
 
-export async function reviewApplications(formData: FormData) {
+export async function inviteFaculty(
+  _state: ActionState,
+  formData: FormData
+): Promise<ActionState & { results?: InviteResult[] }> {
   await requireRole('ADMIN')
-  const { userIds, decision } = bulkReviewSchema.parse({
-    userIds: formData.getAll('userIds'),
-    decision: formData.get('decision'),
+  const result = inviteFacultySchema.safeParse({
+    emails: formData.get('emails'),
+    departmentId: formData.get('departmentId'),
+    positionTitle: formData.get('positionTitle') || undefined,
   })
+  if (!result.success)
+    return { error: result.error.issues[0]?.message ?? 'Check the invite details.' }
+  const input = result.data
   const { data, error } = await (
     await createClient()
-  ).rpc('review_applications', { target_user_ids: userIds, decision })
-  if (error) throw new Error('The selected applications could not be reviewed.')
-  const failures = (data as { succeeded: boolean }[]).filter((item) => !item.succeeded).length
-  if (failures)
-    throw new Error(
-      `${failures} application records changed before this review. Refresh and try again.`
-    )
+  ).rpc('invite_faculty', {
+    invite_emails: input.emails,
+    invite_department_id: input.departmentId,
+    invite_position_title: input.positionTitle,
+  })
+  if (error) return { error: 'The invites could not be saved. Refresh and try again.' }
   revalidatePath('/admin/users')
+  return { error: null, results: data as InviteResult[] }
 }
 
 export async function correctUserAccount(

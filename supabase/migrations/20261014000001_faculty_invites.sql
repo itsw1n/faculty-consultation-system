@@ -33,7 +33,7 @@ begin
     reason := null;
     if clean = '' or clean not like '%@%' or clean like '%@%@%' or not public.is_approved_email(clean) then
       reason := 'Not a school email';
-    elsif exists (select 1 from public.profiles where lower(email) = clean and role = 'FACULTY' and account_status = 'APPROVED') then
+    elsif exists (select 1 from public.profiles where lower(profiles.email) = clean and role = 'FACULTY' and account_status = 'APPROVED') then
       reason := 'Already faculty';
     else
       begin

@@ -1,5 +1,5 @@
 begin;
-select plan(15);
+select plan(16);
 
 delete from public.approved_email_domains where domain = '*';
 
@@ -12,11 +12,16 @@ values
 ('d1000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','outsider@gmail.com','',now(),'{}','{}',now(),now()),
 ('d2000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','applicant@acdeducation.com','',now(),'{}','{}',now(),now()),
 ('d3000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','boss@acdeducation.com','',now(),'{}','{}',now(),now()),
-('d4000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000000','authenticated','authenticated','legacy@gmail.com','',now(),'{}','{}',now(),now());
+('d4000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000000','authenticated','authenticated','legacy@gmail.com','',now(),'{}','{}',now(),now()),
+('d5000000-0000-0000-0000-000000000005','00000000-0000-0000-0000-000000000000','authenticated','authenticated','legacy-in@acdeducation.com','',now(),'{}','{}',now(),now());
 insert into public.profiles (id, email, full_name, requested_role, department_id, account_status)
 values ('d4000000-0000-0000-0000-000000000004','legacy@gmail.com','Legacy Applicant','STUDENT',(select id from public.departments where code='IT'),'PENDING')
 on conflict (id) do update set requested_role = excluded.requested_role,
   department_id = excluded.department_id, account_status = excluded.account_status;
+update public.profiles set requested_role = 'STUDENT',
+  department_id = (select id from public.departments where code='IT'),
+  account_status = 'PENDING', role = null
+where id = 'd5000000-0000-0000-0000-000000000005';
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"d1000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
@@ -25,14 +30,15 @@ reset role;
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"d2000000-0000-0000-0000-000000000002","role":"authenticated"}',true);
-select lives_ok($$select public.submit_application('STUDENT',(select id from public.departments where code='IT'),null)$$,'school email can apply');
+select results_eq($$select role::text from public.profiles where id='d2000000-0000-0000-0000-000000000002'$$,array['STUDENT'::text],'school email auto lands as student');
+select results_eq($$select account_status::text from public.profiles where id='d2000000-0000-0000-0000-000000000002'$$,array['APPROVED'::text],'school email is approved on first sign in');
 reset role;
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"d3000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
 select lives_ok($$select public.claim_first_admin('boss@acdeducation.com')$$,'designated email claims first admin');
 select throws_ok($$select public.claim_first_admin('boss@acdeducation.com')$$,'23514','An administrator already exists','second claim fails');
-select lives_ok($$select public.review_application('d2000000-0000-0000-0000-000000000002','APPROVED')$$,'admin approves school applicant');
+select lives_ok($$select public.review_application('d5000000-0000-0000-0000-000000000005','APPROVED')$$,'legacy pending school application can be approved');
 select throws_ok($$select public.review_application('d4000000-0000-0000-0000-000000000004','APPROVED')$$,'22023','School email required','legacy outside application cannot be approved');
 select lives_ok($$select public.correct_user_account('d2000000-0000-0000-0000-000000000002','FACULTY',(select id from public.departments where code='IT'),'Lecturer')$$,'admin corrects role and department');
 select lives_ok($$select public.correct_user_account('d2000000-0000-0000-0000-000000000002','FACULTY',(select id from public.departments where code='IT'),null)$$,'repeat correction without a position keeps the current one');

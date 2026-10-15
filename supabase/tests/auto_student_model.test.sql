@@ -1,5 +1,5 @@
 begin;
-select plan(10);
+select plan(11);
 
 delete from public.approved_email_domains where domain = '*';
 
@@ -35,8 +35,8 @@ select results_eq(
   'both candidate emails are reported'
 );
 select results_eq(
-  $$select invited::text from public.invite_faculty(array['invited@acdeducation.com'],(select id from public.departments where code='IT'),'Lecturer') order by email$$,
-  array['true'::text],
+  $$select email || ':' || invited::text || ':' || coalesce(reason, 'ok') from public.invite_faculty(array['invited@acdeducation.com'],(select id from public.departments where code='IT'),'Lecturer')$$,
+  array['invited@acdeducation.com:true:ok'::text],
   'school email invite is accepted'
 );
 select results_eq(

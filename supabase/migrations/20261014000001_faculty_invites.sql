@@ -39,7 +39,7 @@ begin
       begin
         insert into public.faculty_invites (email, department_id, position_title, invited_by)
         values (clean, invite_department_id, btrim(invite_position_title), (select auth.uid()))
-        on conflict (email) do update
+        on conflict on constraint faculty_invites_pkey do update
           set department_id = excluded.department_id,
               position_title = excluded.position_title,
               invited_by = excluded.invited_by,

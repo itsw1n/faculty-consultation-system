@@ -11,14 +11,14 @@ export default async function ManageUsersPage({
 }) {
   const parameters = await searchParams
   const [page, departments] = await Promise.all([
-    getApplicationPage({ ...parameters, status: parameters.status ?? 'PENDING' }),
+    getApplicationPage({ ...parameters, status: parameters.status ?? '' }),
     getDepartments(),
   ])
   return (
     <>
       <PageHeading
         title="Manage Users"
-        description="Review student and faculty access applications."
+        description="Everyone with a school email is a student by default. Promote faculty here."
       />
       <ApplicationFilters departments={departments} />
       <ApplicationReviewList
@@ -26,7 +26,7 @@ export default async function ManageUsersPage({
         initialPage={page}
         filters={{
           search: parameters.search ?? '',
-          status: parameters.status ?? 'PENDING',
+          status: parameters.status ?? '',
           role: parameters.role ?? '',
           department: parameters.department ?? '',
         }}

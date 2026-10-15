@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ClaimAdminForm } from './ClaimAdminForm'
 
@@ -20,7 +21,9 @@ describe('ClaimAdminForm', () => {
   it('shows the safe error when the claim is rejected', async () => {
     render(<ClaimAdminForm />)
 
-    fireEvent.click(screen.getByRole('button', { name: /claim administrator access/i }))
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /claim administrator access/i }))
+    })
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Admin claim is not available for this account.'

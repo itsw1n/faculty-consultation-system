@@ -25,6 +25,7 @@ export function FacultyDirectory({
   const [pending, startTransition] = useTransition()
   const [search, setSearch] = useState(useSearchParams().get('search') ?? '')
   const department = useSearchParams().get('department') ?? ''
+  const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
   const marker = useRef<HTMLDivElement>(null)
@@ -33,10 +34,12 @@ export function FacultyDirectory({
       const params = new URLSearchParams()
       if (search) params.set('search', search)
       if (department) params.set('department', department)
-      router.replace(`${pathname}?${params}`)
+      // Skip no-op replaces: a replace to the current URL aborts an
+      // in-flight Link navigation, swallowing the user's first click.
+      if (params.toString() !== searchParams.toString()) router.replace(`${pathname}?${params}`)
     }, 300)
     return () => clearTimeout(timeout)
-  }, [search, department, pathname, router])
+  }, [search, department, pathname, router, searchParams])
   useEffect(() => {
     const node = marker.current
     if (!node || !page.hasMore || pending) return

@@ -60,4 +60,13 @@ npm run supabase:test
 npm run test:e2e
 ```
 
+End-to-end specs under `e2e/` drive real Chromium against your local
+Supabase. Landing-page specs run anywhere; the click-to-database specs
+(`admin-users.spec.ts`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`
+(refresh it from `supabase status -o env`) and skip automatically in CI,
+which has no local database. Test sign-in bypasses Google OAuth by design:
+fixtures create password users through the Auth Admin API, inject the real
+GoTrue session cookie, and every click after login is genuine — assertions
+then check both the screen and the database row.
+
 Commit the generated `package-lock.json`; CI uses `npm ci`.

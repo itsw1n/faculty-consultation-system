@@ -6,5 +6,3 @@ export const accountCorrectionSchema = z.object({
   departmentId: z.uuid(),
   positionTitle: z.string().trim().max(120).optional(),
 })
-
-export type AccountCorrectionInput = z.infer<typeof accountCorrectionSchema>

@@ -13,5 +13,6 @@ services:
     environment:
       - NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
       - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+      - NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 # The Supabase platform is managed separately. Use `supabase start` for the
 # official local stack instead of approximating it with a bare PostgreSQL image.

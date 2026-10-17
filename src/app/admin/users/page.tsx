@@ -1,7 +1,7 @@
 import { PageHeading } from '@/components/common/PageHeading'
 import { ApplicationReviewList } from '@/features/applications/components/ApplicationReviewList'
 import { getApplicationPage } from '@/features/applications/repositories/applicationRepository'
-import { getDepartments } from '@/features/auth/repositories/authRepository'
+import { listDepartments } from '@/features/admin/repositories/adminRepository'
 import { ApplicationFilters } from '@/features/applications/components/ApplicationFilters'
 
 export default async function ManageUsersPage({
@@ -12,7 +12,7 @@ export default async function ManageUsersPage({
   const parameters = await searchParams
   const [page, departments] = await Promise.all([
     getApplicationPage({ ...parameters, status: parameters.status ?? '' }),
-    getDepartments(),
+    listDepartments(),
   ])
   return (
     <>

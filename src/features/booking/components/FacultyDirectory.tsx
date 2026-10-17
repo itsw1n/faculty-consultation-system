@@ -1,34 +1,33 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { SearchInput } from '@/components/common/SearchInput'
 import { Select } from '@/components/common/select/Select'
+import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
 import { getFacultyPage } from '../queries/getFacultyPage'
 import type { FacultyResult } from '../repositories/bookingRepository'
 
-type Page = {
-  items: FacultyResult[]
-  hasMore: boolean
-  nextCursor: { name: string; id: string } | null
-}
+type Cursor = { name: string; id: string }
 
 export function FacultyDirectory({
   initialPage,
   departments,
 }: {
-  initialPage: Page
+  initialPage: InfinitePage<FacultyResult, Cursor>
   departments: { id: string; code: string }[]
 }) {
-  const [page, setPage] = useState(initialPage)
-  const [pending, startTransition] = useTransition()
   const [search, setSearch] = useState(useSearchParams().get('search') ?? '')
   const department = useSearchParams().get('department') ?? ''
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-  const marker = useRef<HTMLDivElement>(null)
+  const { page, pending, markerRef } = useInfinitePage<FacultyResult, Cursor>({
+    initialPage,
+    fetchPage: (cursor) => getFacultyPage({ search, departmentId: department, cursor }),
+  })
   useEffect(() => {
     const timeout = setTimeout(() => {
       const params = new URLSearchParams()
@@ -40,26 +39,6 @@ export function FacultyDirectory({
     }, 300)
     return () => clearTimeout(timeout)
   }, [search, department, pathname, router, searchParams])
-  useEffect(() => {
-    const node = marker.current
-    if (!node || !page.hasMore || pending) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && page.nextCursor)
-          startTransition(async () => {
-            const next = await getFacultyPage({
-              search,
-              departmentId: department,
-              cursor: page.nextCursor,
-            })
-            setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
-          })
-      },
-      { rootMargin: '200px' }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [page, search, department, pending])
   function changeDepartment(value: string) {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
@@ -107,13 +86,12 @@ export function FacultyDirectory({
           </article>
         ))}
       </div>
-      <div
-        ref={marker}
-        className="grid min-h-12 place-items-center text-sm text-muted"
-        aria-live="polite"
-      >
-        {pending ? 'Loading more faculty…' : page.hasMore ? 'Scroll for more' : ''}
-      </div>
+      <InfiniteListMarker
+        markerRef={markerRef}
+        pending={pending}
+        hasMore={page.hasMore}
+        pendingLabel="Loading more faculty…"
+      />
     </>
   )
 }

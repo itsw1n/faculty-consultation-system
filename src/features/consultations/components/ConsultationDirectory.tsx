@@ -1,63 +1,41 @@
 'use client'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { AlertDialog } from '@/components/common/AlertDialog'
+import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Select } from '@/components/common/select/Select'
+import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
 import { cancelConsultation, decideConsultation } from '../actions'
 import { getConsultationPage } from '../queries/getConsultationPage'
 import type { ConsultationItem } from '../types'
 import { categoryLabel } from '../categories'
-import Link from 'next/link'
+
 type Status = ConsultationItem['consultation_status']
-type Page = {
-  items: ConsultationItem[]
-  hasMore: boolean
-  nextCursor: { createdAt: string; id: string } | null
-}
+type Cursor = { createdAt: string; id: string }
+
 export function ConsultationDirectory({
   initialPage,
   viewer,
   fixedStatus,
 }: {
-  initialPage: Page
+  initialPage: InfinitePage<ConsultationItem, Cursor>
   viewer: 'STUDENT' | 'FACULTY' | 'ADMIN'
   fixedStatus?: Status
 }) {
-  const [page, setPage] = useState(initialPage)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<Status | ''>(fixedStatus ?? '')
-  const [pending, startTransition] = useTransition()
-  const marker = useRef<HTMLDivElement>(null)
+  const { page, pending, markerRef, reload } = useInfinitePage<ConsultationItem, Cursor>({
+    initialPage,
+    fetchPage: (cursor) => getConsultationPage({ search, status: status || null, cursor }),
+  })
   useEffect(() => {
     const timeout = setTimeout(
-      () =>
-        startTransition(async () =>
-          setPage(await getConsultationPage({ search, status: status || null, cursor: null }))
-        ),
+      () => reload(() => getConsultationPage({ search, status: status || null, cursor: null })),
       300
     )
     return () => clearTimeout(timeout)
-  }, [search, status])
-  useEffect(() => {
-    const node = marker.current
-    if (!node || pending || !page.hasMore) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && page.nextCursor)
-          startTransition(async () => {
-            const next = await getConsultationPage({
-              search,
-              status: status || null,
-              cursor: page.nextCursor,
-            })
-            setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
-          })
-      },
-      { rootMargin: '200px' }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [page, pending, search, status])
+  }, [search, status, reload])
   const field = 'grid flex-1 gap-1.5 text-xs font-bold'
   const control =
     'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
@@ -160,13 +138,12 @@ export function ConsultationDirectory({
           ))
         )}
       </section>
-      <div
-        ref={marker}
-        className="grid min-h-12 place-items-center text-sm text-muted"
-        aria-live="polite"
-      >
-        {pending ? 'Loading consultations…' : page.hasMore ? 'Scroll for more' : ''}
-      </div>
+      <InfiniteListMarker
+        markerRef={markerRef}
+        pending={pending}
+        hasMore={page.hasMore}
+        pendingLabel="Loading consultations…"
+      />
     </>
   )
 }

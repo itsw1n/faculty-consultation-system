@@ -1,18 +1,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { FacultyResult, SlotResult } from '../types'
-export type { FacultyResult, SlotResult }
-export async function listFaculty(search = '', departmentId?: string) {
-  const { data, error } = await (
-    await createClient()
-  ).rpc('list_faculty', {
-    faculty_search: search,
-    department_filter: departmentId || null,
-    result_limit: 20,
-  })
-  if (error) throw new Error('Unable to load faculty')
-  return data as FacultyResult[]
-}
+export type { FacultyResult }
 export async function getFacultyPage(
   search = '',
   departmentId?: string,

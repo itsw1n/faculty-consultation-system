@@ -15,5 +15,3 @@ export const inviteFacultySchema = z.object({
   departmentId: z.uuid(),
   positionTitle: z.string().trim().min(1).max(120),
 })
-
-export type InviteFacultyInput = z.infer<typeof inviteFacultySchema>

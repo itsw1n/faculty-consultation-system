@@ -1,5 +1,5 @@
 import { PageHeading } from '@/components/common/PageHeading'
-import { getDepartments } from '@/features/auth/repositories/authRepository'
+import { listDepartments } from '@/features/admin/repositories/adminRepository'
 import { FacultyDirectory } from '@/features/booking/components/FacultyDirectory'
 import { getFacultyPage } from '@/features/booking/repositories/bookingRepository'
 export default async function ChooseFaculty({
@@ -10,7 +10,7 @@ export default async function ChooseFaculty({
   const p = await searchParams
   const [page, departments] = await Promise.all([
     getFacultyPage(p.search, p.department),
-    getDepartments(),
+    listDepartments(),
   ])
   return (
     <>

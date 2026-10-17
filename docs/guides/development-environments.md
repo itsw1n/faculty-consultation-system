@@ -2,7 +2,7 @@
 
 ## Default local workflow
 
-Run the generator directly on the host, then use the commands in `setup.md`. Docker is optional and is never required to run create-win-project itself. Local files and package-manager metadata remain the source of truth.
+Use the commands in `setup.md` to run the app and the Supabase stack on the host. Docker is optional.
 
 ## Optional Docker workflow
 
@@ -14,8 +14,8 @@ docker compose build
 docker compose up -d
 ```
 
-Override host collisions with `FRONTEND_HOST_PORT`, `BACKEND_HOST_PORT`, and `POSTGRES_HOST_PORT`. Backend runtimes and databases stay inside containers, reducing the host tools you need.
+Override the host port collision with `FRONTEND_HOST_PORT`. Supabase runs separately through the Supabase CLI, so the compose file only builds the Next.js app.
 
 ## Dev Containers
 
-A generic Dev Container is intentionally not generated: JavaScript, Java, PHP, and mobile stacks need different host/device boundaries. VS Code and Codespaces users can open the generated repository normally and add a stack-specific Dev Container later without changing the supported local or Compose workflows.
+A generic Dev Container is intentionally not generated: JavaScript, Java, PHP, and mobile stacks need different host/device boundaries. VS Code and Codespaces users can open the repository normally and add a stack-specific Dev Container later without changing the supported local or Compose workflows.

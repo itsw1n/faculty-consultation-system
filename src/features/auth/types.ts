@@ -1,4 +1,4 @@
-export type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type UserRole = 'STUDENT' | 'FACULTY' | 'ADMIN'
 
 export type AuthProfile = {

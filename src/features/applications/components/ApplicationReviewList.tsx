@@ -1,21 +1,19 @@
 'use client'
 
-import { useActionState, useEffect, useRef, useState, useTransition } from 'react'
+import { useActionState, useState } from 'react'
 import { Button } from '@/components/common/button/Button'
+import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Modal } from '@/components/common/modal/Modal'
 import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
+import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
 import { correctUserAccount, inviteFaculty, type InviteResult } from '../actions'
 import { getApplicationPage } from '../queries/getApplicationPage'
 import type { ApplicationItem } from '../types'
 
-type Page = {
-  items: ApplicationItem[]
-  hasMore: boolean
-  nextCursor: { createdAt: string; id: string } | null
-}
+type Cursor = { createdAt: string; id: string }
 
 type Filters = { search: string; status: string; role: string; department: string }
 
@@ -24,11 +22,10 @@ export function ApplicationReviewList({
   filters,
   departments,
 }: {
-  initialPage: Page
+  initialPage: InfinitePage<ApplicationItem, Cursor>
   filters: Filters
   departments: { id: string; name: string }[]
 }) {
-  const [page, setPage] = useState(initialPage)
   const [correctTarget, setCorrectTarget] = useState<ApplicationItem | null>(null)
   const [correctRole, setCorrectRole] = useState('STUDENT')
   const [correctionState, correctionAction] = useActionState(correctUserAccount, initialActionState)
@@ -37,33 +34,17 @@ export function ApplicationReviewList({
     results: [] as InviteResult[],
   })
   const inviteResults: InviteResult[] = inviteState.results ?? []
-  const [pending, startTransition] = useTransition()
-  const marker = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const node = marker.current
-    if (!node || pending || !page.hasMore) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && page.nextCursor) {
-          startTransition(async () => {
-            const next = await getApplicationPage({
-              search: filters.search,
-              status: filters.status || null,
-              role: filters.role || null,
-              department: filters.department || null,
-              cursor: page.nextCursor,
-            })
-            setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
-          })
-        }
-      },
-      { rootMargin: '200px' }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [page, pending, filters])
+  const { page, pending, markerRef } = useInfinitePage<ApplicationItem, Cursor>({
+    initialPage,
+    fetchPage: (cursor) =>
+      getApplicationPage({
+        search: filters.search,
+        status: filters.status || null,
+        role: filters.role || null,
+        department: filters.department || null,
+        cursor,
+      }),
+  })
 
   return (
     <>
@@ -227,13 +208,12 @@ export function ApplicationReviewList({
           </form>
         ) : null}
       </Modal>
-      <div
-        ref={marker}
-        className="grid min-h-12 place-items-center text-sm text-muted"
-        aria-live="polite"
-      >
-        {pending ? 'Loading accounts…' : page.hasMore ? 'Scroll for more' : ''}
-      </div>
+      <InfiniteListMarker
+        markerRef={markerRef}
+        pending={pending}
+        hasMore={page.hasMore}
+        pendingLabel="Loading accounts…"
+      />
     </>
   )
 }

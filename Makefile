@@ -5,7 +5,7 @@
 .DEFAULT_GOAL := help
 NPM_DIR := .
 
-.PHONY: help dev build lint test test-e2e db-start db-stop db-reset db-test db-types
+.PHONY: help dev build lint test test-e2e db-start db-stop db-reset db-test
 
 help: ## Show all commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -37,6 +37,3 @@ db-reset: ## Reset local DB (apply migrations + seed)
 
 db-test: ## Run local database and RLS tests
 	npm --prefix $(NPM_DIR) run supabase:test
-
-db-types: ## Regenerate TypeScript types from Supabase schema
-	npm --prefix $(NPM_DIR) run supabase:types

@@ -10,7 +10,6 @@ node_modules/
 # Build outputs
 .next/
 out/
-src/generated/prisma/
 *.tsbuildinfo
 
 # IDE

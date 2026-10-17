@@ -4,7 +4,7 @@ export async function listDepartments() {
   const { data, error } = await (await createClient())
     .from('departments')
     .select('id,code,name')
-    .order('code')
+    .order('name')
   if (error) throw new Error('Unable to load departments')
   return data
 }

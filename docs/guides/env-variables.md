@@ -17,6 +17,10 @@ Values with `NEXT_PUBLIC_` are bundled into client code and must never contain s
 | `SUPABASE_SERVICE_ROLE_KEY` | server only |                yes | Queue processor access to the private email outbox. |
 | `CRON_SECRET`               | server only |                yes | Bearer token for Vercel's scheduled email route.    |
 
+| Variable              | Visibility  | Purpose                                              |
+| --------------------- | ----------- | ---------------------------------------------------- |
+| `INITIAL_ADMIN_EMAIL` | server only | Designated address allowed to claim the first admin. |
+
 Do not prefix these values with `NEXT_PUBLIC_`. For a class demonstration, verify a sender domain or subdomain you control in Resend and send to test accounts. A Vercel app subdomain hosts the application but does not grant control of email DNS records. School-branded email needs ICTC approval for school DNS and sender identity.
 
 ## Local Google OAuth credentials

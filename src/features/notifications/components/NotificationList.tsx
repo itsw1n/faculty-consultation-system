@@ -1,34 +1,22 @@
 'use client'
-import { useEffect, useRef, useState, useTransition } from 'react'
 import { Button } from '@/components/common/button/Button'
+import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
+import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
 import { markNotificationRead } from '../actions'
 import { getNotificationPage } from '../queries/getNotificationPage'
 import type { NotificationItem } from '../types'
-type Page = {
-  items: NotificationItem[]
-  hasMore: boolean
-  nextCursor: { createdAt: string; id: string } | null
-}
-export function NotificationList({ initialPage }: { initialPage: Page }) {
-  const [page, setPage] = useState(initialPage)
-  const [pending, startTransition] = useTransition()
-  const marker = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const node = marker.current
-    if (!node || pending || !page.hasMore) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && page.nextCursor)
-          startTransition(async () => {
-            const next = await getNotificationPage({ cursor: page.nextCursor })
-            setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
-          })
-      },
-      { rootMargin: '200px' }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [page, pending])
+
+type Cursor = { createdAt: string; id: string }
+
+export function NotificationList({
+  initialPage,
+}: {
+  initialPage: InfinitePage<NotificationItem, Cursor>
+}) {
+  const { page, pending, markerRef } = useInfinitePage<NotificationItem, Cursor>({
+    initialPage,
+    fetchPage: (cursor) => getNotificationPage({ cursor }),
+  })
   return (
     <>
       <section className="overflow-hidden rounded-xl border border-border bg-surface">
@@ -62,13 +50,12 @@ export function NotificationList({ initialPage }: { initialPage: Page }) {
           ))
         )}
       </section>
-      <div
-        ref={marker}
-        className="grid min-h-12 place-items-center text-sm text-muted"
-        aria-live="polite"
-      >
-        {pending ? 'Loading notifications…' : page.hasMore ? 'Scroll for more' : ''}
-      </div>
+      <InfiniteListMarker
+        markerRef={markerRef}
+        pending={pending}
+        hasMore={page.hasMore}
+        pendingLabel="Loading notifications…"
+      />
     </>
   )
 }

@@ -11,5 +11,3 @@ export const departmentSchema = z.object({
 })
 
 export const departmentUpdateSchema = departmentSchema.extend({ id: z.string().uuid() })
-
-export type DepartmentInput = z.infer<typeof departmentSchema>

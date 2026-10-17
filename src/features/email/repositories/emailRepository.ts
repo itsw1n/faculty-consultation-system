@@ -8,7 +8,7 @@ function adminClient() {
   return createClient(url, key, { auth: { persistSession: false } })
 }
 
-export type QueuedEmail = {
+type QueuedEmail = {
   id: string
   recipient_email: string
   event_type: string

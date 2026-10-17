@@ -14,3 +14,7 @@
 Enums define user role, account status, availability status, consultation status, and consultation mode. Foreign keys preserve ownership. Check constraints enforce valid time ranges and role-dependent fields. Indexes support status, department, date, recipient, and cursor queries.
 
 PostgreSQL exclusion/unique constraints and atomic RPCs prevent overlapping availability and double booking. RLS policies separate student, faculty, and admin visibility. See `supabase/migrations/` for the executable schema and `supabase/tests/` for role and concurrency coverage.
+
+## Deprecated objects
+
+Migration history is append-only, so these superseded objects stay in the schema but must not be used by new code: the `examples` scaffold table, the `list_faculty` and `list_open_faculty_slots` RPCs, `review_applications`, and `complete_consultation` (revoked; use `complete_consultation_with_outcome`).

@@ -15,5 +15,3 @@ export const availabilitySchema = z
     if (value.mode === 'IN_PERSON' && !value.location)
       context.addIssue({ code: 'custom', path: ['location'], message: 'Location is required.' })
   })
-
-export type AvailabilityInput = z.infer<typeof availabilitySchema>

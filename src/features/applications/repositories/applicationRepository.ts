@@ -1,7 +1,6 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { ApplicationItem } from '../types'
-export type { ApplicationItem }
 export type ApplicationFilters = {
   search?: string
   status?: string

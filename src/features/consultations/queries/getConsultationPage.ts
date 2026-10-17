@@ -1,6 +1,6 @@
 'use server'
 import { z } from 'zod'
-import { getAuthenticatedProfile } from '@/features/auth/repositories/authRepository'
+import { requireApprovedProfile } from '@/features/auth/repositories/authRepository'
 import { getConsultationPage as fetchConsultationPage } from '../repositories/consultationRepository'
 const status = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'])
 const schema = z.object({
@@ -9,8 +9,7 @@ const schema = z.object({
   cursor: z.object({ createdAt: z.iso.datetime(), id: z.uuid() }).nullable(),
 })
 export async function getConsultationPage(input: unknown) {
-  const profile = await getAuthenticatedProfile()
-  if (!profile || profile.accountStatus !== 'APPROVED') throw new Error('Authentication required')
+  await requireApprovedProfile()
   const value = schema.parse(input)
   return fetchConsultationPage({
     search: value.search,

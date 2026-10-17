@@ -12,7 +12,7 @@ import {
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-export type SelectOption = {
+type SelectOption = {
   id: string
   label: string
   isDisabled?: boolean

@@ -40,9 +40,8 @@ export async function requireRole(role: UserRole): Promise<AuthProfile> {
   return profile
 }
 
-export async function getDepartments() {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('departments').select('id,code,name').order('name')
-  if (error) throw new Error('Unable to load departments')
-  return data
+export async function requireApprovedProfile(): Promise<AuthProfile> {
+  const profile = await getAuthenticatedProfile()
+  if (!profile || profile.accountStatus !== 'APPROVED') throw new Error('Authentication required')
+  return profile
 }

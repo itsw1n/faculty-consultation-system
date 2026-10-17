@@ -203,7 +203,7 @@ A school-focused web application with three main roles. Faculty publish individu
 
 ## 5.3 Week 2 API demonstration
 
-Recommended proof: a session-checked GET /api/faculty/\[facultyId\]/availability endpoint that returns available faculty-created slots, with the booking UI visibly using the JSON response. The route is a proposed addition; current code provides booking data through other server mechanisms and a basic /api/health endpoint. Validate request, response, HTTP status and user access in DevTools/Postman.
+Recommended proof: a session-checked GET /api/faculty/\[facultyId\]/availability endpoint that returns available faculty-created slots, with the booking UI visibly using the JSON response. The route exists and the booking wizard consumes it; a basic /api/health endpoint answers liveness checks. Validate request, response, HTTP status and user access in DevTools/Postman.
 
 ## 5.4 Environment and configuration
 

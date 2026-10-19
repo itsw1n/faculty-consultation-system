@@ -1,63 +1,35 @@
 # Business Rules
 
-## 1. Account and Role Rules
+This document describes the rules enforced by the current application and database.
 
-1. Authentication is handled by Google OAuth through Supabase Auth.
-2. Users cannot create local passwords inside this application.
-3. A new user may request `STUDENT` or `FACULTY` access.
-4. Requested role is not the final assigned role.
-5. Admin approval is required before application access is granted.
-6. Users cannot request or self-assign `ADMIN`.
-7. Approved school-related fields such as role and department are not freely editable by the user in v1.
-8. Rejected applications cannot access role dashboards.
+## 1. Account and role rules
 
-## 2. Application Status
+1. Authentication uses Google OAuth through Supabase Auth.
+2. A verified school email on an approved domain becomes an approved student on first sign-in.
+3. An invited faculty email becomes an approved faculty member with the invited department and position on first sign-in.
+4. Only the designated initial admin email may claim the first admin role.
+5. Users cannot request or self-assign `ADMIN`.
+6. Users cannot edit their own approved role or department; admins use the correction RPC.
+7. Legacy `PENDING` and `REJECTED` profiles cannot access role dashboards.
 
-Allowed statuses:
+## 2. Account status
+
+Allowed values:
 
 - `PENDING`
 - `APPROVED`
 - `REJECTED`
 
-Transitions:
+The current automatic path moves new profiles directly to `APPROVED`. The legacy path still permits `PENDING -> APPROVED` and `PENDING -> REJECTED` through the database functions.
 
-```text
-PENDING -> APPROVED
-PENDING -> REJECTED
-```
+## 3. Availability status
 
-An approved application assigns the requested role to the profile.
+- `OPEN`: no consultation holds the slot.
+- `RESERVED`: a pending consultation holds the slot.
+- `BOOKED`: the consultation is approved.
+- `CLOSED`: the consultation is complete; the slot is no longer reusable.
 
-## 3. Availability Slot Status
-
-Allowed statuses:
-
-- `OPEN`
-- `RESERVED`
-- `BOOKED`
-- `CLOSED`
-
-Meaning:
-
-### OPEN
-
-Faculty is available and no consultation request currently holds the slot.
-
-### RESERVED
-
-A student submitted a request for the slot and it is waiting for faculty decision. The slot is temporarily unavailable to other students.
-
-### BOOKED
-
-Faculty approved the consultation. The schedule is confirmed.
-
-### CLOSED
-
-The consultation is finished or the time slot is no longer reusable.
-
-## 4. Consultation Status
-
-Allowed statuses:
+## 4. Consultation status
 
 - `PENDING`
 - `APPROVED`
@@ -65,16 +37,28 @@ Allowed statuses:
 - `CANCELLED`
 - `COMPLETED`
 
-## 5. Booking State Transitions
+## 5. Consultation categories
 
-### Student submits request
+`consultations.purpose` stores the category code and `consultations.category` mirrors it:
+
+- `GRADE`
+- `CAPSTONE`
+- `ACADEMIC`
+- `PERSONAL`
+- `OTHER`
+
+`notes` holds the optional description. Both the category and notes are limited to 2,000 characters where applicable.
+
+## 6. Booking transitions
+
+### Student submits a request
 
 ```text
 availability: OPEN -> RESERVED
-consultation: create as PENDING
+consultation: created as PENDING
 ```
 
-Both changes must succeed atomically.
+`book_consultation` performs both changes in one transaction. It requires an approved student and an `OPEN` slot.
 
 ### Faculty approves
 
@@ -83,6 +67,8 @@ consultation: PENDING -> APPROVED
 availability: RESERVED -> BOOKED
 ```
 
+`decide_consultation` requires the assigned faculty and a pending consultation.
+
 ### Faculty rejects
 
 ```text
@@ -90,93 +76,85 @@ consultation: PENDING -> REJECTED
 availability: RESERVED -> OPEN
 ```
 
-### Student cancels pending request
+### Student cancels
 
 ```text
-consultation: PENDING -> CANCELLED
-availability: RESERVED -> OPEN
+consultation: PENDING or APPROVED -> CANCELLED
+availability: RESERVED or BOOKED -> OPEN
 ```
 
-### Student cancels approved consultation
+`cancel_consultation` requires the requesting student and sets `cancelled_at`.
 
-For v1, cancellation is allowed before completion unless a later policy restricts the cutoff.
-
-```text
-consultation: APPROVED -> CANCELLED
-availability: BOOKED -> OPEN
-```
-
-Faculty receives a notification.
-
-### Faculty completes consultation
+### Faculty completes
 
 ```text
 consultation: APPROVED -> COMPLETED
 availability: BOOKED -> CLOSED
 ```
 
-## 6. Double-Booking Rule
+`complete_consultation_with_outcome` requires the assigned faculty, sets `completed_at`, and stores an optional outcome of up to 2,000 characters.
 
-A slot can be requested only when its status is `OPEN`.
+All lifecycle RPCs run as security definer functions and re-check the caller.
 
-The server/database must enforce this rule. Client-side disabling alone is insufficient.
+## 7. Double-booking rule
 
-If two students attempt to reserve the same slot concurrently, only one booking may succeed.
+A slot can be requested only while its status is `OPEN`. The conditional update in `book_consultation` changes at most one slot to `RESERVED`; if zero rows change, the request fails with a conflict.
 
-## 7. Availability Rules
+A partial unique index allows at most one `PENDING` or `APPROVED` consultation per availability slot while preserving historical rejected and cancelled records.
+
+## 8. Availability rules
 
 1. Faculty may create availability only for themselves.
-2. End time must be later than start time.
-3. Availability must not overlap another active availability slot for the same faculty.
-4. `RESERVED` and `BOOKED` slots cannot be deleted as normal open slots.
-5. Students cannot edit availability.
-6. Students can see disabled `RESERVED` and `BOOKED` states.
+2. The date cannot be in the past.
+3. End time must be later than start time.
+4. `IN_PERSON` requires a nonblank location. `ONLINE` stores an optional meeting link and no location.
+5. Active availability for the same faculty cannot overlap; a GiST exclusion constraint enforces this for non-`CLOSED` slots.
+6. Exact duplicate slots are rejected by a unique constraint.
+7. Only `OPEN` slots can be edited or deleted.
+8. Students cannot mutate availability.
+9. Faculty see their own upcoming slots; the list is capped at 100 rows.
+10. Dashboard open-slot counts include only current or future `OPEN` slots.
 
-## 8. Department Rules
+## 9. Visibility rules
+
+- Students see their own consultations.
+- Faculty see consultations assigned to them.
+- Admins see consultation metadata and counts.
+- Participants see the category, description, and outcome on detail pages.
+- Admin list and CSV results replace the description with the category and omit participant-only notes.
+
+## 10. Department rules
 
 1. Students and faculty belong to a department.
 2. Faculty listings can be filtered by department.
-3. Student's own department should be the default filter where practical.
-4. Cross-department booking is allowed unless future school policy explicitly restricts it.
+3. Students can book across departments.
+4. Department codes are uppercase and unique; names are unique.
 
-## 9. Consultation Mode and Location
+## 11. Search, filtering, and pagination
 
-Availability may define:
+1. Server-backed text search uses a 300 ms debounce in the client.
+2. A new search or filter resets the cursor and loaded items.
+3. Lists load 20 records per request unless a different cap is documented.
+4. Faculty pagination uses a `(lower(full_name), id)` cursor.
+5. Application, consultation, and notification pagination use `(created_at, id)` cursors.
+6. Loading stops when no next cursor exists.
+7. Consultation status filters are applied on the server.
 
-- `IN_PERSON`
-- `ONLINE`
+## 12. Admin rules
 
-If `IN_PERSON`:
+1. Admins can invite 1–50 school emails as faculty with a department and position.
+2. Existing approved faculty are skipped with a reason.
+3. Admins can correct an approved account's role or department.
+4. Admins cannot correct their own account or assign `ADMIN`.
+5. Consultations cannot be bulk-deleted.
+6. CSV export is metadata only and limited to 366 days.
+7. The current Manage Users UI has no bulk approve/reject action.
 
-- location/room is required.
+## 13. Notifications and email
 
-If `ONLINE`:
-
-- meeting link may be supplied.
-
-Students should see mode/location before confirming a booking.
-
-## 10. Search and Filtering Rules
-
-1. Text search that hits the server/database should use approximately 300 ms debounce.
-2. Select/dropdown filters on desktop apply immediately.
-3. Mobile filter drawer may use an explicit Apply button.
-4. A new search/filter resets infinite-scroll cursor and loaded items.
-5. Search/filter must occur server-side for large datasets.
-
-## 11. Infinite Scroll Rules
-
-1. Do not load complete datasets up front.
-2. Fetch a bounded first chunk, recommended 20 records.
-3. Fetch subsequent chunks as user approaches the end.
-4. Cursor-based pagination is preferred internally.
-5. Stop requesting when no next cursor exists.
-6. Preserve active search/filter/sort parameters for every subsequent request.
-
-## 12. Bulk Actions
-
-1. Bulk-selection infrastructure can be shared.
-2. Bulk actions are shown only where meaningful.
-3. User applications support bulk approve/reject.
-4. Consultation records must not expose bulk delete.
-5. Any destructive or high-impact bulk action requires confirmation.
+1. Every lifecycle change creates an in-app notification for the affected participant.
+2. Status changes to `APPROVED`, `REJECTED`, or `CANCELLED` enqueue an email.
+3. Approved consultations scheduled for the next day queue reminders for both participants.
+4. Email claims are limited to 25 per batch and 5 attempts per record.
+5. A claimed email locks for 10 minutes before another worker may retry it.
+6. Email delivery is optional; missing Resend configuration returns zero claimed and sent emails without failing the route.

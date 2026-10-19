@@ -1,227 +1,190 @@
 # Product Requirements
 
-## 1. Product Name
+This document describes the behavior implemented in the current codebase.
 
-Faculty Consultation & Scheduling System
+## 1. Product name
 
-## 2. User Roles
+Faculty Consultation & Scheduling System for Assumption College of Davao.
+
+## 2. User roles
 
 ### Student
 
-A verified/approved student who can discover faculty and request consultations.
+An approved school account that can discover faculty, request consultations, view its own consultation records, and cancel eligible requests.
 
 ### Faculty
 
-A verified/approved faculty member who can manage availability and consultation requests.
+An approved account invited by an administrator. Faculty publish availability, decide requests, complete consultations, and record outcomes.
 
 ### Admin
 
-A privileged system user who approves applications and manages system records.
+A privileged account that manages departments, invites faculty, corrects approved accounts, and reads consultation metadata.
 
-## 3. Authentication Journey
+## 3. Access model
 
-### Returning approved user
+1. The public landing page at `/` starts Google OAuth through Supabase Auth.
+2. `/auth/callback` exchanges the OAuth code for a cookie-backed session.
+3. `/auth/continue` routes the authenticated profile by status and role.
+4. `handle_new_auth_user` creates a profile from trusted Google identity data.
+5. An email on an approved domain becomes `STUDENT / APPROVED` automatically.
+6. If an unconsumed `faculty_invites` row matches the email, the profile instead becomes `FACULTY / APPROVED` with the invited department and position.
+7. Profiles that already carry `PENDING` or `REJECTED` remain parked at `/application/pending` or `/application/rejected`.
+8. The account matching `INITIAL_ADMIN_EMAIL` can claim the first admin role once at `/auth/claim-admin`.
+9. Administrators invite faculty from `/admin/users` and correct an approved account's role or department.
 
-1. User signs in with Google.
-2. System obtains authenticated identity from Supabase Auth.
-3. System checks application/profile status.
-4. If `APPROVED`, user is redirected to the dashboard for the assigned role.
+Local development seeds a wildcard domain so personal Google accounts can sign in. Hosted environments use only the confirmed school domain stored in `approved_email_domains`.
 
-### New user
-
-1. User signs in with Google.
-2. System detects no approved profile/application.
-3. User selects:
-   - Apply as Student
-   - Apply as Faculty
-4. Google name/email are prefilled.
-5. Email is read-only.
-6. User completes role-specific details.
-7. Application is submitted with `PENDING` status.
-8. Admin approves or rejects.
-9. Role is assigned only upon approval.
-
-## 4. Student Requirements
+## 4. Student requirements
 
 ### Dashboard
 
-Must show a concise overview such as:
+- Confirmed and pending consultation counts.
+- The five most recent consultations.
+- Quick action to book a consultation.
 
-- Upcoming consultation.
-- Recent consultations.
-- Quick action to Book Consultation.
-- Relevant counts/status summaries.
+### Book consultation
 
-### Book Consultation
+1. Choose a faculty member from the paginated directory.
+2. Search by name or filter by department.
+3. Choose an open slot in the weekly desktop calendar or the mobile day list.
+4. Select a purpose and optional description.
+5. Review faculty, date, time, mode, and purpose.
+6. Confirm the request.
 
-Flow:
+Slot states:
 
-1. Choose Faculty.
-2. Choose Schedule.
-3. Enter Details.
-4. Review and Confirm.
+- `OPEN`: selectable.
+- `RESERVED`, `BOOKED`, `CLOSED`: visible and disabled.
 
-#### Choose Faculty
+The schedule can be refreshed without leaving the wizard.
 
-- Search by faculty name.
-- Filter by department.
-- Student's department may be the default filter.
-- Other departments may remain selectable.
-- Results load in chunks, not all at once.
+### Details step
 
-#### Choose Schedule
+- Purpose is one of: `GRADE`, `CAPSTONE`, `ACADEMIC`, `PERSONAL`, `OTHER`.
+- Description is optional and limited to 2,000 characters.
+- Mode and location come from the availability slot.
 
-- Weekly calendar on desktop.
-- Day-based schedule list on narrow mobile screens.
-- `OPEN`: visible and selectable.
-- `RESERVED`: visible and disabled.
-- `BOOKED`: visible and disabled.
-- `CLOSED`: visible only when useful; disabled/muted.
+### My consultations
 
-#### Details
+- Search and filter by consultation status.
+- Cursor-based infinite scrolling.
+- Status badges.
+- Cancel a `PENDING` or `APPROVED` consultation through a confirmation dialog.
+- Open participant-only detail pages.
 
-At minimum:
-
-- Purpose/subject.
-- Description/details.
-- Optional related course if included in implementation.
-- Consultation mode/location is displayed from faculty availability.
-
-#### Review
-
-Must display:
-
-- Faculty.
-- Date/time.
-- Purpose.
-- Consultation mode/location.
-- Confirmation action.
-
-### My Consultations
-
-- Search/filter own consultations when necessary.
-- Show statuses.
-- Allow cancellation only when business rules permit.
-
-## 5. Faculty Requirements
+## 5. Faculty requirements
 
 ### Dashboard
 
-Must show:
-
-- Upcoming consultations.
-- Pending consultation requests.
-- Availability summary.
+- Pending request count.
+- Confirmed consultation count.
+- Open availability count.
 - Quick action to add availability.
 
-### My Availability
+### My availability
 
-- Weekly calendar.
-- Add Availability button.
-- Add Availability modal with date, start time, end time, and mode/location fields.
-- Cannot create overlapping availability for the same faculty.
-- Reserved/booked slots cannot be deleted as ordinary open availability.
+- List upcoming availability.
+- Add availability with date, start time, end time, mode, location, and meeting link.
+- Edit or remove an `OPEN` slot.
+- View slot details.
+- `RESERVED`, `BOOKED`, and `CLOSED` slots cannot be edited or removed as open availability.
 
-### Consultation Requests
+### Consultation requests
 
-- Show pending and historical requests.
-- Search/filter.
-- Approve.
-- Reject.
-- Confirmation dialog before state-changing action.
+- Pending requests only.
+- Search and infinite scrolling.
+- Approve or reject through confirmation dialogs.
 
-### My Consultations
+### My consultations
 
-- Upcoming/approved consultations.
-- Completed consultations.
-- Mark eligible approved consultations completed.
+- Confirmed and completed consultations.
+- Search and filter.
+- Open participant-only detail pages.
+- Mark an approved consultation completed with an optional outcome note.
 
-## 6. Admin Requirements
+## 6. Admin requirements
 
 ### Dashboard
 
-Must show useful operational summaries such as:
+- Pending application count.
+- Approved faculty count.
+- Total consultation count.
 
-- Pending applications.
-- Approved users/faculty count.
-- Recent consultation activity.
+### Manage users
 
-### Manage Users / Applications
-
-- Search name/email.
-- Filter role/application type.
-- Filter department.
-- Filter status.
+- Search by name or email.
+- Filter by status, role, and department.
 - Infinite scrolling.
-- Row selection.
-- Bulk approve/reject.
-- Single approve/reject.
+- Invite up to 50 school emails at a time with a department and position title.
+- Correct the role or department of an approved account.
+- Legacy `PENDING` accounts are visible but the current UI has no approve/reject action.
 
-### Manage Faculty
+### Manage faculty
 
-- Search/filter faculty records.
-- View faculty department and profile information.
-- Perform only business-approved management actions.
+- Search approved faculty.
+- View name, email, department code, position title, and status.
 
 ### Departments
 
 - List departments.
-- Add/update department records if enabled.
+- Add a department with a unique code and name.
+- Update an existing department.
 
-Initial known departments include:
+### Consultation records
 
-- IT
-- HM
-- BSBA
-- BSED
-- BSSW
-
-### Consultation Records
-
-- Read-only administrative visibility by default.
-- Search/filter.
+- Search and filter by status.
 - Infinite scrolling.
-- No bulk deletion of consultation history.
+- Read-only metadata view.
+- Download a metadata summary CSV for a range of up to 366 days.
 
-## 7. Notifications
+## 7. Notifications and email
 
-### Dropdown
+### In-app notifications
 
-- Bell is shown in top-right header.
-- Clicking bell opens recent notifications.
-- Show latest limited set (for example 5).
-- `View all notifications` routes to full notifications page.
+- The header bell shows the five latest notifications and an unread count.
+- `View all notifications` opens `/notifications`.
+- The notifications page supports infinite scrolling and marking all as read.
 
-### Important notification events
+Important events:
 
-Student:
+- Application approved or rejected.
+- New consultation request for faculty.
+- Consultation approved, rejected, cancelled, or completed.
+- New application for admins, when the legacy application path is used.
 
-- Application approved/rejected.
-- Consultation approved/rejected.
-- Consultation cancelled/changed when applicable.
+### Email
 
-Faculty:
+- Status changes enqueue email records in `email_outbox`.
+- `GET /api/cron/email` processes the outbox with a bearer secret.
+- The Vercel schedule runs daily at `00:00 UTC` (08:00 Philippine time).
+- Reminders are queued for approved consultations scheduled the next day.
+- Resend uses the email record ID as an idempotency key.
+- In-app notifications remain the primary channel.
 
-- New consultation request.
-- Student cancellation.
+## 8. Profile and navigation
 
-Admin:
+- The profile details panel is pinned to the bottom of the desktop sidebar.
+- It shows name, email, role, department, optional position, and sign out.
+- Approved role and department are not user-editable.
+- Navigation is role-specific:
+  - Student: Dashboard, Book Consultation, My Consultations.
+  - Faculty: Dashboard, My Availability, Consultation Requests, My Consultations.
+  - Admin: Dashboard, Manage Users, Manage Faculty, Departments, Consultation Records.
 
-- New Student/Faculty application.
+## 9. Responsive and accessibility requirements
 
-## 8. Profile
+- Mobile-first layout with a hamburger navigation panel.
+- The weekly calendar becomes a day selector plus vertical slot list on narrow screens.
+- Dialogs manage focus and restore it on close.
+- Interactive controls are keyboard accessible.
+- Status is conveyed with text as well as color.
+- The application is light-theme only in v1.
 
-- Profile entry is pinned to bottom of sidebar.
-- Profile is read-only in v1.
-- Prefer modal/panel instead of dedicated page.
-- Approved role/department are not user-editable.
-- Sign out is available from profile UI.
+## 10. Out of scope and current gaps
 
-## 9. Responsive Requirements
-
-- Mobile-first design.
-- Light theme only for v1.
-- Sidebar becomes hamburger drawer on mobile.
-- Tables may transform into stacked cards on narrow screens.
-- Complex filter bars become a filter drawer/bottom sheet on mobile.
-- Calendar becomes a day-focused list when weekly grid is too narrow.
+- Payments and native mobile applications.
+- Dark mode.
+- Direct SIS integration.
+- User-editable approved role or department.
+- Administrative deletion of consultation history.
+- Bulk approve/reject in the current Manage Users UI.

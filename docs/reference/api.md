@@ -59,4 +59,4 @@ These are internal application interfaces, not public HTTP APIs. See the full fu
 - Email processing returns `401` for a bad callback secret and `503` when the outbox is unavailable.
 - Unexpected rendering failures use the application error boundary; unknown routes use the not-found page.
 
-Database and provider details stay server-side. Key-based list actions return `{ data, error }`; form actions return a message. Unexpected failures throw. There is no stable public error-code API in v1.
+Database and provider details stay server-side. Server actions return `{ error }`; cursor loaders return an `InfinitePage` and throw on failure. There is no stable public error-code API in v1.

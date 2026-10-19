@@ -29,11 +29,11 @@ How each role becomes an account is defined in [`rules.md`](rules.md#account-and
 
 ## What each role can do
 
-| Role | Screens |
-| ---- | ------- |
-| Student | Dashboard, Book Consultation, My Consultations |
-| Faculty | Dashboard, My Availability, Consultation Requests, My Consultations |
-| Admin | Dashboard, Manage Users, Manage Faculty, Departments, Consultation Records |
+| Role    | Screens                                                                    |
+| ------- | -------------------------------------------------------------------------- |
+| Student | Dashboard, Book Consultation, My Consultations                             |
+| Faculty | Dashboard, My Availability, Consultation Requests, My Consultations        |
+| Admin   | Dashboard, Manage Users, Manage Faculty, Departments, Consultation Records |
 
 Common capabilities:
 

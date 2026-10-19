@@ -66,13 +66,13 @@ The invite only takes effect the first time that email signs in.
 
 ## Booking transitions
 
-| Event | Consultation | Availability | Function |
-| ----- | ------------ | ------------ | -------- |
-| Student requests | created `PENDING` | `OPEN -> RESERVED` | `book_consultation` |
-| Faculty approves | `PENDING -> APPROVED` | `RESERVED -> BOOKED` | `decide_consultation` |
-| Faculty rejects | `PENDING -> REJECTED` | `RESERVED -> OPEN` | `decide_consultation` |
-| Student cancels | `PENDING`/`APPROVED -> CANCELLED` | `RESERVED`/`BOOKED -> OPEN` | `cancel_consultation` |
-| Faculty completes | `APPROVED -> COMPLETED` | `BOOKED -> CLOSED` | `complete_consultation_with_outcome` |
+| Event             | Consultation                      | Availability                | Function                             |
+| ----------------- | --------------------------------- | --------------------------- | ------------------------------------ |
+| Student requests  | created `PENDING`                 | `OPEN -> RESERVED`          | `book_consultation`                  |
+| Faculty approves  | `PENDING -> APPROVED`             | `RESERVED -> BOOKED`        | `decide_consultation`                |
+| Faculty rejects   | `PENDING -> REJECTED`             | `RESERVED -> OPEN`          | `decide_consultation`                |
+| Student cancels   | `PENDING`/`APPROVED -> CANCELLED` | `RESERVED`/`BOOKED -> OPEN` | `cancel_consultation`                |
+| Faculty completes | `APPROVED -> COMPLETED`           | `BOOKED -> CLOSED`          | `complete_consultation_with_outcome` |
 
 Each transition runs as a security-definer function that re-checks the caller. Cancellation sets `cancelled_at`; completion sets `completed_at` and stores an optional outcome.
 

@@ -4,23 +4,23 @@ Copy `.env.example` to `.env.local` before starting. Setup steps are in [`../get
 
 ## Client and public values
 
-| Variable | Required | Purpose |
-| -------- | -------: | ------- |
-| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | yes | Public Supabase key; RLS protects data. |
-| `NEXT_PUBLIC_SITE_URL` | yes | Canonical application origin used for the allowlisted OAuth callback. |
+| Variable                               | Required | Purpose                                                               |
+| -------------------------------------- | -------: | --------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             |      yes | Supabase project URL.                                                 |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |      yes | Public Supabase key; RLS protects data.                               |
+| `NEXT_PUBLIC_SITE_URL`                 |      yes | Canonical application origin used for the allowlisted OAuth callback. |
 
 Values with `NEXT_PUBLIC_` are bundled into client code and must never contain secrets. Keep real environment files out of version control.
 
 ## Server-only values
 
-| Variable | Required for | Purpose |
-| -------- | ------------ | ------- |
-| `RESEND_API_KEY` | email delivery | Resend API credential. |
-| `RESEND_FROM_EMAIL` | email delivery | Verified sender address. |
-| `SUPABASE_SERVICE_ROLE_KEY` | email queue | Queue processor access to the private email outbox. |
-| `CRON_SECRET` | scheduled email | Bearer token for the scheduled email route. |
-| `INITIAL_ADMIN_EMAIL` | first admin | Address allowed to claim the first admin role. |
+| Variable                    | Required for    | Purpose                                             |
+| --------------------------- | --------------- | --------------------------------------------------- |
+| `RESEND_API_KEY`            | email delivery  | Resend API credential.                              |
+| `RESEND_FROM_EMAIL`         | email delivery  | Verified sender address.                            |
+| `SUPABASE_SERVICE_ROLE_KEY` | email queue     | Queue processor access to the private email outbox. |
+| `CRON_SECRET`               | scheduled email | Bearer token for the scheduled email route.         |
+| `INITIAL_ADMIN_EMAIL`       | first admin     | Address allowed to claim the first admin role.      |
 
 Do not prefix these with `NEXT_PUBLIC_`. Email delivery is optional locally; without Resend credentials the outbox processor returns zero claimed and sent emails.
 

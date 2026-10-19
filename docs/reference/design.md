@@ -10,25 +10,25 @@ Design tokens and UI conventions. The token values live in `src/app/globals.css`
 
 ## Tokens
 
-| Token | Value | Utilities |
-| ----- | ----- | --------- |
-| `--color-primary` | `#062e61` | `bg-primary`, `text-primary` |
-| `--color-primary-hover` | `#0a3b78` | `hover:bg-primary-hover` |
-| `--color-accent` | `#1769e8` | `bg-accent`, `text-accent` |
-| `--color-accent-hover` | `#0d57b7` | `hover:bg-accent-hover` |
-| `--color-background` | `#f6f8fc` | `bg-background` |
-| `--color-surface` | `#ffffff` | `bg-surface` |
-| `--color-subtle` | `#edf3fb` | `bg-subtle`, `hover:bg-subtle` |
-| `--color-border` | `#dfe6ef` | `border-border` |
-| `--color-foreground` | `#0f1f3a` | `text-foreground` |
-| `--color-muted` | `#66758a` | `text-muted` |
-| `--color-danger` | `#c53939` | `text-danger`, `bg-danger` |
-| `--color-danger-hover` | `#a52929` | `hover:bg-danger-hover` |
-| `--color-success` | `#176d42` | `text-success` |
-| `--color-warning` | `#8a5a00` | `text-warning` |
-| `--color-focus` | `#70a7ff` | `focus-visible:outline-focus` |
-| `--shadow-card` | `0 3px 10px rgb(10 26 51 / 0.08)` | `shadow-card` |
-| `--shadow-dialog` | `0 20px 60px rgb(0 0 0 / 0.25)` | `shadow-dialog` |
+| Token                   | Value                             | Utilities                      |
+| ----------------------- | --------------------------------- | ------------------------------ |
+| `--color-primary`       | `#062e61`                         | `bg-primary`, `text-primary`   |
+| `--color-primary-hover` | `#0a3b78`                         | `hover:bg-primary-hover`       |
+| `--color-accent`        | `#1769e8`                         | `bg-accent`, `text-accent`     |
+| `--color-accent-hover`  | `#0d57b7`                         | `hover:bg-accent-hover`        |
+| `--color-background`    | `#f6f8fc`                         | `bg-background`                |
+| `--color-surface`       | `#ffffff`                         | `bg-surface`                   |
+| `--color-subtle`        | `#edf3fb`                         | `bg-subtle`, `hover:bg-subtle` |
+| `--color-border`        | `#dfe6ef`                         | `border-border`                |
+| `--color-foreground`    | `#0f1f3a`                         | `text-foreground`              |
+| `--color-muted`         | `#66758a`                         | `text-muted`                   |
+| `--color-danger`        | `#c53939`                         | `text-danger`, `bg-danger`     |
+| `--color-danger-hover`  | `#a52929`                         | `hover:bg-danger-hover`        |
+| `--color-success`       | `#176d42`                         | `text-success`                 |
+| `--color-warning`       | `#8a5a00`                         | `text-warning`                 |
+| `--color-focus`         | `#70a7ff`                         | `focus-visible:outline-focus`  |
+| `--shadow-card`         | `0 3px 10px rgb(10 26 51 / 0.08)` | `shadow-card`                  |
+| `--shadow-dialog`       | `0 20px 60px rgb(0 0 0 / 0.25)`   | `shadow-dialog`                |
 
 The `:root` block sets `color-scheme: light` and the Inter font stack.
 
@@ -92,3 +92,7 @@ The faculty availability view uses the same color language. Include a legend whe
 - Visible focus styles are required; dialogs trap and restore focus.
 - Interactive controls must be keyboard accessible.
 - Disabled slots use native disabled behavior, not only muted styling.
+
+## Reference image
+
+[`ui-inspo.png`](ui-inspo.png) is the original visual reference. Labels pictured there do not override product behavior.

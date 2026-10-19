@@ -22,12 +22,18 @@ faculty-consultation-system — consultation and scheduling system for Assumptio
 
 1. Read `CONTEXT.md` and inspect neighboring implementation and tests.
 2. Read only the doc that matches the task:
+   - Docs index and reading paths: `docs/README.md`
    - Product intent: `CONTEXT.md`
-   - Current behavior: `docs/specs/`
-   - Runtime boundaries: `docs/architecture/`
-   - HTTP routes, actions, RPCs: `docs/api/`
-   - Local setup and operations: `docs/guides/`
-   - Branch, commit, PR rules: `docs/contribution/`
+   - What and why: `docs/concepts/product.md`
+   - Exact rules: `docs/concepts/rules.md`
+   - Runtime boundaries and flow: `docs/concepts/architecture.md`
+   - Schema, RLS, RPCs: `docs/concepts/data-model.md`
+   - Routes, actions, errors: `docs/reference/api.md`
+   - Environment variables: `docs/reference/environment.md`
+   - Design tokens: `docs/reference/design.md`
+   - Local setup: `docs/getting-started.md`
+   - Deploy and email: `docs/operations.md`
+   - Branch, commit, PR rules: `docs/contributing.md`
    - Completion status: `PROGRESS.md`
 3. State assumptions when product behavior is ambiguous.
 4. Make the smallest coherent change and add risk-appropriate tests.

@@ -28,8 +28,11 @@ Assumption College of Davao is a web-based faculty consultation and scheduling s
 
 - User-editable approved role or department.
 - Administrative deletion of consultation history.
-- Payments, dark mode, native mobile applications, and direct SIS integration.
+- Payments, dark mode, native mobile applications.
+- Direct SIS integration until ICTC approves access, data use, and security controls.
+
+Exact record fields and the retention period are still to be confirmed with the school before paper records can be retired.
 
 ## Source of truth
 
-Product behavior is defined by the as-built documents in `docs/specs/`. Migrations and automated tests are authoritative for database behavior. `PROGRESS.md` records completion and deferred work.
+Product behavior is defined by [`docs/concepts/`](docs/concepts/). Migrations and automated tests are authoritative for database behavior. [`PROGRESS.md`](PROGRESS.md) records completion and deferred work. The full docs map is in [`docs/README.md`](docs/README.md).

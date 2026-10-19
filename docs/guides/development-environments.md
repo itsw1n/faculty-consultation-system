@@ -2,7 +2,7 @@
 
 ## Default local workflow
 
-Use the commands in `setup.md` to run the app and the Supabase stack on the host. Docker is optional.
+Use the commands in `setup.md` to run the app and the Supabase stack on the host. This is the supported workflow for OAuth, migrations, and end-to-end tests.
 
 ## Optional Docker workflow
 
@@ -14,8 +14,6 @@ docker compose build
 docker compose up -d
 ```
 
-Override the host port collision with `FRONTEND_HOST_PORT`. Supabase runs separately through the Supabase CLI, so the compose file only builds the Next.js app.
+Compose builds only the Next.js app with `Dockerfile.dev`. Supabase still runs through the Supabase CLI, so start it separately with `npm run supabase:start`. Override a host-port collision with `FRONTEND_HOST_PORT`.
 
-## Dev Containers
-
-A generic Dev Container is intentionally not generated: JavaScript, Java, PHP, and mobile stacks need different host/device boundaries. VS Code and Codespaces users can open the repository normally and add a stack-specific Dev Container later without changing the supported local or Compose workflows.
+The production `Dockerfile` uses the standalone Next.js output. It is not needed for local development.

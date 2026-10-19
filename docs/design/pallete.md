@@ -2,189 +2,98 @@
 
 > File name intentionally follows the requested `pallete.md` spelling.
 
-## 1. Design Direction
+## 1. Design direction
 
 - Clean academic/admin application.
-- Light theme only for v1.
-- Navy/blue primary identity.
-- High readability.
-- Minimal visual noise.
+- Light theme only for v1; dark mode is a later phase.
+- Navy primary identity with a blue accent.
+- High readability, minimal visual noise.
 - Consistent across Student, Faculty, and Admin.
 - Mobile-first responsive behavior.
 
-## 2. Core Colors
+## 2. Token source of truth
 
-The existing Figma direction uses a dark navy foundation similar to:
+Design tokens are declared once in `src/app/globals.css` under `@theme`. Components must use the resulting Tailwind utilities instead of raw hex values.
 
-```text
-Primary Navy      #062E61
-Primary Hover     #0A3B78
-Sidebar Surface   #0A356B
-Page Background   #F6F8FC
-Surface           #FFFFFF
-Subtle Surface    #F8FAFD
-Border            #DFE6EF
-Text Primary      #0F1F3A
-Text Secondary    #66758A
-Text Muted        #9AA7B7
-```
+| Token                   | Value                             | Utility examples               |
+| ----------------------- | --------------------------------- | ------------------------------ |
+| `--color-primary`       | `#062e61`                         | `bg-primary`, `text-primary`   |
+| `--color-primary-hover` | `#0a3b78`                         | `hover:bg-primary-hover`       |
+| `--color-accent`        | `#1769e8`                         | `bg-accent`, `text-accent`     |
+| `--color-accent-hover`  | `#0d57b7`                         | `hover:bg-accent-hover`        |
+| `--color-background`    | `#f6f8fc`                         | `bg-background`                |
+| `--color-surface`       | `#ffffff`                         | `bg-surface`                   |
+| `--color-subtle`        | `#edf3fb`                         | `bg-subtle`, `hover:bg-subtle` |
+| `--color-border`        | `#dfe6ef`                         | `border-border`                |
+| `--color-foreground`    | `#0f1f3a`                         | `text-foreground`              |
+| `--color-muted`         | `#66758a`                         | `text-muted`                   |
+| `--color-danger`        | `#c53939`                         | `text-danger`, `bg-danger`     |
+| `--color-danger-hover`  | `#a52929`                         | `hover:bg-danger-hover`        |
+| `--color-success`       | `#176d42`                         | `text-success`                 |
+| `--color-warning`       | `#8a5a00`                         | `text-warning`                 |
+| `--color-focus`         | `#70a7ff`                         | `focus-visible:outline-focus`  |
+| `--shadow-card`         | `0 3px 10px rgb(10 26 51 / 0.08)` | `shadow-card`                  |
+| `--shadow-dialog`       | `0 20px 60px rgb(0 0 0 / 0.25)`   | `shadow-dialog`                |
 
-These are baseline tokens; implementation should centralize them rather than scatter raw hex values through components.
+The `:root` block sets `color-scheme: light` and the Inter font stack.
 
-## 3. Status Colors
+## 3. Status presentation
 
-### Success / Open / Approved
-
-```text
-Success Text       #1F9D55
-Success Surface    #EAF8EF or #CFEFD9
-```
-
-### Pending / Reserved
-
-Use a restrained amber or blue-muted treatment depending on context.
-
-Suggested semantic tokens:
+Statuses are conveyed with text plus a tinted surface. Use the shared `StatusBadge` and semantic token classes rather than introducing new hex values.
 
 ```text
-Pending Text
-Pending Surface
-Reserved Text
-Reserved Surface
+Approved / Completed / Open   text-success with a subtle surface
+Pending / Reserved            text-warning with a subtle surface
+Booked                        enabled darker accent surface, distinct from Open
+Rejected / Cancelled          text-danger with a subtle surface
+Closed / Disabled             text-muted with a muted background
 ```
 
-### Booked
+## 4. Typography
 
-Booked should be clearly visible but disabled for Student booking.
-
-Suggested:
-
-- medium blue surface/text distinct from Open.
-
-### Danger / Rejected / Cancelled
-
-```text
-Danger Text        #C53939
-Danger Border      #E7B1B1
-Danger Surface     light red/pink tint
-```
-
-### Closed / Disabled
-
-```text
-Disabled Text      #9AA7B7
-Disabled Surface   #F1F4F8
-```
-
-## 4. Semantic Token Names
-
-Prefer semantic CSS variables/tokens:
-
-```text
---color-primary
---color-primary-hover
---color-background
---color-surface
---color-surface-subtle
---color-border
---color-text
---color-text-muted
---color-success
---color-success-surface
---color-warning
---color-warning-surface
---color-danger
---color-danger-surface
---color-disabled
-```
-
-## 5. Typography
-
-Current Figma direction uses **Inter**.
-
-Recommended hierarchy:
+The application uses **Inter**. Keep the hierarchy consistent:
 
 ```text
 Page title       24px / Bold
-Header title     18px / Semi Bold
-Card title       14px / Semi Bold
-Body             12-14px / Regular
-Label            10-12px / Semi Bold
-Small/meta        9-11px / Regular/Medium
+Header title     18px / Semibold
+Card title       14px / Semibold
+Body             14px / Regular
+Label            12px / Semibold
+Meta             12px / Regular
 ```
 
-Actual implementation should use responsive/rem-based values while preserving hierarchy.
+Use responsive/rem-based Tailwind values while preserving this hierarchy.
 
-## 6. Spacing
+## 5. Spacing and radius
 
-Use a predictable spacing scale.
+Use the standard Tailwind spacing scale and avoid one-off values. Keep radii consistent: small controls rounded, cards slightly larger, status pills full, avatar circular.
 
-Suggested:
-
-```text
-4
-6
-8
-12
-16
-20
-24
-32
-```
-
-Avoid arbitrary one-off spacing values unless required by layout.
-
-## 7. Radius
-
-Suggested semantic sizes:
-
-```text
-Small controls   6-7px
-Cards            8-10px
-Pills/status     full/pill
-Avatar           full circle
-```
-
-## 8. Shadows
-
-Cards should use subtle shadows only.
-
-Existing visual direction resembles:
-
-```text
-0 3px 10px rgba(10, 26, 51, 0.08)
-```
-
-Do not overuse elevation.
-
-## 9. Layout Notes
+## 6. Layout notes
 
 ### Sidebar
 
-- Dark navy.
-- Active nav item uses lighter navy highlight.
-- Profile pinned at bottom.
+- Dark navy (`bg-primary`).
+- Active item uses a lighter navy highlight.
+- Profile details are pinned to the bottom on desktop.
 
 ### Header
 
 - White surface.
-- Breadcrumb/page context left.
-- Notification bell right.
+- Breadcrumb/page context on the left.
+- Notification bell on the right.
 
 ### Cards
 
-- White surface.
-- Border + subtle shadow.
+- White surface, border, and `shadow-card`.
 - Clear title hierarchy.
 
-### Search/filters
+### Search and filters
 
-- Same control height/radius across roles.
-- Search is primary wide field.
-- Desktop filters align in same row where space allows.
-- Mobile uses a dedicated filter drawer/sheet.
+- Consistent control height and radius across roles.
+- Search is the primary wide field.
+- Filters sit inline beside search on desktop and stack below it on mobile. There is no separate filter drawer.
 
-## 10. Calendar Status Presentation
+## 7. Calendar status presentation
 
 Student booking calendar:
 
@@ -195,30 +104,26 @@ BOOKED     visible + disabled
 CLOSED     muted + disabled
 ```
 
-Faculty availability calendar may use the same colors for consistency.
+The faculty availability view uses the same color language. Include a legend when several statuses are visible.
 
-Include a legend when multiple statuses are visible.
-
-## 11. Responsive Notes
+## 8. Responsive notes
 
 ### Desktop
 
 - Persistent sidebar.
 - Weekly calendar grid.
-- Table layouts.
 
 ### Mobile
 
 - Hamburger navigation drawer.
-- Day selector + vertical time-slot list instead of squeezed weekly grid.
-- Table rows may become cards.
-- Filters move to drawer/bottom sheet.
+- Day selector with a vertical time-slot list instead of a squeezed weekly grid.
+- Card lists replace wide rows.
 
-## 12. Accessibility Notes
+## 9. Accessibility
 
 - Maintain sufficient text/background contrast.
 - Do not rely on color alone for status; include text labels.
 - Visible focus styles are required.
-- Dialogs must trap/restore focus correctly.
+- Dialogs trap and restore focus.
 - Interactive controls must be keyboard accessible.
-- Disabled slot states must be semantically disabled, not only visually muted.
+- Disabled slots use native disabled behavior, not only muted styling.

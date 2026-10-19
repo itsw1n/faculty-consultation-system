@@ -1,6 +1,8 @@
 # Environment Variables
 
-Copy the generated example before starting. Client environment location: `.env.local`.
+Copy `.env.example` to `.env.local` before starting.
+
+## Client and public values
 
 | Variable                               | Visibility    | Required | Purpose                                                               |
 | -------------------------------------- | ------------- | -------: | --------------------------------------------------------------------- |
@@ -10,18 +12,19 @@ Copy the generated example before starting. Client environment location: `.env.l
 
 Values with `NEXT_PUBLIC_` are bundled into client code and must never contain secrets. Keep real environment files out of version control.
 
-| Variable                    | Visibility  | Required for email | Purpose                                             |
-| --------------------------- | ----------- | -----------------: | --------------------------------------------------- |
-| `RESEND_API_KEY`            | server only |                yes | Resend API credential.                              |
-| `RESEND_FROM_EMAIL`         | server only |                yes | Verified sender address.                            |
-| `SUPABASE_SERVICE_ROLE_KEY` | server only |                yes | Queue processor access to the private email outbox. |
-| `CRON_SECRET`               | server only |                yes | Bearer token for Vercel's scheduled email route.    |
+## Server-only values
 
-| Variable              | Visibility  | Purpose                                              |
-| --------------------- | ----------- | ---------------------------------------------------- |
-| `INITIAL_ADMIN_EMAIL` | server only | Designated address allowed to claim the first admin. |
+| Variable                    | Required for    | Purpose                                             |
+| --------------------------- | --------------- | --------------------------------------------------- |
+| `RESEND_API_KEY`            | email delivery  | Resend API credential.                              |
+| `RESEND_FROM_EMAIL`         | email delivery  | Verified sender address.                            |
+| `SUPABASE_SERVICE_ROLE_KEY` | email queue     | Queue processor access to the private email outbox. |
+| `CRON_SECRET`               | scheduled email | Bearer token for Vercel's scheduled email route.    |
+| `INITIAL_ADMIN_EMAIL`       | first admin     | Address allowed to claim the first admin role.      |
 
-Do not prefix these values with `NEXT_PUBLIC_`. For a class demonstration, verify a sender domain or subdomain you control in Resend and send to test accounts. A Vercel app subdomain hosts the application but does not grant control of email DNS records. School-branded email needs ICTC approval for school DNS and sender identity.
+Do not prefix these values with `NEXT_PUBLIC_`. Email delivery is optional for local development; without Resend credentials the outbox processor returns zero claimed and sent emails.
+
+For a class demonstration, verify a sender domain or subdomain you control in Resend and send to test accounts. A Vercel app subdomain hosts the application but does not grant control of email DNS records. School-branded email needs ICTC approval for school DNS and sender identity.
 
 ## Local Google OAuth credentials
 
@@ -33,3 +36,7 @@ GOOGLE_CLIENT_SECRET=
 ```
 
 Copy `supabase/.env.example` to create it. The file is ignored by Git. Do not put these values in `NEXT_PUBLIC_*` variables or commit them. Production Google credentials are configured separately in the hosted Supabase project's Auth provider settings.
+
+## Approved email domains
+
+`approved_email_domains` is database data, not an environment variable. Migrations set the confirmed school domain. Local seed data adds a `*` wildcard for development only; do not add that row to a hosted environment.

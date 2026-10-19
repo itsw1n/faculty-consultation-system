@@ -3,7 +3,6 @@
 ## Prerequisites
 
 - Node.js 22.14.0 or newer with npm 11.19.0 or newer (tested on Node.js 24.20.0)
-- npm
 - A running Docker-compatible runtime for the pinned local Supabase CLI
 
 ## Install and start
@@ -25,7 +24,7 @@ Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `supabase/.env.local`. This
 http://127.0.0.1:54321/auth/v1/callback
 ```
 
-The local Supabase config reads the credentials through `env(GOOGLE_CLIENT_ID)` and `env(GOOGLE_CLIENT_SECRET)`. Other repositories with their own Supabase project do not use this file.
+The local Supabase config reads the credentials through `env(GOOGLE_CLIENT_ID)` and `env(GOOGLE_CLIENT_SECRET)`.
 
 The application connection values belong in `.env.local`:
 
@@ -43,32 +42,39 @@ npm run supabase:reset
 npm run dev
 ```
 
-Local `supabase:reset` applies `supabase/seed.sql`, which allows any email
-domain so the team can sign in with personal Google accounts. Hosted
-environments never receive the seed — only school domains work there. To test
-strict domain checks locally, run
-`delete from public.approved_email_domains where domain = '*';`.
+Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domain so the team can sign in with personal Google accounts. Hosted environments never receive the seed — only school domains work there. To test strict domain checks locally, run:
+
+```sql
+delete from public.approved_email_domains where domain = '*';
+```
+
+## First administrator
+
+1. Add `INITIAL_ADMIN_EMAIL` to `.env.local`.
+2. Restart the dev server.
+3. Sign in with that Google account.
+4. Open `/auth/claim-admin` and claim the first admin role.
+
+The claim only succeeds while no approved admin exists. When the claim succeeds, the account is redirected to `/admin`.
+
+## Faculty onboarding
+
+1. Sign in as an admin.
+2. Open `/admin/users`.
+3. Enter 1–50 school emails, a department, and a position title.
+4. Invite the faculty.
+
+Each invited address becomes approved faculty the first time its owner signs in. The invite assigns the department and position. Admins can later correct an approved account's role or department from the same page.
 
 ## Validate
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test --if-present
+npm run check
 npm run build
 npm run supabase:test
 npm run test:e2e
 ```
 
-End-to-end specs under `e2e/` drive real Chromium against your local
-Supabase. Landing-page specs run anywhere; the click-to-database specs
-(`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`,
-`faculty-availability`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY`
-in `.env.local` (refresh it from `supabase status -o env`) and skip
-automatically in CI, which has no local database. Test sign-in bypasses
-Google OAuth by design: fixtures create password users through the Auth
-Admin API, inject the real GoTrue session cookie, and every click after
-login is genuine — assertions then check both the screen and the database
-row.
+End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it from `supabase status -o env`) and skip automatically when it is unavailable. Test sign-in bypasses Google OAuth by design: fixtures create password users through the Auth Admin API, inject the real GoTrue session cookie, and every click after login is genuine. Assertions check both the screen and the database row.
 
 Commit the generated `package-lock.json`; CI uses `npm ci`.

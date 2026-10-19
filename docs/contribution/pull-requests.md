@@ -16,10 +16,9 @@ git checkout feature/short-description
 git merge origin/dev
 
 # 2. Validate locally (same checks CI runs)
-npm run lint
-npm run typecheck
-npm run test --if-present
+npm run check
 npm run build
+npm run supabase:test
 
 # 3. Push your branch
 git push origin feature/short-description
@@ -162,11 +161,10 @@ documents the dev-based flow in one place.
 - [x] Commits follow `type(scope): description`
 - [x] No `console.log` or debug code
 - [x] No hardcoded secrets
-- [x] Lint passes
-- [x] Tests pass
+- [x] `npm run check` passes
+- [x] `npm run build` passes
+- [x] `npm run supabase:test` passes when database behavior changed
 - [x] Docs updated if endpoints or rules changed
-- [x] Compatibility matrix passes if a profile, dependency, runtime, or container changed
-- [x] Major upgrades include migration notes
 
 Closes #45
 ```

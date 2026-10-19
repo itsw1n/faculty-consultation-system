@@ -56,6 +56,6 @@ git push origin feature/short-description
 
 ## Source of truth
 
-- Branch + commit conventions: `playbooks/universal/git-conventions.md`
+- Branch and commit conventions: `docs/contribution/branching.md` and `docs/contribution/commits.md`
 - PR template file: `.github/PULL_REQUEST_TEMPLATE.md`
-- If this folder and those files disagree, those files win.
+- If this folder and those files disagree, the files in this folder win.

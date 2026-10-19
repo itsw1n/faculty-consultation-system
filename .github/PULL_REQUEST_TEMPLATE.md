@@ -38,10 +38,9 @@
 - [ ] Commits follow `type(scope): description`
 - [ ] No `console.log` or debug code
 - [ ] No hardcoded secrets
-- [ ] Lint passes
-- [ ] Tests pass
+- [ ] `npm run check` passes
+- [ ] `npm run build` passes
+- [ ] `npm run supabase:test` passes when database behavior changed
 - [ ] Docs updated if endpoints or rules changed
-- [ ] Compatibility matrix passes if a profile, dependency, runtime, or container changed
-- [ ] Major upgrades include migration notes
 
 Closes #

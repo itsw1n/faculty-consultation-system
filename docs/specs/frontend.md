@@ -1,78 +1,120 @@
 # Frontend Specification
 
-## 1. Frontend Principles
+This document describes the implemented Next.js App Router frontend.
 
-- Mobile-first.
-- Light mode only for v1.
-- Consistent shared layout across Student, Faculty, and Admin.
-- Accessible interactions using React Aria where appropriate.
-- Avoid page-specific duplicated UI when a shared component can handle the behavior.
+## 1. Principles
 
-## 2. Component Folder Rule
+- Mobile-first layout.
+- Light mode only in v1.
+- Server Components by default; `'use client'` only for interaction.
+- React Aria Components for accessible select, modal, and dialog behavior.
+- One shared layout across student, faculty, and admin workspaces.
+- Shared controls live under `src/components`; domain UI lives under `src/features`.
 
-Only two shared component groups:
+## 2. Application tree
 
 ```text
-components/
-├── layout/
-└── common/
+src/app
+├── page.tsx                       public landing and Google sign-in
+├── layout.tsx                     root metadata and global styles
+├── error.tsx
+├── loading.tsx
+├── not-found.tsx
+├── api/
+│   ├── health/route.ts
+│   ├── cron/email/route.ts
+│   └── faculty/[facultyId]/availability/route.ts
+├── auth/
+│   ├── callback/route.ts
+│   ├── claim-admin/page.tsx
+│   └── continue/page.tsx
+├── application/
+│   ├── pending/page.tsx
+│   └── rejected/page.tsx
+├── student/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── book/page.tsx
+│   ├── book/[facultyId]/page.tsx
+│   ├── consultations/page.tsx
+│   └── consultations/[id]/page.tsx
+├── faculty/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── availability/page.tsx
+│   ├── requests/page.tsx
+│   ├── consultations/page.tsx
+│   └── consultations/[id]/page.tsx
+├── admin/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── users/page.tsx
+│   ├── faculty/page.tsx
+│   ├── departments/page.tsx
+│   ├── consultations/page.tsx
+│   └── consultations/export/route.ts
+└── notifications/page.tsx
 ```
 
-### `components/layout`
+## 3. Shared components
 
-Structural application components only.
+### Layout
 
-Examples:
+```text
+src/components/layout/AppShell.tsx
+src/components/layout/Breadcrumbs.tsx
+src/components/layout/Container.tsx
+src/components/layout/Navigation.tsx
+src/components/layout/RoleLayout.tsx
+src/components/layout/Section.tsx
+```
 
-- `AppShell`
-- `Sidebar`
-- `MobileSidebarDrawer`
-- `Header`
-- `Breadcrumbs`
+- `RoleLayout` calls `requireRole` and renders `AppShell`.
+- `AppShell` owns the desktop sidebar, mobile navigation panel, breadcrumb header, notification details dropdown, profile details, and sign out.
+- `Navigation` renders role-specific links and marks the active route.
+- `Breadcrumbs` derives labels from the current path.
 
-### `components/common`
+### Common
 
-Reusable controls and patterns.
+```text
+src/components/common/AlertDialog.tsx
+src/components/common/EmptyState.tsx
+src/components/common/InfiniteListMarker.tsx
+src/components/common/PageHeading.tsx
+src/components/common/SearchInput.tsx
+src/components/common/StatusBadge.tsx
+src/components/common/SubmitButton.tsx
+src/components/common/button/Button.tsx
+src/components/common/modal/Modal.tsx
+src/components/common/select/Select.tsx
+```
 
-Examples:
+Small primitives may use a subfolder under `common` (`button`, `modal`, `select`). Do not introduce unrelated generic folders such as `ui/` or `shared/`.
 
-- `Button`
-- `Input`
-- `SearchField`
-- `Select`
-- `ComboBox`
-- `Checkbox`
-- `Dialog`
-- `ConfirmDialog`
-- `StatusBadge`
-- `Table`
-- `FilterBar`
-- `FilterDrawer`
-- `InfiniteList`
-- `EmptyState`
-- `LoadingState`
-- `NotificationDropdown`
-- `ProfilePanel`
+## 4. Feature tree
 
-Do not create extra generic folders such as `ui/` or `shared/` unless the project rules are formally changed.
+Each feature owns its components, queries, repositories, schemas, services, and types as needed:
 
-## 3. Global Layout
+```text
+src/features/auth
+src/features/applications
+src/features/admin
+src/features/availability
+src/features/booking
+src/features/consultations
+src/features/dashboard
+src/features/email
+src/features/notifications
+```
 
-### Desktop
+Rules:
 
-- Left sidebar.
-- Top header in main content area.
-- Breadcrumb/page context on left.
-- Notification bell on right.
-- Profile control pinned to bottom of sidebar.
+- Pages render feature components and call repositories for initial data.
+- Client components call `features/*/queries/*.ts` for additional pages.
+- Mutations call server actions.
+- Domain-only components stay inside their feature.
 
-### Mobile
-
-- Sidebar hidden by default.
-- Hamburger button opens navigation drawer.
-- Header retains page title/breadcrumb context and notification bell.
-
-## 4. Navigation
+## 5. Workspace navigation
 
 ### Student
 
@@ -80,16 +122,12 @@ Do not create extra generic folders such as `ui/` or `shared/` unless the projec
 - Book Consultation
 - My Consultations
 
-Profile is pinned separately at sidebar bottom.
-
 ### Faculty
 
 - Dashboard
 - My Availability
 - Consultation Requests
 - My Consultations
-
-Profile is pinned separately at sidebar bottom.
 
 ### Admin
 
@@ -99,242 +137,132 @@ Profile is pinned separately at sidebar bottom.
 - Departments
 - Consultation Records
 
-Profile is pinned separately at sidebar bottom.
+The profile details panel is pinned to the bottom of the desktop sidebar. Notifications open from the header bell.
 
-## 5. Breadcrumb Rules
-
-Use breadcrumbs only when hierarchy is useful.
-
-Examples:
-
-```text
-Book Consultation / Schedule
-Manage Users / Application Details
-```
-
-Avoid redundant patterns such as `Home / Dashboard`.
-
-## 6. Notifications UI
-
-### Bell dropdown
-
-- Shows unread indicator.
-- Opens recent notifications.
-- Shows small number of latest items.
-- Provides `View all notifications` action.
-
-### Notifications page
-
-- Infinite-scroll if dataset grows.
-- Unread/read styling.
-- Optional mark-as-read actions.
-
-## 7. Profile UI
-
-- Open from profile control at bottom of sidebar.
-- Use modal/panel in v1.
-- Read-only school profile.
-- Show name, email, role, department, and role-specific fields.
-- Include sign out.
-
-## 8. Search and Filter Pattern
-
-All searchable collection pages should follow one consistent pattern.
-
-### Desktop
-
-```text
-Title
-Description
-
-[ Search................................ ] [Filter] [Filter] [Clear]
-
-Content
-
-Infinite loading state
-```
-
-### Mobile
-
-```text
-[ Search......................... ]
-[ Filters (n) ]
-```
-
-`Filters` opens a bottom sheet/drawer.
-
-### Search behavior
-
-- ~300 ms debounce for server-backed text search.
-- Do not debounce deliberate select changes.
-- Search change resets loaded collection and cursor.
-
-## 9. Infinite Scroll Pattern
-
-UI has no visible page numbers.
-
-State should conceptually include:
-
-```text
-items
-nextCursor
-hasMore
-isLoading
-search
-filters
-sort
-```
-
-Initial recommended chunk: 20.
-
-States:
-
-- Initial loading.
-- Loaded.
-- Loading more.
-- Empty.
-- No search results.
-- Error.
-- End of results.
-
-## 10. Student Screens
+## 6. Student screens
 
 ### Dashboard
 
-- Greeting/context.
-- Upcoming consultation.
-- Recent consultations.
-- Quick action: Book Consultation.
-- Small status summary cards.
+- Upcoming and pending counts.
+- Five most recent consultations.
+- Book consultation action.
 
-### Book Consultation — Faculty
+### Book consultation — faculty
 
-- Department select/filter.
+- Server-rendered first page of faculty.
+- Search input and department select.
+- Infinite scrolling with cursor reset on search or filter change.
+
+### Book consultation — schedule/details/review
+
+- Three-step client wizard.
+- Weekly desktop grid, mobile day tabs.
+- `OPEN` slots are selectable; other states are disabled.
+- Refresh action fetches `/api/faculty/[facultyId]/availability`.
+- Purpose select and optional 2,000-character description.
+- Review screen and atomic submit.
+
+### My consultations
+
+- Search and status filter.
+- Cursor-based infinite scrolling.
+- Status badge, detail link, and cancellation dialog for `PENDING` or `APPROVED`.
+- Detail page shows category, description, schedule, mode, and outcome when completed.
+
+## 7. Faculty screens
+
+### Dashboard
+
+- Pending requests, confirmed consultations, and open availability counts.
+- Add availability action.
+
+### My availability
+
+- Upcoming slots list.
+- Add availability modal.
+- Edit and remove actions only for `OPEN` slots.
+- Slot details modal.
+- Mode-specific fields: location for `IN_PERSON`, meeting link for `ONLINE`.
+
+### Consultation requests
+
+- Pending requests only.
+- Search and infinite scrolling.
+- Approve and reject confirmation dialogs.
+
+### My consultations
+
+- Confirmed and completed consultations.
+- Search and status filter.
+- Detail page with completion form and optional outcome.
+
+## 8. Admin screens
+
+### Dashboard
+
+- Pending application, approved faculty, and consultation counts.
+
+### Manage users
+
+- Search and status/role/department filters.
+- Infinite scrolling.
+- Faculty invite form with a department and position.
+- Account correction modal for approved accounts.
+- Legacy pending accounts are visible without an approve/reject action.
+
+### Manage faculty
+
 - Search field.
-- Faculty result cards/list.
-- Infinite scrolling.
-
-### Book Consultation — Schedule
-
-Desktop:
-
-- Weekly calendar grid.
-- Week previous/next controls.
-- Today action.
-- Faculty summary.
-- Legend.
-
-Mobile:
-
-- Horizontal/compact day selector.
-- Vertical slot list for selected day.
-
-Slot states:
-
-- Open: selectable.
-- Reserved: disabled.
-- Booked: disabled.
-- Closed: muted/disabled.
-
-### Book Consultation — Details
-
-- Purpose/subject.
-- Description.
-- Optional related course if included.
-- Display consultation mode/location.
-
-### Book Consultation — Review
-
-- Full booking summary.
-- Back.
-- Confirm booking.
-
-### My Consultations
-
-- Search/filter where useful.
-- Status badges.
-- Contextual actions only.
-
-## 11. Faculty Screens
-
-### Dashboard
-
-- Upcoming consultations.
-- Pending requests.
-- Availability summary.
-- Add Availability quick action.
-
-### My Availability
-
-- Weekly calendar.
-- Status legend.
-- Add Availability modal.
-- Slot detail modal when clicking existing slot.
-
-### Add Availability Modal
-
-Fields:
-
-- Date.
-- Start time.
-- End time.
-- Mode.
-- Location or meeting link depending on mode.
-
-### Consultation Requests
-
-- Search/filter.
-- Infinite scrolling.
-- Approve/reject.
-- Confirmation dialogs.
-
-### My Consultations
-
-- Approved/upcoming.
-- Completed.
-- Mark completed where eligible.
-
-## 12. Admin Screens
-
-### Dashboard
-
-- Pending applications.
-- Approved user/faculty counts.
-- Recent activity.
-
-### Manage Users
-
-- Search.
-- Role filter.
-- Department filter.
-- Status filter.
-- Infinite scrolling.
-- Checkbox selection.
-- Bulk approve/reject.
-
-### Manage Faculty
-
-- Search/filter.
-- Faculty records.
-- Infinite scrolling.
+- Read-only faculty list with department, position, and status.
 
 ### Departments
 
-- Department cards/table.
-- Add/edit only if included in implementation.
+- Add form.
+- Editable cards for existing departments.
 
-### Consultation Records
+### Consultation records
 
-- Search/filter.
-- Infinite scrolling.
-- Read-only by default.
+- Read-only consultation directory with search and status filter.
+- CSV date-range form.
+- Admin rows omit participant-only descriptions.
 
-## 13. Confirmation Rules
+## 9. Notifications
 
-Use shared confirmation dialog for actions such as:
+- Header bell lists the five latest notifications and an unread count.
+- `/notifications` shows the full paginated list.
+- `Mark all as read` is shown when unread items exist.
+- Notification detail actions use server actions and RLS.
 
-- Student cancellation.
-- Faculty approve/reject.
-- Admin bulk approve/reject.
+## 10. Search and pagination
 
-Dialogs must manage focus correctly and be keyboard accessible.
+- Text search debounces for 300 ms.
+- Select changes apply immediately.
+- A new search or filter resets the cursor and loaded items.
+- `useInfinitePage` owns the loaded page, pending state, and marker ref.
+- `InfiniteListMarker` triggers the next request and shows the end state.
+
+## 11. Forms and dialogs
+
+- Server actions receive `FormData`.
+- Client mutation forms use `useActionState` and display a safe error message.
+- `AlertDialog` handles confirmations.
+- `Modal` handles add, edit, details, and correction panels.
+- Dialogs trap and restore focus.
+- `SubmitButton` shows a pending label while the action runs.
+
+## 12. Styling
+
+- Tailwind CSS 4 with tokens declared in `src/app/globals.css`.
+- Use semantic token classes such as `bg-surface`, `text-muted`, `border-border`, `text-primary`, and `bg-accent`.
+- Shared controls use consistent heights, radii, and focus rings.
+- Status is conveyed with text as well as color.
+
+## 13. Accessibility
+
+- Semantic landmarks and headings.
+- Keyboard access for navigation, calendars, dialogs, and forms.
+- Visible focus styles.
+- `aria-current` for active navigation and booking steps.
+- Disabled slot states use native disabled behavior.
+- Error messages use `role="alert"`.
+- Tables and card lists preserve readable order on narrow screens.

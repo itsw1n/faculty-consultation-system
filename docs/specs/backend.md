@@ -1,228 +1,168 @@
 # Backend Specification
 
-## 1. Backend Responsibilities
+This document describes the implemented server and data-access layers.
 
-The backend/server layer is responsible for:
+## 1. Responsibilities
 
-- Authentication/session validation.
-- Authorization.
-- Request validation.
-- Database mutations.
-- Booking consistency.
-- Search/filter queries.
-- Cursor-based pagination.
-- Notification creation.
-- Optional email notification dispatch.
+- Validate untrusted input with Zod.
+- Authenticate the caller.
+- Authorize the caller for the requested role or account state.
+- Delegate reads to repositories and writes to repositories or RPCs.
+- Keep booking and lifecycle transitions atomic in PostgreSQL.
+- Create in-app notifications and enqueue email from database triggers and RPCs.
 
-Client UI must never be the only enforcement point for business rules.
+Client UI is never the only enforcement point.
 
-## 2. Recommended Service Boundaries
-
-Logical modules/services:
+## 2. Feature modules
 
 ```text
-auth
-applications
-profiles
-departments
-faculty
-availability
-consultations
-notifications
-admin
+src/features/auth          sign-in, sign-out, first-admin claim, profile guards
+src/features/applications  account page, invites, corrections
+src/features/admin         departments, faculty records
+src/features/availability  faculty availability actions and reads
+src/features/booking       faculty directory, slots, booking action
+src/features/consultations lifecycle actions, lists, detail, CSV
+src/features/dashboard     role-specific dashboard counts
+src/features/email         outbox claim and Resend delivery
+src/features/notifications in-app notifications and read state
 ```
 
-These may be implemented using Next.js server actions, route handlers, Supabase RPC/functions, or a combination.
+Shared code lives in `src/lib`:
 
-## 3. Validation
+- `src/lib/env.ts` validates public and server environment values.
+- `src/lib/actionState.ts` defines the common action result.
+- `src/lib/useInfinitePage.ts` implements cursor-based client pagination.
+- `src/lib/supabase/server.ts` creates the cookie-backed server client.
 
-All mutations should validate payloads server-side.
-
-Recommended validation library: Zod or equivalent schema validation already selected by project rules.
-
-Examples:
-
-- Date/time formats.
-- Required department.
-- Valid requested role.
-- End time > start time.
-- Valid consultation status transition.
-- Valid availability status transition.
-- Mode-specific location/link requirements.
-
-## 4. Authorization
-
-Every server mutation must validate the authenticated user and role.
-
-Examples:
-
-### Student
-
-May:
-
-- Read eligible faculty.
-- Read availability.
-- Create own consultation request.
-- Read own consultations.
-- Cancel own eligible consultation.
-
-May not:
-
-- Approve requests.
-- Modify faculty availability.
-- Read other students' private consultation records.
-
-### Faculty
-
-May:
-
-- Manage own availability.
-- Read consultation requests assigned to self.
-- Approve/reject own assigned requests.
-- Complete own approved consultations.
-
-### Admin
-
-May:
-
-- Review applications.
-- Assign approved roles.
-- Manage faculty/department records according to policy.
-- Read consultation records.
-
-## 5. Booking Mutation
-
-Booking must be atomic.
-
-Required sequence:
-
-1. Validate authenticated Student.
-2. Validate slot exists and is `OPEN`.
-3. Change slot to `RESERVED` only if currently `OPEN`.
-4. Create `PENDING` consultation linked to slot.
-5. Commit both changes together.
-6. Create faculty notification.
-
-Preferred implementation:
-
-- PostgreSQL function/RPC or transaction-capable server-side operation.
-
-Do not implement as two unrelated client-side Supabase mutations because that creates race conditions.
-
-## 6. Consultation Decision Mutation
-
-### Approve
-
-1. Validate Faculty owns consultation's slot/request.
-2. Validate consultation `PENDING`.
-3. Validate slot `RESERVED`.
-4. Set consultation `APPROVED`.
-5. Set slot `BOOKED`.
-6. Notify Student.
-
-### Reject
-
-1. Validate ownership.
-2. Validate pending state.
-3. Set consultation `REJECTED`.
-4. Set slot `OPEN`.
-5. Notify Student.
-
-## 7. Cancellation Mutation
-
-### Student pending cancellation
-
-- Consultation `PENDING -> CANCELLED`.
-- Slot `RESERVED -> OPEN`.
-
-### Student approved cancellation
-
-- Consultation `APPROVED -> CANCELLED`.
-- Slot `BOOKED -> OPEN`.
-- Notify Faculty.
-
-Mutation should be atomic.
-
-## 8. Completion Mutation
-
-Faculty only:
-
-- Consultation `APPROVED -> COMPLETED`.
-- Slot `BOOKED -> CLOSED`.
-
-## 9. Availability Mutation
-
-Create availability:
-
-- Authenticated Faculty only.
-- Faculty id comes from session/profile, not trusted client input.
-- Validate date/time.
-- Validate no overlap.
-- Initial status is `OPEN`.
-
-Delete availability:
-
-- Faculty owns slot.
-- Only allowed for safe status such as `OPEN`.
-- `RESERVED` or `BOOKED` must not be silently deleted.
-
-## 10. Search and Filtering API Pattern
-
-Example conceptual request:
+## 3. Layers
 
 ```text
-GET /api/admin/applications
-  ?search=maria
-  &requestedRole=FACULTY
-  &department=IT
-  &status=PENDING
-  &limit=20
-  &cursor=...
+page / layout / route handler
+        |
+        v
+server action or query loader
+        |
+        v
+feature repository
+        |
+        v
+Supabase table or RPC
 ```
 
-Response:
+- Pages call repositories directly for initial server-rendered reads.
+- `features/*/queries/*.ts` are `'use server'` loaders used by client components for pagination. They add authorization and Zod validation around repository reads.
+- Repositories own Supabase calls. They do not make policy decisions that belong in the database.
+- Server actions validate input, call `requireRole`, then call a repository or RPC.
 
-```json
-{
-  "items": [],
-  "nextCursor": null,
-  "hasMore": false
-}
-```
+## 4. Authorization helpers
 
-Exact route shape may change based on chosen Next.js architecture.
+- `getAuthenticatedProfile()` reads claims and the profile row.
+- `requireRole(role)` redirects unauthenticated users to `/`.
+- `requireRole` redirects an authenticated user with the wrong role or status to `/auth/continue`.
+- `requireApprovedProfile()` throws when there is no approved profile and is used for shared reads.
 
-## 11. Pagination
+Every server action calls one of these helpers before touching data.
 
-Prefer cursor-based pagination.
+## 5. Server actions
 
-Cursor must be based on deterministic ordering, for example:
+### auth
 
-- `created_at DESC, id DESC`
+- `signInWithGoogle()` starts Supabase Google OAuth and redirects to the provider URL.
+- `signOut()` clears the Supabase session.
+- `claimFirstAdmin(state)` validates `INITIAL_ADMIN_EMAIL` and calls `claim_first_admin`.
 
-Avoid relying on offset pagination for large/changing admin datasets when cursor pagination is practical.
+### applications
 
-## 12. Notifications
+- `inviteFaculty(state, formData)` validates 1–50 emails, department, and position, then calls `invite_faculty`.
+- `correctUserAccount(state, formData)` validates role, department, and optional position, then calls `correct_user_account`.
 
-Notification service should support creating records for:
+### admin
 
-- New application -> Admin.
-- Application approved/rejected -> applicant.
-- New consultation request -> Faculty.
-- Consultation approved/rejected -> Student.
-- Student cancellation -> Faculty.
+- `createDepartment(formData)` inserts a department.
+- `updateDepartment(formData)` updates code and name.
 
-Email through Resend is optional/secondary to in-app notification unless required by assignment milestones.
+### availability
 
-## 13. Error Contract
+- `createAvailability(state, formData)` calls `create_availability`.
+- `updateAvailability(state, formData)` calls `update_open_availability`.
+- `deleteAvailability(formData)` calls `delete_open_availability`.
 
-Server responses/actions should distinguish:
+### booking
 
-- Validation error.
-- Unauthorized.
-- Forbidden.
-- Not found.
-- Conflict (for example slot is no longer open).
-- Internal error.
+- `bookConsultation(state, formData)` validates the slot, category, and notes, then calls `book_consultation`.
 
-Booking conflicts should return a clear recoverable error so the UI can refresh availability.
+### consultations
+
+- `decideConsultation(formData)` calls `decide_consultation` and then attempts email delivery.
+- `cancelConsultation(formData)` calls `cancel_consultation` and then attempts email delivery.
+- `completeConsultation(formData)` calls `complete_consultation_with_outcome`.
+
+### notifications
+
+- `markNotificationRead(formData)` updates one notification's `read_at`.
+- `markAllNotificationsRead()` updates all unread notifications for the caller.
+
+## 6. Repositories and RPCs
+
+| Repository read           | Source                                           |
+| ------------------------- | ------------------------------------------------ |
+| `getAuthenticatedProfile` | `profiles` select                                |
+| `listDepartments`         | `departments` select                             |
+| `listFacultyRecords`      | `profiles` select with faculty relations         |
+| `getApplicationPage`      | `list_application_page` RPC                      |
+| `listOwnAvailability`     | `list_own_availability` RPC                      |
+| `getFacultyPage`          | `list_faculty_page` RPC                          |
+| `listFacultySlots`        | `list_faculty_slots` RPC                         |
+| `getConsultationPage`     | `search_my_consultations` RPC                    |
+| `getConsultationDetail`   | `get_consultation_detail` RPC                    |
+| `getStudentDashboard`     | `consultations` counts and recent select         |
+| `getFacultyDashboard`     | `consultations` counts and open-slot count       |
+| `getAdminDashboard`       | `profiles` counts and `admin_consultation_count` |
+| `listNotifications`       | `notifications` select                           |
+| `getNotificationPage`     | `notifications` select with cursor               |
+| `queueReminders`          | `queue_tomorrow_reminders` RPC                   |
+| `claimEmails`             | `claim_email_batch` RPC                          |
+| `markEmailSent`           | `mark_email_sent` RPC                            |
+
+## 7. Atomic workflow RPCs
+
+The following operations must not be split into multiple client writes:
+
+- `book_consultation`: `OPEN -> RESERVED` plus consultation creation and notification.
+- `decide_consultation`: consultation decision plus slot transition and notification.
+- `cancel_consultation`: cancellation plus slot reopening and notification.
+- `complete_consultation_with_outcome`: completion, outcome, and slot closing.
+- `claim_first_admin`: serialized first-admin assignment.
+- `invite_faculty`: per-email invite result.
+- `correct_user_account`: role/department correction with faculty-profile maintenance.
+
+## 8. Search and pagination
+
+- Faculty: cursor `(lower(full_name), id)`.
+- Applications: cursor `(created_at, id)`.
+- Consultations: cursor `(created_at, id)`.
+- Notifications: cursor `(created_at, id)`.
+- Each list request is capped by the RPC or query limit, normally 20 records.
+- Search is server-side; the client debounces text input by 300 ms.
+
+## 9. Email delivery
+
+`deliverEmails(includeReminders)`:
+
+1. Optionally queues next-day reminders.
+2. Returns `{ claimed: 0, sent: 0 }` when Resend is not configured.
+3. Claims up to 25 outbox records.
+4. Sends each email through Resend with the outbox ID as the idempotency key.
+5. Marks each successful record sent.
+
+`GET /api/cron/email` requires a bearer `CRON_SECRET` and returns 503 when processing fails.
+
+## 10. Error contract
+
+- Validation failures return a safe field-level or generic message.
+- Missing authentication redirects to `/`.
+- Wrong role or account state redirects to `/auth/continue`.
+- Booking conflicts ask the student to choose another slot.
+- Lifecycle conflicts ask the user to refresh.
+- Database and provider details stay server-side.
+- Unexpected rendering failures use the application error boundary; unknown routes use the not-found page.

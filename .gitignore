@@ -36,6 +36,9 @@ test-results/
 # Docker volumes
 postgres-data/
 
+# Local agent specs
+docs/superpowers/
+
 # Supabase
 .supabase/
 supabase/.branches/

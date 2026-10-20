@@ -41,6 +41,32 @@ Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domai
 delete from public.approved_email_domains where domain = '*';
 ```
 
+## Demo accounts
+
+`supabase db reset` loads three local demo accounts plus availability, consultations in every lifecycle state, and notifications:
+
+| Role    | Email                                | Password       |
+| ------- | ------------------------------------ | -------------- |
+| Admin   | `erwinjrcurato8975@acdeducation.com` | `Password123!` |
+| Faculty | `itsw1nmade@gmail.com`               | `Password123!` |
+| Student | `erwincurato@gmail.com`              | `Password123!` |
+
+Re-apply just the demo data without rebuilding the database:
+
+```bash
+make seed
+```
+
+Remove the demo data by rebuilding only the local database from migrations, without applying the seed:
+
+```bash
+make reset
+```
+
+Both targets pass `--local`, so they never touch a linked or hosted Supabase project. `make reset` also clears any other local development data.
+
+The two Gmail accounts work locally because the seed keeps the `*` approved-domain wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
+
 ## First administrator
 
 1. Add `INITIAL_ADMIN_EMAIL` to `.env.local`.

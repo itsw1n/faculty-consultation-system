@@ -11,7 +11,7 @@ update public.profiles set role='STUDENT',account_status='APPROVED',department_i
 update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='22000000-0000-0000-0000-000000000002';
 update public.profiles set role='ADMIN',account_status='APPROVED' where id='44000000-0000-0000-0000-000000000004';
 insert into public.availability_slots(id,faculty_id,date,start_time,end_time,mode,location)
-values ('55000000-0000-0000-0000-000000000005','22000000-0000-0000-0000-000000000002',current_date+1,'09:00','10:00','IN_PERSON','Room 1');
+values ('55000000-0000-0000-0000-000000000005','22000000-0000-0000-0000-000000000002',(now() at time zone 'Asia/Manila')::date + 1,'09:00','10:00','IN_PERSON','Room 1');
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"11000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
@@ -24,7 +24,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"33000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
 select is_empty('select id from public.consultations','other student cannot read consultation table');
 select is_empty($$select id from public.get_consultation_detail((select id from public.consultations limit 1))$$,'other student cannot read details');
-select throws_ok($$select public.consultation_summary(current_date,current_date+1)$$,'42501','Admin access required','other student cannot export report');
+select throws_ok($$select public.consultation_summary((now() at time zone 'Asia/Manila')::date,(now() at time zone 'Asia/Manila')::date + 1)$$,'42501','Admin access required','other student cannot export report');
 reset role;
 
 set local role authenticated;
@@ -32,7 +32,7 @@ select set_config('request.jwt.claims','{"sub":"44000000-0000-0000-0000-00000000
 select is_empty('select id from public.consultations','admin cannot read raw consultation');
 select is_empty($$select id from public.get_consultation_detail((select id from public.consultations limit 1))$$,'admin cannot read participant details');
 select results_eq($$select count(*)::int from public.search_my_consultations() where notes is not null$$,array[0],'admin listing redacts every description');
-select results_eq($$select count(*)::int from public.consultation_summary(current_date,current_date+1) where category='PERSONAL'$$,array[1],'admin sees category summary');
+select results_eq($$select count(*)::int from public.consultation_summary((now() at time zone 'Asia/Manila')::date,(now() at time zone 'Asia/Manila')::date + 1) where category='PERSONAL'$$,array[1],'admin sees category summary');
 reset role;
 
 set local role authenticated;

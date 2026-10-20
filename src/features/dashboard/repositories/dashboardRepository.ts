@@ -40,11 +40,12 @@ export async function getFacultyDashboard() {
 }
 export async function getAdminDashboard() {
   const supabase = await createClient()
-  const [pending, faculty, consultations] = await Promise.all([
+  const [students, faculty, consultations] = await Promise.all([
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('account_status', 'PENDING'),
+      .eq('role', 'STUDENT')
+      .eq('account_status', 'APPROVED'),
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
@@ -53,7 +54,7 @@ export async function getAdminDashboard() {
     supabase.rpc('admin_consultation_count'),
   ])
   return {
-    pending: pending.count ?? 0,
+    students: students.count ?? 0,
     faculty: faculty.count ?? 0,
     consultations: Number(consultations.data ?? 0),
   }

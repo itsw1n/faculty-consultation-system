@@ -8,6 +8,36 @@ export type ApplicationFilters = {
   department?: string
   cursor?: { createdAt: string; id: string }
 }
+
+export async function getAccountCounts() {
+  const supabase = await createClient()
+  const [total, students, faculty, admins] = await Promise.all([
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'STUDENT')
+      .eq('account_status', 'APPROVED'),
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'FACULTY')
+      .eq('account_status', 'APPROVED'),
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'ADMIN')
+      .eq('account_status', 'APPROVED'),
+  ])
+  if (total.error || students.error || faculty.error || admins.error)
+    throw new Error('Unable to load account counts')
+  return {
+    total: total.count ?? 0,
+    students: students.count ?? 0,
+    faculty: faculty.count ?? 0,
+    admins: admins.count ?? 0,
+  }
+}
 export async function getApplicationPage(filters: ApplicationFilters) {
   const { data, error } = await (
     await createClient()

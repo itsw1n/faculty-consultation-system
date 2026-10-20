@@ -14,8 +14,8 @@ test.describe('Email and password authentication', () => {
     await setProfile(user.id, { role: 'STUDENT', account_status: 'APPROVED' })
 
     await page.goto('/')
-    await page.getByLabel('Email').fill(email)
-    await page.getByLabel('Password').fill(password)
+    await page.getByLabel('School email').fill(email)
+    await page.getByLabel('Password', { exact: true }).fill(password)
     await page.getByRole('button', { name: 'Sign in' }).click()
     await expect(page).toHaveURL('/student')
   })
@@ -31,8 +31,8 @@ test.describe('Email and password authentication', () => {
     if (error) throw error
 
     await page.goto('/')
-    await page.getByLabel('Email').fill(email)
-    await page.getByLabel('Password').fill(password)
+    await page.getByLabel('School email').fill(email)
+    await page.getByLabel('Password', { exact: true }).fill(password)
     await page.getByRole('button', { name: 'Sign in' }).click()
     await expect(page.getByRole('main').getByRole('alert')).toContainText('verify your email')
   })
@@ -59,7 +59,7 @@ test.describe('Email and password authentication', () => {
     await page.getByLabel('Full name').fill('Signup Student')
     await page.getByLabel('School email').fill(email)
     await page.getByLabel('Password', { exact: true }).fill(password)
-    await page.getByLabel('Confirm password').fill(password)
+    await page.getByLabel('Confirm password', { exact: true }).fill(password)
     await page.getByRole('button', { name: 'Create account' }).click()
     await expect(page.getByRole('status')).toContainText('Check your email')
   })
@@ -82,7 +82,7 @@ test.describe('Email and password authentication', () => {
 
     const newPassword = 'NewPassword123!'
     await page.getByLabel('New password', { exact: true }).fill(newPassword)
-    await page.getByLabel('Confirm new password').fill(newPassword)
+    await page.getByLabel('Confirm new password', { exact: true }).fill(newPassword)
     await page.getByRole('button', { name: 'Save new password' }).click()
     await expect(page).toHaveURL('/student')
   })

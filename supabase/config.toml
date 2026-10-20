@@ -3,9 +3,21 @@ project_id = "nextjs-supabase"
 [auth]
 site_url = "http://localhost:3000"
 additional_redirect_urls = [
-  "http://localhost:3000/auth/callback",
-  "http://127.0.0.1:3000/auth/callback",
+  "http://localhost:3000/auth/confirm",
+  "http://127.0.0.1:3000/auth/confirm",
 ]
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+
+[auth.email.template.confirmation]
+subject = "Confirm your CampusConnect account"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your CampusConnect password"
+content_path = "./supabase/templates/recovery.html"
 
 [api]
 enabled = true
@@ -20,8 +32,3 @@ major_version = 17
 [studio]
 enabled = true
 port = 54323
-
-[auth.external.google]
-enabled = true
-client_id = "env(GOOGLE_CLIENT_ID)"
-secret = "env(GOOGLE_CLIENT_SECRET)"

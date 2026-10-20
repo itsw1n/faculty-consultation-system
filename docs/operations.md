@@ -4,8 +4,8 @@ Deployment and scheduled email. Local setup is in [`getting-started.md`](getting
 
 ## Supabase
 
-1. Create the hosted Supabase project and enable Google as an Auth provider.
-2. Add the application callback URL ending in `/auth/callback` to the provider and Supabase allowlists.
+1. Create the hosted Supabase project and confirm email authentication is enabled.
+2. Configure SMTP or Supabase's email service, set the hosted site URL, and update the confirmation and recovery templates to link to `/auth/confirm` with `{{ .TokenHash }}`.
 3. Link the CLI to the intended project and review pending migrations.
 4. Apply migrations with `supabase db push` only through the team's approved release process.
 5. Confirm the school domain exists in `approved_email_domains` and that no `*` wildcard row is present.
@@ -21,7 +21,7 @@ Server-only values required for email and administration:
 - `CRON_SECRET` for the scheduled email route.
 - `INITIAL_ADMIN_EMAIL` for the first-admin claim.
 
-Do not expose a service-role key or OAuth client secret to the browser. Keep hosted Google credentials in the Supabase Auth provider settings, not repository files. See [`reference/environment.md`](reference/environment.md).
+Do not expose a service-role key or email credentials to the browser. Keep hosted SMTP credentials in the Supabase Auth settings, not repository files. See [`reference/environment.md`](reference/environment.md).
 
 ## Scheduled email
 
@@ -33,4 +33,4 @@ Merging `dev` → `main` runs full CI; on green, the release workflow tags the n
 
 ## Release checklist
 
-Run the validation commands from [`getting-started.md`](getting-started.md), test OAuth against the target callback origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.
+Run the validation commands from [`getting-started.md`](getting-started.md), test the confirmation and recovery emails against the target origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.

@@ -2,12 +2,12 @@
 
 ## Status
 
-Core v1 implementation complete; awaiting environment-specific OAuth configuration, hosted credentials, and deployment.
+Core v1 implementation complete; awaiting environment-specific auth email configuration, hosted credentials, and deployment.
 
 ## Completed
 
 - Supabase schema, RLS, seed data, atomic workflow RPCs, and database tests.
-- Google OAuth sign-in with automatic student approval, invite-based faculty onboarding, first-admin claim, and admin account correction.
+- Email + password sign-in with mandatory verification, self-service sign-up, password recovery, automatic student approval, invite-based faculty onboarding, first-admin claim, and admin account correction.
 - Student faculty directory, availability calendar, booking, and consultation management.
 - Faculty availability management and request decisions.
 - Admin users, faculty, department, and consultation record views with CSV export.
@@ -18,6 +18,6 @@ Core v1 implementation complete; awaiting environment-specific OAuth configurati
 
 ## Deferred
 
-- Hosted Google OAuth, Resend, and cron credentials.
-- Production deployment and live OAuth verification.
+- Hosted auth email/SMTP, Resend, and cron credentials.
+- Production deployment and live email verification.
 - Dark mode.

@@ -4,8 +4,8 @@ Normative behavior enforced by the application and database. How these rules are
 
 ## Account and role rules
 
-1. Authentication uses Google OAuth through Supabase Auth. There is no application-managed password flow.
-2. A verified school email on an approved domain becomes `STUDENT / APPROVED` on first sign-in.
+1. Authentication uses email + password through Supabase Auth. Accounts must verify their email before signing in, and password recovery uses emailed reset links.
+2. A verified school email on an approved domain becomes `STUDENT / APPROVED` when the account is created.
 3. An unconsumed `faculty_invites` row matching the email instead makes the profile `FACULTY / APPROVED` with the invited department and position.
 4. Existing `PENDING` or `REJECTED` profiles are not overwritten by the sign-in trigger.
 5. Only the account matching `INITIAL_ADMIN_EMAIL` may claim the first admin role, once, while no approved admin exists.

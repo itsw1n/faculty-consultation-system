@@ -17,7 +17,7 @@ test.describe('Manage Users directory', () => {
   test('sends anonymous visitors back to sign-in', async ({ page }) => {
     await page.goto('/admin/users')
     await expect(page).toHaveURL('/')
-    await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeVisible()
+    await expect(page.getByLabel('School email')).toBeVisible()
   })
 
   test('admin invites faculty and the invite persists in the database', async ({ page }) => {

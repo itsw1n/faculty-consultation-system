@@ -5,7 +5,6 @@ import { ClaimAdminForm } from './ClaimAdminForm'
 
 vi.mock('../actions', () => ({
   claimFirstAdmin: vi.fn(async () => ({ error: 'Admin claim is not available for this account.' })),
-  signInWithGoogle: vi.fn(),
   signOut: vi.fn(),
 }))
 

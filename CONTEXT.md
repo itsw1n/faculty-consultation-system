@@ -14,7 +14,7 @@ Assumption College of Davao is a web-based faculty consultation and scheduling s
 ## Key decisions
 
 - Next.js App Router with Server Components by default and client components only for interactive UI.
-- Supabase Auth uses Google OAuth; Supabase PostgreSQL owns application data and authorization policies.
+- Supabase Auth uses email + password with mandatory email verification and emailed password recovery; Supabase PostgreSQL owns application data and authorization policies.
 - Approved school-domain emails become students automatically on first sign-in.
 - Admins invite faculty by school email; the invite assigns department and position on first sign-in.
 - The designated `INITIAL_ADMIN_EMAIL` can claim the first admin role once from `/auth/claim-admin`.

@@ -1,0 +1,8 @@
+Request: GET /admin (no redirects followed)
+Response status: 200
+Response location: (none)
+
+Browser followed the redirect:
+Final URL: http://127.0.0.1:3100/student
+Signed in as: demo.student@acdeducation.com (role: STUDENT)
+Note: the page shell streams before the auth check, so Next completes the redirect in the browser instead of returning a 307.

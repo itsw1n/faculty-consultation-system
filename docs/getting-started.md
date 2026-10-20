@@ -14,19 +14,7 @@ cp .env.example .env.local
 npm install
 ```
 
-Before the first local start, configure Google OAuth for this repository:
-
-```bash
-cp supabase/.env.example supabase/.env.local
-```
-
-Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `supabase/.env.local`. This file is ignored by Git and applies only to this project's local Supabase container. Add this authorized redirect URI to the Google OAuth web client:
-
-```text
-http://127.0.0.1:54321/auth/v1/callback
-```
-
-The local Supabase config reads the credentials through `env(GOOGLE_CLIENT_ID)` and `env(GOOGLE_CLIENT_SECRET)`.
+Local email verification uses Supabase's built-in mail catcher and the templates in `supabase/config.toml`. No provider credentials are needed. Confirmation and recovery messages appear at `http://127.0.0.1:54324` while the local stack is running.
 
 Point the app at the local stack in `.env.local`:
 
@@ -46,7 +34,7 @@ npm run supabase:reset
 npm run dev
 ```
 
-Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domain so the team can sign in with personal Google accounts. Hosted environments never receive the seed — only school domains work there. To test strict domain checks locally, run:
+Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domain so the team can sign up with any email address. Hosted environments never receive the seed — only school domains work there. To test strict domain checks locally, run:
 
 ```sql
 delete from public.approved_email_domains where domain = '*';
@@ -56,7 +44,7 @@ delete from public.approved_email_domains where domain = '*';
 
 1. Add `INITIAL_ADMIN_EMAIL` to `.env.local`.
 2. Restart the dev server.
-3. Sign in with that Google account.
+3. Sign in with that email and password.
 4. Open `/auth/claim-admin` and claim the first admin role.
 
 The claim only succeeds while no approved admin exists. On success the account redirects to `/admin`.
@@ -79,7 +67,7 @@ npm run supabase:test
 npm run test:e2e
 ```
 
-`npm run check` runs format, lint, typecheck, and unit tests. End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it with `supabase status -o env`) and skip automatically when it is unavailable. Test sign-in bypasses Google OAuth by design: fixtures create password users through the Auth Admin API, inject the real GoTrue session cookie, and every click after login is genuine. Assertions check both the screen and the database row.
+`npm run check` runs format, lint, typecheck, and unit tests. End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `password-auth`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it with `supabase status -o env`) and skip automatically when it is unavailable. Password specs exercise the real sign-in form; fixtures create users through the Auth Admin API and generate verification tokens where a test must not depend on reading mail. Assertions check both the screen and the database row.
 
 Commit the generated `package-lock.json`; CI uses `npm ci`.
 

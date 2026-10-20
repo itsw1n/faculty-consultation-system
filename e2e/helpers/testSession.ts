@@ -39,8 +39,8 @@ function storageKeyFor(url: string): string {
 /**
  * Signs in with email + password through the real GoTrue API, then writes
  * the session into the browser using the exact cookie format the app's
- * Supabase SSR client reads. Google OAuth itself cannot be bot-driven, so
- * this is the seam: everything after login is genuinely clicked.
+ * Supabase SSR client reads. This keeps setup fast for specs that are not
+ * exercising the sign-in form itself.
  */
 export async function signInAs(page: Page, email: string, password: string): Promise<void> {
   const client = createClient(supabaseUrl, supabaseAnonKey, {

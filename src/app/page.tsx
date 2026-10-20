@@ -1,8 +1,9 @@
-import { signInWithGoogle } from '@/features/auth/actions'
-import { Button } from '@/components/common/button/Button'
+import Image from 'next/image'
+import { CalendarClock, MessageCircle, ShieldCheck } from 'lucide-react'
+import logo from '@/assets/acd-logo.png'
+import { SignInForm } from '@/features/auth/components/SignInForm'
 import { Container } from '@/components/layout/Container'
 import { Section } from '@/components/layout/Section'
-import { CalendarClock, MessageCircle, ShieldCheck } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -59,45 +60,44 @@ export default function HomePage() {
         className="relative flex min-h-[38rem] flex-col overflow-hidden bg-linear-to-br from-[#3c6190] via-primary to-[#0b356c] py-12 text-white md:min-h-screen md:py-20"
         aria-labelledby="signin-title"
       >
-        <div className="pointer-events-none absolute inset-0 opacity-25" aria-hidden="true">
-          <div className="absolute -top-24 right-[-8rem] size-[28rem] rounded-full border-[3rem] border-white/10" />
-          <div className="absolute bottom-[-12rem] left-[-8rem] size-[30rem] rounded-full border-[4rem] border-blue-200/10" />
-          <div className="absolute top-1/3 right-1/4 h-px w-72 rotate-[-28deg] bg-white/25" />
+        <div
+          className="pointer-events-none absolute top-[-10rem] right-[-9rem] w-[32rem] sm:right-[-11rem] sm:w-[40rem] md:right-[-16rem] md:w-[48rem] lg:right-[-18rem] lg:w-[56rem]"
+          aria-hidden="true"
+        >
+          <Image
+            src={logo}
+            alt=""
+            width={484}
+            height={474}
+            unoptimized
+            className="h-auto w-full opacity-10"
+          />
         </div>
-        <Container className="relative flex h-full max-w-2xl flex-1 flex-col px-8 md:px-12 lg:px-16">
-          <div className="md:pt-1">
-            <p
-              className="grid size-14 place-items-center rounded-xl border-2 border-white/90 text-lg font-extrabold"
-              aria-hidden="true"
-            >
-              ACD
-            </p>
-            <p className="mt-4 text-2xl font-extrabold sm:text-3xl">Assumption College of Davao</p>
-            <p className="mt-1 text-base text-blue-50 sm:text-lg">
-              Faculty Consultation &amp; Scheduling System
-            </p>
-          </div>
-          <div className="mx-auto mt-16 w-full max-w-lg rounded-2xl bg-surface/95 p-7 text-foreground shadow-dialog sm:mt-auto sm:mb-10 sm:p-9">
-            <h2 id="signin-title" className="max-w-md text-2xl leading-tight font-bold sm:text-3xl">
-              One account. A more connected campus.
+        <Container className="relative flex h-full max-w-2xl flex-1 flex-col justify-center px-8 md:px-12 lg:px-16">
+          <div className="mx-auto w-full max-w-md rounded-3xl bg-surface p-7 text-foreground shadow-dialog sm:p-9">
+            <div className="flex items-center gap-3 border-b border-border pb-6">
+              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-subtle">
+                <Image
+                  src={logo}
+                  alt=""
+                  width={24}
+                  height={24}
+                  unoptimized
+                  className="size-6 object-contain"
+                />
+              </span>
+              <p className="text-lg leading-tight font-bold">
+                <span className="block">Faculty Consultation &amp;</span>
+                <span className="block">Scheduling</span>
+              </p>
+            </div>
+            <h2 id="signin-title" className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
+              Welcome back!
             </h2>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
-              Use your school Google account to sign in securely and get started.
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Sign in to manage your consultations and schedules.
             </p>
-            <form className="mt-7" action={signInWithGoogle}>
-              <Button
-                type="submit"
-                className="min-h-13 w-full bg-accent py-3 shadow-sm hover:bg-accent-hover"
-              >
-                <span
-                  className="mr-3 grid size-7 place-items-center rounded bg-white text-sm font-extrabold text-accent"
-                  aria-hidden="true"
-                >
-                  G
-                </span>{' '}
-                Sign in with Google
-              </Button>
-            </form>
+            <SignInForm />
           </div>
         </Container>
       </Section>

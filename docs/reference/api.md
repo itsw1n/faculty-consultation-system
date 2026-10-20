@@ -25,7 +25,7 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 | `/application/*`        | Pending and rejected account screens                 |
 | `/student/*`            | Dashboard, faculty directory, booking, consultations |
 | `/faculty/*`            | Dashboard, availability, requests, consultations     |
-| `/admin/*`              | Dashboard, users, faculty, departments, records      |
+| `/admin/*`              | Dashboard, users, departments, records               |
 | `/notifications`        | Notification list and mark-all-read                  |
 
 ## Server actions
@@ -33,14 +33,14 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 | Module          | Actions                                                                                                            |
 | --------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `auth`          | `signInWithPassword`, `signUpWithPassword`, `requestPasswordReset`, `updatePassword`, `signOut`, `claimFirstAdmin` |
-| `applications`  | `inviteFaculty`, `correctUserAccount`                                                                              |
+| `applications`  | `promoteFaculty`, `correctUserAccount`                                                                             |
 | `admin`         | `createDepartment`, `updateDepartment`                                                                             |
 | `availability`  | `createAvailability`, `updateAvailability`, `deleteAvailability`                                                   |
 | `booking`       | `bookConsultation`                                                                                                 |
 | `consultations` | `decideConsultation`, `cancelConsultation`, `completeConsultation`                                                 |
 | `notifications` | `markNotificationRead`, `markAllNotificationsRead`                                                                 |
 
-Each action validates input and performs role authorization. Booking, decisions, cancellation, completion, invites, correction, and first-admin claim delegate to transactional PostgreSQL functions.
+Each action validates input and performs role authorization. Booking, decisions, cancellation, completion, faculty promotion, correction, and first-admin claim delegate to transactional PostgreSQL functions.
 
 ## RPC-backed cursor loaders
 

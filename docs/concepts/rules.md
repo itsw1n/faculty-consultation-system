@@ -5,8 +5,8 @@ Normative behavior enforced by the application and database. How these rules are
 ## Account and role rules
 
 1. Authentication uses email + password through Supabase Auth. Accounts must verify their email before signing in, and password recovery uses emailed reset links.
-2. A verified school email on an approved domain becomes `STUDENT / APPROVED` when the account is created.
-3. An unconsumed `faculty_invites` row matching the email instead makes the profile `FACULTY / APPROVED` with the invited department and position.
+2. A new account on an approved domain becomes `STUDENT / APPROVED` when created; email verification is still required before sign-in or promotion.
+3. An administrator can promote an existing verified student to `FACULTY / APPROVED`, assigning department and position. Historical faculty invites are not consumed.
 4. Existing `PENDING` or `REJECTED` profiles are not overwritten by the sign-in trigger.
 5. Only the account matching `INITIAL_ADMIN_EMAIL` may claim the first admin role, once, while no approved admin exists.
 6. Users cannot request or self-assign `ADMIN`.
@@ -29,28 +29,28 @@ ADMIN     -> /admin
 - Migrations set the confirmed school domain `acdeducation.com`.
 - `supabase/seed.sql` adds `*` for local development only; hosted environments never receive it.
 
-### Faculty invitations
+### Faculty promotion
 
-`invite_faculty` requires an admin and:
+`promote_registered_faculty` requires an admin and:
 
-- accepts 1–50 email addresses, a department, and a position title;
-- rejects emails outside approved domains;
-- skips emails that already belong to approved faculty;
-- inserts or refreshes the invite and clears `consumed_at`;
-- returns a per-email result with `invited` and an optional `reason`.
+- accepts one existing account email, a department, and a position title;
+- requires a verified, approved student on an allowed domain;
+- changes the same profile to faculty and creates its faculty profile atomically;
+- returns a result for missing, unverified, ineligible, or already-faculty accounts.
 
-The invite only takes effect the first time that email signs in.
+There is no faculty application, invitation, or pending faculty state in the current flow.
 
 ### First administrator
 
-`claim_first_admin` requires authentication, serializes concurrent claims with an advisory lock, fails if any approved admin already exists, and requires the supplied email to match the caller's approved school email. On success the profile becomes `ADMIN / APPROVED`.
+`claim_first_admin` is callable only by the server's service role after it verifies the signed-in user against `INITIAL_ADMIN_EMAIL`. The database rechecks the confirmed email and allowed domain, serializes concurrent claims with an advisory lock, and fails if any approved admin already exists. On success the profile becomes `ADMIN / APPROVED`.
 
 ### Account correction
 
 `correct_user_account`:
 
 - cannot target the caller and cannot assign `ADMIN`;
-- requires an existing department and an already-`APPROVED` target;
+- requires an existing department and an already-`APPROVED` target; faculty promotion requires a verified email;
+- prevents demoting faculty with open or future availability or active consultations;
 - creates, updates, or removes `faculty_profiles` according to the new role.
 
 ## Statuses
@@ -108,8 +108,8 @@ A slot can be requested only while `OPEN`. The conditional update changes at mos
 
 ## Admin
 
-1. Admins invite 1–50 school emails as faculty with a department and position.
-2. Existing approved faculty are skipped with a reason.
+1. Admins promote one existing verified student as faculty with a department and position.
+2. Missing, unverified, ineligible, and already-faculty accounts receive a reason.
 3. Admins can correct an approved account's role or department.
 4. Admins cannot correct their own account or assign `ADMIN`.
 5. Consultations cannot be bulk-deleted.

@@ -27,7 +27,7 @@ npm run supabase:reset
 npm run dev
 ```
 
-Full steps (email verification, seed data, first-admin claim, faculty invites): [`docs/getting-started.md`](docs/getting-started.md).
+Full steps (email verification, seed data, first-admin claim, faculty promotion): [`docs/getting-started.md`](docs/getting-started.md).
 
 ## Work on it
 

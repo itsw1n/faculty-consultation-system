@@ -22,6 +22,7 @@ Point the app at the local stack in `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<local key from supabase status>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SUPABASE_SERVICE_ROLE_KEY=<local secret key from supabase status>
 ```
 
 See [`reference/environment.md`](reference/environment.md) for every variable.
@@ -44,19 +45,18 @@ delete from public.approved_email_domains where domain = '*';
 
 1. Add `INITIAL_ADMIN_EMAIL` to `.env.local`.
 2. Restart the dev server.
-3. Sign in with that email and password.
+3. Register that address, confirm it through the local mail catcher, then sign in with the app password.
 4. Open `/auth/claim-admin` and claim the first admin role.
 
 The claim only succeeds while no approved admin exists. On success the account redirects to `/admin`.
 
 ## Faculty onboarding
 
-1. Sign in as an admin.
-2. Open `/admin/users`.
-3. Enter 1–50 school emails, a department, and a position title.
-4. Invite the faculty.
+1. Ask the faculty member to register with their email and an app password, then verify the email.
+2. Sign in as an admin and open `/admin/users`.
+3. Select **Add Faculty**, enter the registered email, department, and position, then submit.
 
-Each invited address becomes approved faculty the first time its owner signs in, with the invited department and position. Admins can later correct an approved account's role or department from the same page. See [`concepts/rules.md`](concepts/rules.md) for the full lifecycle.
+The existing student account becomes faculty immediately. No invitation or pending faculty record is created. Admins can later correct an approved account's role or department from the same page. See [`concepts/rules.md`](concepts/rules.md) for the full lifecycle.
 
 ## Validate
 

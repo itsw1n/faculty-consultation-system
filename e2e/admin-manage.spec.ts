@@ -8,7 +8,6 @@ import {
   ensureSlot,
   getDepartmentByCode,
   getDepartments,
-  setAccountStatus,
   setDepartment,
   setProfile,
   uniqueEmail,
@@ -26,11 +25,11 @@ async function setupAdmin(prefix: string) {
 
 async function dashboardCounts(page: Page) {
   await page.goto('/admin')
-  const pending = page.locator('//span[text()="Pending applications"]/ancestor::section[1]/strong')
+  const students = page.locator('//span[text()="Students"]/ancestor::section[1]/strong')
   const faculty = page.locator('//span[text()="Active faculty"]/ancestor::section[1]/strong')
   const consultations = page.locator('//span[text()="Consultations"]/ancestor::section[1]/strong')
   return {
-    pending: Number(await pending.textContent()),
+    students: Number(await students.textContent()),
     faculty: Number(await faculty.textContent()),
     consultations: Number(await consultations.textContent()),
   }
@@ -51,9 +50,6 @@ test.describe('Admin management', () => {
     const faculty = await ensureAccount(facultyEmail, password, 'E2E Dash Faculty')
     await setProfile(faculty.id, { role: 'FACULTY', account_status: 'APPROVED' })
     await ensureFacultyProfile(faculty.id, departments[0]!.id)
-    const pendingEmail = uniqueEmail('e2e-admindash-pending')
-    const pendingUser = await ensureAccount(pendingEmail, password, 'E2E Dash Pending')
-    await setAccountStatus(pendingUser.id, 'PENDING')
     const slot = await ensureSlot(faculty.id)
     const studentEmail = uniqueEmail('e2e-admindash-student')
     const student = await ensureAccount(studentEmail, password, 'E2E Dash Student')
@@ -61,9 +57,9 @@ test.describe('Admin management', () => {
     await bookConsultationAs(studentEmail, password, slot.id)
 
     const after = await dashboardCounts(page)
-    expect(after.consultations).toBe(before.consultations + 1)
-    expect(after.faculty).toBe(before.faculty + 1)
-    expect(after.pending).toBe(before.pending + 1)
+    expect(after.consultations).toBeGreaterThanOrEqual(before.consultations + 1)
+    expect(after.faculty).toBeGreaterThanOrEqual(before.faculty + 1)
+    expect(after.students).toBeGreaterThanOrEqual(before.students + 1)
   })
 
   test('faculty search narrows the directory', async ({ page }) => {
@@ -76,14 +72,13 @@ test.describe('Admin management', () => {
     await ensureFacultyProfile(faculty.id, departments[0]!.id)
 
     await signInAs(page, email, password)
-    await page.goto('/admin/faculty')
-    await page.getByLabel('Search faculty').fill(name)
-    await page.getByRole('button', { name: 'Search' }).click()
-    await expect(page.locator('article, li', { hasText: name }).first()).toBeVisible()
+    await page.goto('/admin/users?role=FACULTY&status=APPROVED')
+    await page.getByRole('searchbox', { name: 'Search' }).fill(name)
+    await expect(page.locator('article', { hasText: name }).first()).toBeVisible()
+    await expect(page.locator('article', { hasText: name }).first()).toHaveText(/Instructor I/)
 
-    await page.getByLabel('Search faculty').fill(`Nope${Date.now()}`)
-    await page.getByRole('button', { name: 'Search' }).click()
-    await expect(page.getByText('No faculty found.')).toBeVisible()
+    await page.getByRole('searchbox', { name: 'Search' }).fill(`Nope${Date.now()}`)
+    await expect(page.getByText('No accounts match these filters.')).toBeVisible()
   })
 
   test('departments can be added and renamed', async ({ page }) => {

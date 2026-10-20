@@ -94,16 +94,6 @@ export async function getFacultyProfile(
   return data
 }
 
-export async function getInviteByEmail(email: string): Promise<{ email: string } | null> {
-  const { data, error } = await getServiceClient()
-    .from('faculty_invites')
-    .select('email')
-    .eq('email', email)
-    .maybeSingle()
-  if (error) throw error
-  return data
-}
-
 export async function getFirstDepartment(): Promise<{ id: string; name: string }> {
   const departments = await getDepartments()
   const first = departments[0]

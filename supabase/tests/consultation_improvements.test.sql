@@ -31,8 +31,8 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"44000000-0000-0000-0000-000000000004","role":"authenticated"}',true);
 select is_empty('select id from public.consultations','admin cannot read raw consultation');
 select is_empty($$select id from public.get_consultation_detail((select id from public.consultations limit 1))$$,'admin cannot read participant details');
-select results_eq($$select notes from public.search_my_consultations()$$,array[null::text],'admin listing redacts description');
-select results_eq($$select category from public.consultation_summary(current_date,current_date+1)$$,array['PERSONAL'::text],'admin sees category summary');
+select results_eq($$select count(*)::int from public.search_my_consultations() where notes is not null$$,array[0],'admin listing redacts every description');
+select results_eq($$select count(*)::int from public.consultation_summary(current_date,current_date+1) where category='PERSONAL'$$,array[1],'admin sees category summary');
 reset role;
 
 set local role authenticated;

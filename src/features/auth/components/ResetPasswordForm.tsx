@@ -3,42 +3,37 @@
 import { useActionState } from 'react'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { initialActionState } from '@/lib/actionState'
+import { PasswordField } from './PasswordField'
 import { updatePassword } from '../actions'
-
-const fieldClass = 'grid gap-1.5 text-xs font-bold'
-const controlClass =
-  'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
 
 export function ResetPasswordForm() {
   const [state, formAction] = useActionState(updatePassword, initialActionState)
   return (
-    <form action={formAction} className="mt-7 grid gap-3">
-      <label className={fieldClass}>
-        New password
-        <input
-          className={controlClass}
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          required
-        />
-      </label>
-      <label className={fieldClass}>
-        Confirm new password
-        <input
-          className={controlClass}
-          name="confirmPassword"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          required
-        />
-      </label>
-      <p className="min-h-5 text-sm font-semibold text-danger" role="alert">
-        {state.error}
-      </p>
-      <SubmitButton pendingLabel="Saving…">Save new password</SubmitButton>
+    <form action={formAction} className="mt-6 grid gap-4">
+      <PasswordField
+        id="password"
+        name="password"
+        label="New password"
+        autoComplete="new-password"
+        placeholder="********"
+        minLength={8}
+      />
+      <PasswordField
+        id="confirmPassword"
+        name="confirmPassword"
+        label="Confirm new password"
+        autoComplete="new-password"
+        placeholder="********"
+        minLength={8}
+      />
+      {state.error ? (
+        <p className="text-sm font-semibold text-danger" role="alert">
+          {state.error}
+        </p>
+      ) : null}
+      <SubmitButton pendingLabel="Saving…" className="mt-2">
+        Save new password
+      </SubmitButton>
     </form>
   )
 }

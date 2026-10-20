@@ -1,10 +1,10 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff } from 'lucide-react'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { initialActionState } from '@/lib/actionState'
+import { PasswordField } from './PasswordField'
 import { signInWithPassword } from '../actions'
 
 const fieldClass = 'grid gap-1.5 text-sm font-semibold'
@@ -13,7 +13,6 @@ const controlClass =
 
 export function SignInForm() {
   const [state, formAction] = useActionState(signInWithPassword, initialActionState)
-  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <form action={formAction} className="mt-6 grid gap-4">
@@ -29,32 +28,13 @@ export function SignInForm() {
           required
         />
       </label>
-      <div className={fieldClass}>
-        <label htmlFor="password">Password</label>
-        <div className="relative">
-          <input
-            id="password"
-            className={`${controlClass} pr-11`}
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            autoComplete="current-password"
-            placeholder="********"
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((value) => !value)}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-muted transition hover:text-foreground focus-visible:ring-3 focus-visible:ring-focus"
-          >
-            {showPassword ? (
-              <EyeOff size={18} aria-hidden="true" />
-            ) : (
-              <Eye size={18} aria-hidden="true" />
-            )}
-          </button>
-        </div>
-      </div>
+      <PasswordField
+        id="password"
+        name="password"
+        label="Password"
+        autoComplete="current-password"
+        placeholder="********"
+      />
       <div className="-mt-1 flex justify-end">
         <Link
           className="text-sm font-semibold text-primary hover:underline"

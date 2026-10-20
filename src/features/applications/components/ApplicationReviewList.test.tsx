@@ -3,8 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApplicationReviewList } from './ApplicationReviewList'
 import type { ApplicationItem } from '../types'
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
+
 vi.mock('../actions', () => ({
-  inviteFaculty: vi.fn(async () => ({ error: null, results: [] })),
   correctUserAccount: vi.fn(async () => ({ error: null })),
 }))
 
@@ -24,6 +25,7 @@ const item = (overrides: Partial<ApplicationItem> = {}): ApplicationItem => ({
   created_at: '2026-10-01T00:00:00Z',
   role: 'STUDENT',
   department_id: '22222222-2222-4222-8222-222222222222',
+  position_title: null,
   ...overrides,
 })
 
@@ -55,7 +57,8 @@ describe('ApplicationReviewList directory', () => {
 
     expect(screen.getByText('Alex Reyes')).toBeInTheDocument()
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Correct' })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: 'Edit User' })).toHaveLength(2)
+    expect(screen.getByText('Position')).toBeInTheDocument()
   })
 
   it('prefills the correction form with the account values and its id', () => {
@@ -67,7 +70,7 @@ describe('ApplicationReviewList directory', () => {
       />
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Correct' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Edit User' }))
     const dialog = screen.getByRole('dialog')
 
     expect(within(dialog).getByLabelText('Role')).toBeInTheDocument()
@@ -76,7 +79,7 @@ describe('ApplicationReviewList directory', () => {
     )
   })
 
-  it('offers the faculty invite form', () => {
+  it('does not show a faculty invitation form', () => {
     render(
       <ApplicationReviewList
         initialPage={{ items: [], hasMore: false, nextCursor: null }}
@@ -85,7 +88,6 @@ describe('ApplicationReviewList directory', () => {
       />
     )
 
-    expect(screen.getByRole('heading', { name: /invite faculty/i })).toBeInTheDocument()
-    expect(screen.getByLabelText(/school emails/i)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /invite faculty/i })).not.toBeInTheDocument()
   })
 })

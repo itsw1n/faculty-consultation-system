@@ -32,7 +32,6 @@ export function Navigation({ role, mobile = false }: { role: UserRole; mobile?: 
     ADMIN: [
       { href: '/admin', label: 'Dashboard', icon: Home },
       { href: '/admin/users', label: 'Manage Users', icon: Users },
-      { href: '/admin/faculty', label: 'Manage Faculty', icon: GraduationCap },
       { href: '/admin/departments', label: 'Departments', icon: ClipboardList },
       { href: '/admin/consultations', label: 'Consultation Records', icon: CalendarDays },
     ],

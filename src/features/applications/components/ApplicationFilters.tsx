@@ -1,26 +1,30 @@
 'use client'
+import type { ReactNode } from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
 import { Select } from '@/components/common/select/Select'
 
 const statusOptions = [
-  { id: 'PENDING', label: 'Pending' },
-  { id: 'APPROVED', label: 'Approved' },
-  { id: 'REJECTED', label: 'Rejected' },
   { id: 'all', label: 'All statuses' },
+  { id: 'APPROVED', label: 'Approved' },
+  { id: 'PENDING', label: 'Legacy pending' },
+  { id: 'REJECTED', label: 'Legacy rejected' },
 ]
 
 const roleOptions = [
   { id: 'all', label: 'All roles' },
   { id: 'STUDENT', label: 'Student' },
   { id: 'FACULTY', label: 'Faculty' },
+  { id: 'ADMIN', label: 'Admin' },
 ]
 
 export function ApplicationFilters({
   departments,
+  action,
 }: {
   departments: { id: string; code: string }[]
+  action: ReactNode
 }) {
   const current = useSearchParams()
   const pathname = usePathname()
@@ -56,7 +60,7 @@ export function ApplicationFilters({
       <Select
         label="Status"
         options={statusOptions}
-        value={current.get('status') ?? 'PENDING'}
+        value={current.get('status') ?? 'all'}
         onChange={(value) => update('status', value === 'all' ? '' : value)}
       />
       <Select
@@ -71,6 +75,7 @@ export function ApplicationFilters({
         value={current.get('department') ?? 'all'}
         onChange={(value) => update('department', value === 'all' ? '' : value)}
       />
+      <div className="flex items-end sm:col-span-2 lg:pl-2">{action}</div>
     </div>
   )
 }

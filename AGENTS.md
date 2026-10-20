@@ -1,10 +1,10 @@
 # AGENTS.md
 
-> Small operating contract for agents. Project intent lives in `CONTEXT.md`; task guidance is routed through `RULES.md`.
+> Small operating contract for agents. Project intent lives in `CONTEXT.md`; current behavior lives in `docs/`.
 
 ## Project
 
-faculty-consultation-system — designed for school system
+faculty-consultation-system — consultation and scheduling system for Assumption College of Davao.
 
 - Stack: `nextjs-supabase`
 - Platform: `web`
@@ -14,28 +14,43 @@ faculty-consultation-system — designed for school system
 
 - Install: `npm install` initially; use `npm ci` after committing the lockfile.
 - Develop: `npm run dev`
-- Validate: `npm run lint && npm run typecheck && npm run test --if-present && npm run build`
+- Validate: `npm run check && npm run build`
 - End-to-end: `npm run test:e2e --if-present`
-- Spring backend, when present: `cd backend && ./mvnw --batch-mode test` (`mvnw.cmd` on Windows)
+- Database tests: `npm run supabase:test`
 
 ## Required workflow
 
 1. Read `CONTEXT.md` and inspect neighboring implementation and tests.
-2. Find the concern in `RULES.md`; open only its linked playbook section.
+2. Read only the doc that matches the task:
+   - Docs index and reading paths: `docs/README.md`
+   - Product intent: `CONTEXT.md`
+   - What and why: `docs/concepts/product.md`
+   - Exact rules: `docs/concepts/rules.md`
+   - Runtime boundaries and flow: `docs/concepts/architecture.md`
+   - Schema, RLS, RPCs: `docs/concepts/data-model.md`
+   - Routes, actions, errors: `docs/reference/api.md`
+   - Environment variables: `docs/reference/environment.md`
+   - Design tokens: `docs/reference/design.md`
+   - Local setup: `docs/getting-started.md`
+   - Deploy and email: `docs/operations.md`
+   - Branch, commit, PR rules: `docs/contributing.md`
+   - Completion status: `PROGRESS.md`
 3. State assumptions when product behavior is ambiguous.
 4. Make the smallest coherent change and add risk-appropriate tests.
 5. Run lint, typecheck, relevant tests, and a production build before completion.
 
-## Always-on constraints
+## Engineering invariants
 
-- Treat browser code and browser-visible environment variables as public
-- Preserve semantic HTML, keyboard access, and progressive failure behavior
-- Server Components default; use client only where browser behavior is required
-- Medium default: entry point → Service → owned Repository or remote API client
-
-- Validate untrusted input at the server boundary.
-- Authenticate and authorize separately; enforce authorization near data and side effects.
-- Never expose server secrets through public environment prefixes or client modules.
+- Server Components by default; add `'use client'` only for browser behavior.
+- Flow is route or action entry point → feature service/repository → Supabase/RPC.
+- Feature code lives under `src/features/<domain>/`; shared UI lives under `src/components/layout` or `src/components/common`.
+- Validate untrusted input with Zod at the server boundary.
+- Authenticate and authorize separately; use `requireRole` or `requireApprovedProfile` before reads and mutations.
+- PostgreSQL constraints, RPCs, and RLS are the final authority for booking and lifecycle state.
+- Treat browser code and browser-visible environment variables as public.
+- Never expose server-only values through `NEXT_PUBLIC_*` or client modules.
+- Preserve semantic HTML, keyboard access, focus management, and progressive failure behavior.
+- Add risk-appropriate unit, database, or Playwright coverage.
 
 ## Authority boundaries
 

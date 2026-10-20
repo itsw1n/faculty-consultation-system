@@ -4,15 +4,18 @@ Web app for Assumption College of Davao: students request consultations, faculty
 
 ## Start here
 
-| I want to…                          | Go to                                                                                                                                                                               |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Run it locally                      | [`docs/guides/setup.md`](docs/guides/setup.md)                                                                                                                                      |
-| Configure env (local vs prod)       | [`docs/guides/env-variables.md`](docs/guides/env-variables.md)                                                                                                                      |
-| Deploy it                           | [`docs/guides/deployment.md`](docs/guides/deployment.md)                                                                                                                            |
-| Understand the system               | [`docs/architecture/overview.md`](docs/architecture/overview.md)                                                                                                                    |
-| Know what it must do                | [`docs/specs/`](docs/specs/) (source of truth)                                                                                                                                      |
-| Check what is built / left          | [`docs/plans/implementation-plan.md`](docs/plans/implementation-plan.md) + [`docs/plans/ACD_Implementation_Gap_Tracker_v0.2.md`](docs/plans/ACD_Implementation_Gap_Tracker_v0.2.md) |
-| Contribute (branches, commits, PRs) | [`docs/contribution/`](docs/contribution/)                                                                                                                                          |
+| I want to…                          | Go to                                                            |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| Run it locally                      | [`docs/getting-started.md`](docs/getting-started.md)             |
+| Understand the system               | [`docs/concepts/product.md`](docs/concepts/product.md)           |
+| Look up routes or actions           | [`docs/reference/api.md`](docs/reference/api.md)                 |
+| Configure env (local vs prod)       | [`docs/reference/environment.md`](docs/reference/environment.md) |
+| Know the exact rules                | [`docs/concepts/rules.md`](docs/concepts/rules.md)               |
+| Deploy it                           | [`docs/operations.md`](docs/operations.md)                       |
+| Check what is built / left          | [`PROGRESS.md`](PROGRESS.md)                                     |
+| Contribute (branches, commits, PRs) | [`docs/contributing.md`](docs/contributing.md)                   |
+
+Full documentation map: [`docs/README.md`](docs/README.md).
 
 ## Run locally
 
@@ -24,12 +27,12 @@ npm run supabase:reset
 npm run dev
 ```
 
-Full steps (Google OAuth, seed data, school-domain behavior): [`docs/guides/setup.md`](docs/guides/setup.md).
+Full steps (Google OAuth, seed data, first-admin claim, faculty invites): [`docs/getting-started.md`](docs/getting-started.md).
 
 ## Work on it
 
-- Branch off `dev`, never `main`. Open PRs against `dev`: [`docs/contribution/branching.md`](docs/contribution/branching.md), [`docs/contribution/pull-requests.md`](docs/contribution/pull-requests.md).
-- Commits follow `type(scope): description`: [`docs/contribution/commits.md`](docs/contribution/commits.md).
+- Branch off `dev`, never `main`, and open PRs against `dev`: [`docs/contributing.md`](docs/contributing.md).
+- Commits follow `type(scope): description`: [`docs/contributing.md`](docs/contributing.md#commit-rules).
 
 ## Validate
 
@@ -39,6 +42,17 @@ npm run build
 npm run supabase:test
 npm run test:e2e
 ```
+
+## Documentation map
+
+- Index and reading paths: [`docs/README.md`](docs/README.md)
+- Product intent: [`CONTEXT.md`](CONTEXT.md)
+- Concepts (product, rules, architecture, data model): [`docs/concepts/`](docs/concepts/)
+- Reference (API, environment, design): [`docs/reference/`](docs/reference/)
+- Setup: [`docs/getting-started.md`](docs/getting-started.md)
+- Operations: [`docs/operations.md`](docs/operations.md)
+- Contributing: [`docs/contributing.md`](docs/contributing.md)
+- Completion status: [`PROGRESS.md`](PROGRESS.md)
 
 ## Releases
 

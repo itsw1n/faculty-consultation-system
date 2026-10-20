@@ -83,6 +83,20 @@ export async function AppShell({
             </summary>
             <div className="absolute top-12 left-0 z-20 w-64 rounded-xl bg-primary p-3 text-white shadow-card">
               <Navigation role={role} mobile />
+              <div className="mt-3 border-t border-white/15 pt-3">
+                <p className="truncate px-3 text-sm font-semibold">{profile.fullName}</p>
+                <p className="truncate px-3 text-xs text-blue-100/70">{profile.email}</p>
+                <form action={signOut} className="mt-3">
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    size="compact"
+                    className="w-full text-sm"
+                  >
+                    Sign out
+                  </Button>
+                </form>
+              </div>
             </div>
           </details>
           <Breadcrumbs />

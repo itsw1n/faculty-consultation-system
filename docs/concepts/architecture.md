@@ -45,7 +45,7 @@ Shared code lives in `src/lib` (`env.ts`, `actionState.ts`, `useInfinitePage.ts`
 
 ## Authentication model
 
-Supabase Auth with Google OAuth; no application-managed password flow. The auth-user trigger `handle_new_auth_user` builds a profile from trusted metadata (`id`, `email`, `full_name` falling back to the email local part, `avatar_url`). The browser is never trusted for email, role, or account status. The sign-in routing and account rules are in [`rules.md`](rules.md#sign-in-routing).
+Supabase Auth with email + password and mandatory email verification. Sign-up and password recovery email links are verified by `/auth/confirm`, which exchanges the token hash for a cookie-backed session. Supabase stores only the bcrypt hash in `auth.users.encrypted_password`; the application never sees or stores plaintext passwords. The auth-user trigger `handle_new_auth_user` builds a profile from trusted metadata (`id`, `email`, `full_name` falling back to the email local part, `avatar_url`). The browser is never trusted for email, role, or account status. The sign-in routing and account rules are in [`rules.md`](rules.md#sign-in-routing).
 
 ## Authorization
 

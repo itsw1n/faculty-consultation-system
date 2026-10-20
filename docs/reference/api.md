@@ -4,38 +4,41 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 
 ## HTTP routes
 
-| Method | Route                                                       | Access               | Purpose                                                               |
-| ------ | ----------------------------------------------------------- | -------------------- | --------------------------------------------------------------------- |
-| `GET`  | `/api/health`                                               | Public               | Returns `{ "status": "ok" }`                                          |
-| `GET`  | `/api/faculty/[facultyId]/availability`                     | Approved student     | Slots for one faculty member                                          |
-| `GET`  | `/api/cron/email`                                           | Bearer `CRON_SECRET` | Queues reminders and processes the email outbox                       |
-| `GET`  | `/auth/callback`                                            | OAuth callback       | Exchanges the Supabase OAuth code and redirects into the account flow |
-| `GET`  | `/admin/consultations/export?from=YYYY-MM-DD&to=YYYY-MM-DD` | Admin                | Metadata summary CSV, maximum 366 days                                |
+| Method | Route                                                       | Access               | Purpose                                                         |
+| ------ | ----------------------------------------------------------- | -------------------- | --------------------------------------------------------------- |
+| `GET`  | `/api/health`                                               | Public               | Returns `{ "status": "ok" }`                                    |
+| `GET`  | `/api/faculty/[facultyId]/availability`                     | Approved student     | Slots for one faculty member                                    |
+| `GET`  | `/api/cron/email`                                           | Bearer `CRON_SECRET` | Queues reminders and processes the email outbox                 |
+| `GET`  | `/auth/confirm?token_hash=...&type=email\|recovery`         | Email link           | Verifies a signup or recovery token and establishes the session |
+| `GET`  | `/admin/consultations/export?from=YYYY-MM-DD&to=YYYY-MM-DD` | Admin                | Metadata summary CSV, maximum 366 days                          |
 
 ## Pages with server-side effects
 
-| Route               | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `/`                 | Starts Google OAuth through `signInWithGoogle`       |
-| `/auth/continue`    | Reads the profile and redirects by status and role   |
-| `/auth/claim-admin` | First-admin claim form                               |
-| `/application/*`    | Pending and rejected account screens                 |
-| `/student/*`        | Dashboard, faculty directory, booking, consultations |
-| `/faculty/*`        | Dashboard, availability, requests, consultations     |
-| `/admin/*`          | Dashboard, users, faculty, departments, records      |
-| `/notifications`    | Notification list and mark-all-read                  |
+| Route                   | Purpose                                              |
+| ----------------------- | ---------------------------------------------------- |
+| `/`                     | Email + password sign-in                             |
+| `/auth/sign-up`         | Create an account and send a verification email      |
+| `/auth/forgot-password` | Request a password reset link                        |
+| `/auth/reset-password`  | Set a new password after opening a recovery link     |
+| `/auth/continue`        | Reads the profile and redirects by status and role   |
+| `/auth/claim-admin`     | First-admin claim form                               |
+| `/application/*`        | Pending and rejected account screens                 |
+| `/student/*`            | Dashboard, faculty directory, booking, consultations |
+| `/faculty/*`            | Dashboard, availability, requests, consultations     |
+| `/admin/*`              | Dashboard, users, faculty, departments, records      |
+| `/notifications`        | Notification list and mark-all-read                  |
 
 ## Server actions
 
-| Module          | Actions                                                            |
-| --------------- | ------------------------------------------------------------------ |
-| `auth`          | `signInWithGoogle`, `signOut`, `claimFirstAdmin`                   |
-| `applications`  | `inviteFaculty`, `correctUserAccount`                              |
-| `admin`         | `createDepartment`, `updateDepartment`                             |
-| `availability`  | `createAvailability`, `updateAvailability`, `deleteAvailability`   |
-| `booking`       | `bookConsultation`                                                 |
-| `consultations` | `decideConsultation`, `cancelConsultation`, `completeConsultation` |
-| `notifications` | `markNotificationRead`, `markAllNotificationsRead`                 |
+| Module          | Actions                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `auth`          | `signInWithPassword`, `signUpWithPassword`, `requestPasswordReset`, `updatePassword`, `signOut`, `claimFirstAdmin` |
+| `applications`  | `inviteFaculty`, `correctUserAccount`                                                                              |
+| `admin`         | `createDepartment`, `updateDepartment`                                                                             |
+| `availability`  | `createAvailability`, `updateAvailability`, `deleteAvailability`                                                   |
+| `booking`       | `bookConsultation`                                                                                                 |
+| `consultations` | `decideConsultation`, `cancelConsultation`, `completeConsultation`                                                 |
+| `notifications` | `markNotificationRead`, `markAllNotificationsRead`                                                                 |
 
 Each action validates input and performs role authorization. Booking, decisions, cancellation, completion, invites, correction, and first-admin claim delegate to transactional PostgreSQL functions.
 
@@ -53,10 +56,11 @@ These are internal application interfaces, not public HTTP APIs. See the full fu
 ## Error contract
 
 - Invalid submitted fields return a safe validation message or reject the action.
+- Sign-in failures return one generic message; unverified accounts are asked to verify their email first.
 - Missing authentication redirects to the sign-in flow; a wrong role or status redirects to `/auth/continue`.
 - Booking conflicts report that the slot is no longer available; lifecycle conflicts ask the user to refresh.
 - Duplicate department values report that code and name must be unique.
 - Email processing returns `401` for a bad callback secret and `503` when the outbox is unavailable.
 - Unexpected rendering failures use the application error boundary; unknown routes use the not-found page.
 
-Database and provider details stay server-side. Server actions return `{ error }`; cursor loaders return an `InfinitePage` and throw on failure. There is no stable public error-code API in v1.
+Database and provider details stay server-side. Server actions return `{ error, message? }`; cursor loaders return an `InfinitePage` and throw on failure. There is no stable public error-code API in v1.

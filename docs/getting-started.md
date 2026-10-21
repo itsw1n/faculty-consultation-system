@@ -45,11 +45,11 @@ delete from public.approved_email_domains where domain = '*';
 
 `supabase db reset` loads exactly three local demo accounts, five consultations covering every lifecycle state, and sample notifications:
 
-| Role    | Email                                | Password       |
-| ------- | ------------------------------------ | -------------- |
-| Admin   | `erwinjrcurato8975@acdeducation.com` | `Password123!` |
-| Faculty | `itsw1nmade@gmail.com`               | `Password123!` |
-| Student | `erwincurato@gmail.com`              | `Password123!` |
+| Role    | Email                           | Password       |
+| ------- | ------------------------------- | -------------- |
+| Admin   | `admin.demo@acdeducation.com`   | `Password123!` |
+| Faculty | `faculty.demo@acdeducation.com` | `Password123!` |
+| Student | `student.demo@acdeducation.com` | `Password123!` |
 
 Re-apply just the demo data without rebuilding the database:
 
@@ -65,7 +65,7 @@ make reset
 
 Both targets pass `--local`, so they never touch a linked or hosted Supabase project. `make reset` also clears any other local development data.
 
-The two Gmail accounts work locally because the seed keeps the `*` approved-domain wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
+The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
 
 ## First administrator
 

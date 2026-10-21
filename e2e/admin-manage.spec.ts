@@ -44,6 +44,10 @@ test.describe('Admin management', () => {
 
     await signInAs(page, email, password)
     const before = await dashboardCounts(page)
+    await expect(page.getByRole('heading', { name: 'Needs attention' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Consultation activity' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Recent consultations' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible()
 
     const facultyEmail = uniqueEmail('e2e-admindash-faculty')
     const faculty = await ensureAccount(facultyEmail, password, 'E2E Dash Faculty')

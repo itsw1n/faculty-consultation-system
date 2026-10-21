@@ -1,5 +1,19 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
+import type { ConsultationItem } from '@/features/consultations/types'
+
+type AdminDashboardSummary = {
+  students: number
+  faculty: number
+  consultations: number
+  pending: number
+  approved: number
+  completed: number
+  rejected: number
+  cancelled: number
+  open_slots: number
+  faculty_without_future_slots: number
+}
 export async function getStudentDashboard() {
   const supabase = await createClient()
   const [pending, upcoming, recent] = await Promise.all([
@@ -40,22 +54,20 @@ export async function getFacultyDashboard() {
 }
 export async function getAdminDashboard() {
   const supabase = await createClient()
-  const [students, faculty, consultations] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('role', 'STUDENT')
-      .eq('account_status', 'APPROVED'),
-    supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('role', 'FACULTY')
-      .eq('account_status', 'APPROVED'),
-    supabase.rpc('admin_consultation_count'),
+  const [summary, recent] = await Promise.all([
+    supabase.rpc('admin_dashboard_summary').single(),
+    supabase.rpc('search_my_consultations', {
+      search_text: '',
+      status_filter: null,
+      cursor_created_at: null,
+      cursor_id: null,
+      result_limit: 5,
+    }),
   ])
+  if (summary.error || recent.error || !summary.data)
+    throw new Error('Unable to load the admin dashboard')
   return {
-    students: students.count ?? 0,
-    faculty: faculty.count ?? 0,
-    consultations: Number(consultations.data ?? 0),
+    ...(summary.data as AdminDashboardSummary),
+    recent: (recent.data ?? []) as ConsultationItem[],
   }
 }

@@ -53,6 +53,8 @@ Client components fetch additional pages through `'use server'` loaders:
 
 These are internal application interfaces, not public HTTP APIs. See the full function catalog in [`../concepts/data-model.md`](../concepts/data-model.md#rpc-catalog).
 
+The admin dashboard uses `admin_dashboard_summary()` for aggregate account, availability, and consultation counts, and `search_my_consultations` for its redacted recent-activity list.
+
 ## Error contract
 
 - Invalid submitted fields return a safe validation message or reject the action.

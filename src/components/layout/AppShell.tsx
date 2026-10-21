@@ -1,6 +1,8 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Bell, Menu } from 'lucide-react'
+import logo from '@/assets/acd-logo.png'
 import { signOut } from '@/features/auth/actions'
 import type { AuthProfile } from '@/features/auth/types'
 import { Button } from '@/components/common/button/Button'
@@ -34,9 +36,15 @@ export async function AppShell({
           className="mb-8 flex items-center gap-3 rounded-md px-2 text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           href={`/${role.toLowerCase()}`}
         >
-          <span className="grid size-9 place-items-center rounded-md border border-white/50 text-sm font-bold">
-            ACD
-          </span>
+          <Image
+            src={logo}
+            alt=""
+            width={40}
+            height={40}
+            unoptimized
+            loading="eager"
+            className="size-10 shrink-0 rounded-full object-contain"
+          />
           <strong className="text-sm leading-tight">Assumption College of Davao</strong>
         </Link>
         <Navigation role={role} />

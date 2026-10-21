@@ -17,9 +17,9 @@ begin
 
   -- Reuse an existing local account with the same email when one is already
   -- present. Only the rows with these stable ids are replaced below.
-  select id into v_admin_id from public.profiles where lower(email) = 'erwinjrcurato8975@acdeducation.com';
-  select id into v_faculty_id from public.profiles where lower(email) = 'itsw1nmade@gmail.com';
-  select id into v_student_id from public.profiles where lower(email) = 'erwincurato@gmail.com';
+  select id into v_admin_id from public.profiles where lower(email) = 'admin.demo@acdeducation.com';
+  select id into v_faculty_id from public.profiles where lower(email) = 'faculty.demo@acdeducation.com';
+  select id into v_student_id from public.profiles where lower(email) = 'student.demo@acdeducation.com';
 
   delete from public.email_outbox
   where recipient_id in (v_admin_id, v_faculty_id, v_student_id)
@@ -130,15 +130,17 @@ begin
     values
       (
         'a0000000-0000-4000-8000-000000000001'::uuid,
-        'erwinjrcurato8975@acdeducation.com',
-        'Erwin Curato Jr.'
+        'admin.demo@acdeducation.com',
+        'Demo Admin'
       ),
-      ('a0000000-0000-4000-8000-000000000002'::uuid, 'itsw1nmade@gmail.com', 'Made W1n'),
-      ('a0000000-0000-4000-8000-000000000003'::uuid, 'erwincurato@gmail.com', 'Erwin Curato')
+      ('a0000000-0000-4000-8000-000000000002'::uuid, 'faculty.demo@acdeducation.com', 'Demo Faculty'),
+      ('a0000000-0000-4000-8000-000000000003'::uuid, 'student.demo@acdeducation.com', 'Demo Student')
   ) as demo(id, email, full_name)
   where not exists (
     select 1 from auth.users existing where lower(existing.email) = lower(demo.email)
-  );
+  )
+  on conflict (id) do update
+  set email = excluded.email;
 
   update auth.users existing
   set
@@ -157,15 +159,15 @@ begin
     updated_at = now()
   from (
     values
-      ('erwinjrcurato8975@acdeducation.com', 'Erwin Curato Jr.'),
-      ('itsw1nmade@gmail.com', 'Made W1n'),
-      ('erwincurato@gmail.com', 'Erwin Curato')
+      ('admin.demo@acdeducation.com', 'Demo Admin'),
+      ('faculty.demo@acdeducation.com', 'Demo Faculty'),
+      ('student.demo@acdeducation.com', 'Demo Student')
   ) as demo(email, full_name)
   where lower(existing.email) = lower(demo.email);
 
-  select id into v_admin_id from auth.users where lower(email) = 'erwinjrcurato8975@acdeducation.com';
-  select id into v_faculty_id from auth.users where lower(email) = 'itsw1nmade@gmail.com';
-  select id into v_student_id from auth.users where lower(email) = 'erwincurato@gmail.com';
+  select id into v_admin_id from auth.users where lower(email) = 'admin.demo@acdeducation.com';
+  select id into v_faculty_id from auth.users where lower(email) = 'faculty.demo@acdeducation.com';
+  select id into v_student_id from auth.users where lower(email) = 'student.demo@acdeducation.com';
 
   insert into auth.identities (
     provider_id,
@@ -195,9 +197,9 @@ begin
     now()
   from auth.users user_account
   where lower(user_account.email) in (
-    'erwinjrcurato8975@acdeducation.com',
-    'itsw1nmade@gmail.com',
-    'erwincurato@gmail.com'
+    'admin.demo@acdeducation.com',
+    'faculty.demo@acdeducation.com',
+    'student.demo@acdeducation.com'
   )
   on conflict (provider_id, provider) do update
   set
@@ -216,13 +218,13 @@ begin
   from (
     values
       (
-        'erwinjrcurato8975@acdeducation.com',
-        'Erwin Curato Jr.',
+        'admin.demo@acdeducation.com',
+        'Demo Admin',
         'ADMIN',
         'IT'
       ),
-      ('itsw1nmade@gmail.com', 'Made W1n', 'FACULTY', 'IT'),
-      ('erwincurato@gmail.com', 'Erwin Curato', 'STUDENT', 'IT')
+      ('faculty.demo@acdeducation.com', 'Demo Faculty', 'FACULTY', 'IT'),
+      ('student.demo@acdeducation.com', 'Demo Student', 'STUDENT', 'IT')
   ) as demo(email, full_name, role, department_code)
   join auth.users user_account on lower(user_account.email) = lower(demo.email)
   join public.departments department on department.code = demo.department_code

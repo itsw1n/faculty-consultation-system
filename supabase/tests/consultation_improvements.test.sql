@@ -1,5 +1,5 @@
 begin;
-select plan(21);
+select plan(22);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -46,6 +46,7 @@ select set_config('request.jwt.claims','{"sub":"22000000-0000-0000-0000-00000000
 select lives_ok($$select public.complete_consultation_with_outcome((select id from public.consultations limit 1),'Follow up next week')$$,'faculty completes with outcome');
 select results_eq($$select outcome from public.get_consultation_detail((select id from public.consultations limit 1))$$,array['Follow up next week'::text],'faculty sees outcome');
 select throws_ok($$select public.complete_consultation_with_outcome((select id from public.consultations limit 1),null)$$,'23514','Consultation cannot be completed','cannot complete twice');
+select results_eq($$select outcome from public.search_my_consultations() where id=(select id from public.consultations limit 1)$$,array['Follow up next week'::text],'listing exposes the outcome to participants');
 reset role;
 
 select results_eq($$select event_type from public.email_outbox where event_type='APPROVED'$$,array['APPROVED'::text],'approval enqueues email');

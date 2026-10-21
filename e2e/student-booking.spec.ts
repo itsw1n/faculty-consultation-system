@@ -143,8 +143,8 @@ test.describe('Student booking journey', () => {
 
     await page.getByRole('button', { name: 'Status' }).click()
     await page.getByRole('option', { name: 'Cancelled' }).click()
-    await expect(page.locator('article', { hasText: 'Cancelled' })).toBeVisible()
-    await expect(page.locator('article', { hasText: 'Pending' })).toHaveCount(0)
+    await expect(page.getByRole('row').filter({ hasText: 'Cancelled' })).toBeVisible()
+    await expect(page.getByRole('row').filter({ hasText: 'Pending' })).toHaveCount(0)
 
     const pending = await getLatestConsultationForStudent(student.id)
     await page.goto(`/student/consultations/${pending!.id}`)

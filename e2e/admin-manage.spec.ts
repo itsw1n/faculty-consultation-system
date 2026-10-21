@@ -102,23 +102,23 @@ test.describe('Admin management', () => {
     await addForm.locator('input[name="code"]').fill(code)
     await addForm.locator('input[name="name"]').fill(name)
     await addForm.getByRole('button', { name: 'Add department' }).click()
+
+    const grid = page.getByRole('region', { name: 'Existing departments' })
     await expect
       .poll(async () => {
-        const values = await page
-          .locator('article input[name="name"]')
+        const values = await grid
+          .locator('input[name="name"]')
           .evaluateAll((inputs) => (inputs as HTMLInputElement[]).map((input) => input.value))
         return values.includes(name)
       })
       .toBe(true)
     expect((await getDepartmentByCode(code))?.name).toBe(name)
-
-    const grid = page.getByRole('region', { name: 'Existing departments' })
     let cardIndex = -1
     await expect
       .poll(
         async () => {
           const codes = await grid
-            .locator('article input[name="code"]')
+            .locator('input[name="code"]')
             .evaluateAll((inputs) => (inputs as HTMLInputElement[]).map((input) => input.value))
           cardIndex = codes.indexOf(code)
           return cardIndex
@@ -126,9 +126,9 @@ test.describe('Admin management', () => {
         { timeout: 30_000 }
       )
       .toBeGreaterThanOrEqual(0)
-    const card = grid.locator('article').nth(cardIndex)
-    await card.locator('input[name="name"]').fill(renamed)
-    await card.getByRole('button', { name: 'Save changes' }).click()
+    const row = grid.getByRole('row').nth(cardIndex + 1)
+    await row.locator('input[name="name"]').fill(renamed)
+    await row.getByRole('button', { name: 'Save changes' }).click()
     await expect.poll(() => getDepartmentByCode(code).then((row) => row?.name)).toBe(renamed)
   })
 

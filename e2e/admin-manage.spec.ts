@@ -71,7 +71,9 @@ test.describe('Admin management', () => {
     await ensureFacultyProfile(faculty.id, departments[0]!.id)
 
     await signInAs(page, email, password)
-    await page.goto('/admin/users?role=FACULTY&status=APPROVED')
+    await page.goto('/admin/users?role=FACULTY')
+    await expect(page.getByText('Status', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('Approved', { exact: true })).toHaveCount(0)
     await page.getByRole('searchbox', { name: 'Search' }).fill(name)
     await expect(page.locator('article', { hasText: name }).first()).toBeVisible()
     await expect(page.locator('article', { hasText: name }).first()).toHaveText(/Instructor I/)

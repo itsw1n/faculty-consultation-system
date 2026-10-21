@@ -114,7 +114,7 @@ A slot can be requested only while `OPEN`. The conditional update changes at mos
 4. Admins cannot correct their own account or assign `ADMIN`.
 5. Consultations cannot be bulk-deleted.
 6. CSV export is metadata only and limited to 366 days.
-7. The current Manage Users UI has no bulk approve/reject action.
+7. Manage Users is an active account directory: it shows approved accounts and has no account-status filter or approval action. The legacy statuses remain internal safeguards for historical records and access control.
 
 ## Search and pagination
 

@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import type { ApplicationItem } from '../types'
 export type ApplicationFilters = {
   search?: string
-  status?: string
   role?: string
   department?: string
   cursor?: { createdAt: string; id: string }
@@ -43,7 +42,7 @@ export async function getApplicationPage(filters: ApplicationFilters) {
     await createClient()
   ).rpc('list_application_page', {
     search_text: filters.search ?? '',
-    status_filter: filters.status || null,
+    status_filter: 'APPROVED',
     role_filter: filters.role || null,
     department_filter: filters.department || null,
     cursor_created_at: filters.cursor?.createdAt ?? null,

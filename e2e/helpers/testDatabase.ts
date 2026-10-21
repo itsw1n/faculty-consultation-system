@@ -365,6 +365,10 @@ export async function cleanupE2EData(): Promise<void> {
         (await service.from('email_outbox').delete().in('recipient_id', userBatch)).error,
         'email outbox recipients'
       )
+      assertDelete(
+        (await service.from('notifications').delete().in('entity_id', userBatch)).error,
+        'account notifications'
+      )
     }
     for (const consultationBatch of batches(unique(consultationIds))) {
       assertDelete(
@@ -389,6 +393,17 @@ export async function cleanupE2EData(): Promise<void> {
       if (error) throw new Error(`Unable to clean test user ${userId}: ${error.message}`)
     }
   }
+
+  assertDelete(
+    (
+      await service
+        .from('notifications')
+        .delete()
+        .eq('type', 'NEW_APPLICATION')
+        .ilike('message', 'E2E % submitted an application.%')
+    ).error,
+    'legacy account notifications'
+  )
 
   assertDelete(
     (await service.from('faculty_invites').delete().ilike('email', 'e2e-%@acdeducation.com')).error,

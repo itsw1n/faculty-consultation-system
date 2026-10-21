@@ -163,6 +163,9 @@ test.describe('Student booking journey', () => {
 
     await signInAs(page, email, password)
     await page.goto('/notifications')
+    await expect(page.getByLabel('2 unread notifications')).toBeVisible()
+    await page.getByRole('button', { name: 'Mark read' }).first().click()
+    await expect(page.getByLabel('1 unread notifications')).toBeVisible()
     await page.getByRole('button', { name: 'Mark all as read' }).click()
     // Wait for the server to persist before reading back.
     await expect
@@ -170,6 +173,7 @@ test.describe('Student booking journey', () => {
       .toBe(true)
     // The inbox lists read items too, so "all read" means no unread actions remain.
     await page.reload()
+    await expect(page.getByLabel('0 unread notifications')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Mark read' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Mark all as read' })).toHaveCount(0)
   })

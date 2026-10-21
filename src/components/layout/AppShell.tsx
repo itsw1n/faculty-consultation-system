@@ -4,7 +4,10 @@ import { Bell, Menu } from 'lucide-react'
 import { signOut } from '@/features/auth/actions'
 import type { AuthProfile } from '@/features/auth/types'
 import { Button } from '@/components/common/button/Button'
-import { listNotifications } from '@/features/notifications/repositories/notificationRepository'
+import {
+  countUnreadNotifications,
+  listNotifications,
+} from '@/features/notifications/repositories/notificationRepository'
 import { cn } from '@/lib/cn'
 import { Breadcrumbs } from './Breadcrumbs'
 import { Container } from './Container'
@@ -19,8 +22,10 @@ export async function AppShell({
   profile: AuthProfile
 }) {
   const role = profile.role!
-  const notifications = await listNotifications(5)
-  const unread = notifications.filter((item) => !item.read_at).length
+  const [notifications, unread] = await Promise.all([
+    listNotifications(5),
+    countUnreadNotifications(),
+  ])
 
   return (
     <div data-ui="app-shell" className="min-h-screen md:grid md:grid-cols-[15rem_minmax(0,1fr)]">

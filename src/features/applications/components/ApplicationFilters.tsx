@@ -5,13 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { SearchInput } from '@/components/common/SearchInput'
 import { Select } from '@/components/common/select/Select'
 
-const statusOptions = [
-  { id: 'all', label: 'All statuses' },
-  { id: 'APPROVED', label: 'Approved' },
-  { id: 'PENDING', label: 'Legacy pending' },
-  { id: 'REJECTED', label: 'Legacy rejected' },
-]
-
 const roleOptions = [
   { id: 'all', label: 'All roles' },
   { id: 'STUDENT', label: 'Student' },
@@ -50,18 +43,12 @@ export function ApplicationFilters({
     ...departments.map((item) => ({ id: item.id, label: item.code })),
   ]
   return (
-    <div className="grid items-end gap-3 border-y border-border py-4 sm:grid-cols-2 lg:flex">
+    <div className="grid items-end gap-3 border-y border-border py-4 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1.4fr)_minmax(10rem,1fr)_minmax(12rem,1fr)_auto]">
       <SearchInput
         label="Search"
         value={search}
         onChange={setSearch}
         placeholder="Search name or email"
-      />
-      <Select
-        label="Status"
-        options={statusOptions}
-        value={current.get('status') ?? 'all'}
-        onChange={(value) => update('status', value === 'all' ? '' : value)}
       />
       <Select
         label="Role"
@@ -75,7 +62,7 @@ export function ApplicationFilters({
         value={current.get('department') ?? 'all'}
         onChange={(value) => update('department', value === 'all' ? '' : value)}
       />
-      <div className="flex items-end sm:col-span-2 lg:ml-auto lg:pl-2">{action}</div>
+      <div className="flex items-end sm:col-span-2 lg:col-auto lg:justify-self-end">{action}</div>
     </div>
   )
 }

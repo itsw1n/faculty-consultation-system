@@ -13,12 +13,12 @@ import { SummaryStats } from '@/components/common/SummaryStats'
 export default async function ManageUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; status?: string; role?: string; department?: string }>
+  searchParams: Promise<{ search?: string; role?: string; department?: string }>
 }) {
   await requireRole('ADMIN')
   const parameters = await searchParams
   const [page, departments, counts] = await Promise.all([
-    getApplicationPage({ ...parameters, status: parameters.status ?? '' }),
+    getApplicationPage(parameters),
     listDepartments(),
     getAccountCounts(),
   ])
@@ -43,11 +43,10 @@ export default async function ManageUsersPage({
         action={<AddFacultyButton departments={departments} />}
       />
       <ApplicationReviewList
-        key={`${parameters.search}:${parameters.status}:${parameters.role}:${parameters.department}`}
+        key={`${parameters.search}:${parameters.role}:${parameters.department}`}
         initialPage={page}
         filters={{
           search: parameters.search ?? '',
-          status: parameters.status ?? '',
           role: parameters.role ?? '',
           department: parameters.department ?? '',
         }}

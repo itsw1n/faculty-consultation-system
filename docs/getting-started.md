@@ -43,7 +43,7 @@ delete from public.approved_email_domains where domain = '*';
 
 ## Demo accounts
 
-`supabase db reset` loads three local demo accounts plus availability, consultations in every lifecycle state, and notifications:
+`supabase db reset` loads exactly three local demo accounts, five consultations covering every lifecycle state, and sample notifications:
 
 | Role    | Email                                | Password       |
 | ------- | ------------------------------------ | -------------- |

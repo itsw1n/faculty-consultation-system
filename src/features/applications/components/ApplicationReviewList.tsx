@@ -16,7 +16,7 @@ import type { ApplicationItem } from '../types'
 
 type Cursor = { createdAt: string; id: string }
 
-type Filters = { search: string; status: string; role: string; department: string }
+type Filters = { search: string; role: string; department: string }
 
 function EditUserForm({
   target,
@@ -105,7 +105,6 @@ export function ApplicationReviewList({
     fetchPage: (cursor) =>
       getApplicationPage({
         search: filters.search,
-        status: filters.status || null,
         role: filters.role || null,
         department: filters.department || null,
         cursor,
@@ -122,11 +121,11 @@ export function ApplicationReviewList({
         </p>
       ) : null}
       <div className="mt-5 overflow-hidden rounded-lg border border-border bg-surface">
-        <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-border bg-background px-4 py-3 text-xs font-semibold tracking-wide text-muted uppercase md:grid">
+        <div className="hidden grid-cols-[minmax(17rem,2fr)_minmax(11rem,1.2fr)_minmax(8rem,1fr)_minmax(6rem,0.65fr)_auto] gap-4 border-b border-border bg-background px-5 py-3 text-xs font-semibold tracking-wide text-muted uppercase md:grid">
           <span>User</span>
           <span>Department</span>
           <span>Position</span>
-          <span>Role / Status</span>
+          <span>Role</span>
           <span>Action</span>
         </div>
         {page.items.length === 0 ? (
@@ -134,7 +133,7 @@ export function ApplicationReviewList({
         ) : (
           page.items.map((application) => (
             <article
-              className="grid items-center gap-4 border-b border-border p-4 last:border-0 md:grid-cols-[2fr_1fr_1fr_1fr_auto]"
+              className="grid items-center gap-4 border-b border-border px-5 py-4 last:border-0 md:grid-cols-[minmax(17rem,2fr)_minmax(11rem,1.2fr)_minmax(8rem,1fr)_minmax(6rem,0.65fr)_auto]"
               key={application.id}
             >
               <div>
@@ -154,13 +153,10 @@ export function ApplicationReviewList({
                 {application.role === 'FACULTY' ? (application.position_title ?? '—') : '—'}
               </p>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="w-full text-xs font-semibold text-foreground md:hidden">
-                  Role and status
-                </span>
+                <span className="w-full text-xs font-semibold text-foreground md:hidden">Role</span>
                 <StatusBadge status={application.role} />
-                <StatusBadge status={application.account_status} />
               </div>
-              {application.account_status === 'APPROVED' && application.role !== 'ADMIN' ? (
+              {application.role !== 'ADMIN' ? (
                 <div className="flex gap-2">
                   <Button
                     variant="secondary"

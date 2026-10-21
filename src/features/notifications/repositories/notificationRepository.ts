@@ -10,6 +10,16 @@ export async function listNotifications(limit = 20) {
   if (error) throw new Error('Unable to load notifications')
   return data as NotificationItem[]
 }
+
+export async function countUnreadNotifications(): Promise<number> {
+  const { count, error } = await (await createClient())
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .is('read_at', null)
+  if (error) throw new Error('Unable to count notifications')
+  return count ?? 0
+}
+
 export async function getNotificationPage(cursor?: { createdAt: string; id: string }) {
   let query = (await createClient())
     .from('notifications')

@@ -31,7 +31,7 @@ const item = (overrides: Partial<ApplicationItem> = {}): ApplicationItem => ({
 
 const departments = [{ id: '22222222-2222-4222-8222-222222222222', name: 'IT' }]
 
-const filters = { search: '', status: '', role: '', department: '' }
+const filters = { search: '', role: '', department: '' }
 
 describe('ApplicationReviewList directory', () => {
   it('shows every account with its role, without checkboxes', () => {

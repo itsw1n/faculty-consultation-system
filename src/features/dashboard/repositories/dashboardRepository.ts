@@ -33,23 +33,33 @@ export async function getStudentDashboard() {
   ])
   return { pending: pending.count ?? 0, upcoming: upcoming.count ?? 0, recent: recent.data ?? [] }
 }
+export type FacultyDashboardSummary = {
+  pending: number
+  open_slots: number
+  next_open_date: string | null
+  next_open_start_time: string | null
+  next_open_end_time: string | null
+}
+
 export async function getFacultyDashboard() {
   const supabase = await createClient()
-  const [pending, upcoming, openSlots] = await Promise.all([
-    supabase
-      .from('consultations')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'PENDING'),
-    supabase
-      .from('consultations')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'APPROVED'),
-    supabase.rpc('count_own_open_availability'),
+  const [summary, requests, agenda] = await Promise.all([
+    supabase.rpc('faculty_dashboard_summary').single(),
+    supabase.rpc('search_my_consultations', {
+      search_text: '',
+      status_filter: 'PENDING',
+      cursor_created_at: null,
+      cursor_id: null,
+      result_limit: 3,
+    }),
+    supabase.rpc('list_my_upcoming_consultations', { result_limit: 5 }),
   ])
+  if (summary.error || requests.error || agenda.error || !summary.data)
+    throw new Error('Unable to load the faculty dashboard')
   return {
-    pending: pending.count ?? 0,
-    upcoming: upcoming.count ?? 0,
-    openSlots: Number(openSlots.data ?? 0),
+    summary: summary.data as FacultyDashboardSummary,
+    requests: (requests.data ?? []) as ConsultationItem[],
+    agenda: (agenda.data ?? []) as ConsultationItem[],
   }
 }
 export async function getAdminDashboard() {

@@ -1,6 +1,7 @@
 import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
-import { createDepartment, updateDepartment } from '@/features/admin/actions'
+import { createDepartment } from '@/features/admin/actions'
+import { DepartmentTable } from '@/features/admin/components/DepartmentTable'
 import { listDepartments } from '@/features/admin/repositories/adminRepository'
 
 export default async function DepartmentsPage() {
@@ -44,45 +45,8 @@ export default async function DepartmentsPage() {
           <Button type="submit">Add department</Button>
         </form>
       </section>
-      <section
-        className="mt-6 overflow-hidden rounded-lg border border-border bg-surface"
-        aria-label="Existing departments"
-      >
-        {departments.map((department) => (
-          <article className="border-b border-border p-4 last:border-0" key={department.id}>
-            <form
-              action={updateDepartment}
-              className="grid items-end gap-3 sm:grid-cols-[minmax(7rem,.7fr)_minmax(12rem,2fr)_auto]"
-            >
-              <input type="hidden" name="id" value={department.id} />
-              <label className="grid gap-1.5 text-xs font-bold">
-                Code
-                <input
-                  className="min-h-11 rounded-md border border-border px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
-                  name="code"
-                  defaultValue={department.code}
-                  required
-                  minLength={2}
-                  maxLength={20}
-                />
-              </label>
-              <label className="grid gap-1.5 text-xs font-bold">
-                Name
-                <input
-                  className="min-h-11 rounded-md border border-border px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
-                  name="name"
-                  defaultValue={department.name}
-                  required
-                  minLength={2}
-                  maxLength={120}
-                />
-              </label>
-              <Button type="submit" variant="secondary">
-                Save changes
-              </Button>
-            </form>
-          </article>
-        ))}
+      <section className="mt-6" aria-label="Existing departments">
+        <DepartmentTable departments={departments} />
       </section>
     </>
   )

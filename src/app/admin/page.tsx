@@ -5,6 +5,7 @@ import { PageHeading } from '@/components/common/PageHeading'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SummaryStats } from '@/components/common/SummaryStats'
 import { getAdminDashboard } from '@/features/dashboard/repositories/dashboardRepository'
+import { AdminRecentConsultationsTable } from '@/features/dashboard/components/AdminRecentConsultationsTable'
 
 const quickActions = [
   {
@@ -124,7 +125,7 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      <section className="mt-6 overflow-hidden rounded-lg border border-border bg-surface">
+      <section className="mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
           <div>
             <h2 className="text-lg font-semibold text-primary">Recent consultations</h2>
@@ -136,49 +137,7 @@ export default async function AdminDashboard() {
             View all records
           </Link>
         </div>
-        {data.recent.length === 0 ? (
-          <p className="p-8 text-center text-muted">No consultation activity yet.</p>
-        ) : (
-          <>
-            <div className="hidden grid-cols-[1fr_1fr_0.9fr_auto] gap-4 border-b border-border bg-background px-5 py-3 text-xs font-semibold tracking-wide text-muted uppercase md:grid">
-              <span>Student</span>
-              <span>Faculty</span>
-              <span>Schedule</span>
-              <span>Status</span>
-            </div>
-            {data.recent.map((item) => (
-              <article
-                className="grid gap-4 border-b border-border px-5 py-4 last:border-0 sm:grid-cols-2 md:grid-cols-[1fr_1fr_0.9fr_auto] md:items-center"
-                key={item.id}
-              >
-                <p>
-                  <span className="mb-1 block text-xs font-semibold text-muted uppercase md:hidden">
-                    Student
-                  </span>
-                  <strong className="font-semibold text-primary">{item.student_name}</strong>
-                </p>
-                <p>
-                  <span className="mb-1 block text-xs font-semibold text-muted uppercase md:hidden">
-                    Faculty
-                  </span>
-                  <span className="text-sm text-muted">{item.faculty_name}</span>
-                </p>
-                <p className="text-sm text-muted">
-                  <span className="mb-1 block text-xs font-semibold text-muted uppercase md:hidden">
-                    Schedule
-                  </span>
-                  {item.slot_date} · {item.start_time.slice(0, 5)}–{item.end_time.slice(0, 5)}
-                </p>
-                <div>
-                  <span className="mb-1 block text-xs font-semibold text-muted uppercase md:hidden">
-                    Status
-                  </span>
-                  <StatusBadge status={item.consultation_status} />
-                </div>
-              </article>
-            ))}
-          </>
-        )}
+        <AdminRecentConsultationsTable items={data.recent} />
       </section>
 
       <section className="mt-6">

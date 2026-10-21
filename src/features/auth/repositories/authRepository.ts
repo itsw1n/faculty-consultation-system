@@ -30,6 +30,7 @@ export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
   if (domainError || !allowed) return null
 
   return {
+    id: userId,
     accountStatus: data.account_status,
     email: data.email,
     fullName: data.full_name,

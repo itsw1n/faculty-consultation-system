@@ -25,8 +25,8 @@ export async function AppShell({
 }) {
   const role = profile.role!
   const [notifications, unread] = await Promise.all([
-    listNotifications(5),
-    countUnreadNotifications(),
+    listNotifications(profile.id, 5),
+    countUnreadNotifications(profile.id),
   ])
 
   return (

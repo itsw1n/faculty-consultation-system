@@ -39,5 +39,12 @@ export const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
  */
 export function databaseTestsEnabled(): boolean {
   if (process.env.CI) return false
-  return supabaseUrl.length > 0 && supabaseAnonKey.length > 0 && supabaseServiceKey.length > 0
+  let localDatabase = false
+  try {
+    const hostname = new URL(supabaseUrl).hostname
+    localDatabase = hostname === '127.0.0.1' || hostname === 'localhost'
+  } catch {
+    localDatabase = false
+  }
+  return localDatabase && supabaseAnonKey.length > 0 && supabaseServiceKey.length > 0
 }

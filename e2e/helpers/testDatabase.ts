@@ -316,3 +316,93 @@ export async function setDepartment(userId: string, departmentId: string): Promi
     .eq('id', userId)
   if (error) throw error
 }
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)]
+}
+
+function batches<T>(values: T[], size = 50): T[][] {
+  return Array.from({ length: Math.ceil(values.length / size) }, (_, index) =>
+    values.slice(index * size, (index + 1) * size)
+  )
+}
+
+function assertDelete(error: { message: string } | null, subject: string): void {
+  if (error) throw new Error(`Unable to clean ${subject}: ${error.message}`)
+}
+
+/** Remove records owned by the E2E suite while preserving seeded demo and developer data. */
+export async function cleanupE2EData(): Promise<void> {
+  const service = getServiceClient()
+  const { data: departments, error: departmentQueryError } = await service
+    .from('departments')
+    .select('id')
+    .ilike('name', 'E2E Department %')
+  if (departmentQueryError) throw departmentQueryError
+
+  const { data: profiles, error: profileError } = await service
+    .from('profiles')
+    .select('id')
+    .ilike('email', 'e2e-%@acdeducation.com')
+  if (profileError) throw profileError
+
+  const userIds = profiles.map((profile) => profile.id)
+  if (userIds.length > 0) {
+    const consultationIds: string[] = []
+    for (const userBatch of batches(userIds)) {
+      const [asStudent, asFaculty] = await Promise.all([
+        service.from('consultations').select('id').in('student_id', userBatch),
+        service.from('consultations').select('id').in('faculty_id', userBatch),
+      ])
+      if (asStudent.error) throw asStudent.error
+      if (asFaculty.error) throw asFaculty.error
+      consultationIds.push(
+        ...asStudent.data.map((item) => item.id),
+        ...asFaculty.data.map((item) => item.id)
+      )
+
+      assertDelete(
+        (await service.from('email_outbox').delete().in('recipient_id', userBatch)).error,
+        'email outbox recipients'
+      )
+    }
+    for (const consultationBatch of batches(unique(consultationIds))) {
+      assertDelete(
+        (await service.from('email_outbox').delete().in('consultation_id', consultationBatch))
+          .error,
+        'email outbox consultations'
+      )
+      assertDelete(
+        (await service.from('consultations').delete().in('id', consultationBatch)).error,
+        'consultations'
+      )
+    }
+    for (const userBatch of batches(userIds)) {
+      assertDelete(
+        (await service.from('availability_slots').delete().in('faculty_id', userBatch)).error,
+        'availability slots'
+      )
+    }
+
+    for (const userId of userIds) {
+      const { error } = await service.auth.admin.deleteUser(userId)
+      if (error) throw new Error(`Unable to clean test user ${userId}: ${error.message}`)
+    }
+  }
+
+  assertDelete(
+    (await service.from('faculty_invites').delete().ilike('email', 'e2e-%@acdeducation.com')).error,
+    'faculty invitations'
+  )
+  const departmentIds = departments.map((department) => department.id)
+  if (departmentIds.length > 0) {
+    assertDelete(
+      (await service.from('faculty_invites').delete().in('department_id', departmentIds)).error,
+      'faculty invitations for test departments'
+    )
+  }
+  assertDelete(
+    (await service.from('departments').delete().ilike('name', 'E2E Department %')).error,
+    'departments'
+  )
+}

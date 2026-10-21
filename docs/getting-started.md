@@ -95,6 +95,8 @@ npm run test:e2e
 
 `npm run check` runs format, lint, typecheck, and unit tests. End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `password-auth`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it with `supabase status -o env`) and skip automatically when it is unavailable. Password specs exercise the real sign-in form; fixtures create users through the Auth Admin API and generate verification tokens where a test must not depend on reading mail. Assertions check both the screen and the database row.
 
+Database-backed browser tests run only against localhost. Their setup and teardown remove accounts and departments reserved with the `e2e-` / `E2E Department` prefixes, so test fixtures do not remain in the development UI. Seeded demo accounts and developer-created records are preserved.
+
 Commit the generated `package-lock.json`; CI uses `npm ci`.
 
 ## Optional Docker workflow

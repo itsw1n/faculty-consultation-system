@@ -52,9 +52,9 @@ export function Navigation({ role, mobile = false }: { role: UserRole; mobile?: 
             key={href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'group flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
+              'group flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               active
-                ? 'bg-blue-500/25 text-white shadow-[inset_3px_0_0_#7db5ff]'
+                ? 'bg-white/14 text-white'
                 : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
             )}
           >

@@ -74,8 +74,10 @@ test.describe('Student booking journey', () => {
 
     await signInAs(page, email, password)
     await page.goto('/student')
-    const upcomingCount = page.locator('//span[text()="Upcoming"]/ancestor::section[1]/strong')
-    const pendingCount = page.locator('//span[text()="Pending"]/ancestor::section[1]/strong')
+    const valueFor = (label: string) =>
+      page.locator('dt', { hasText: label }).locator('xpath=..').locator('dd')
+    const upcomingCount = valueFor('Upcoming')
+    const pendingCount = valueFor('Pending')
     await expect(upcomingCount).toHaveText('1')
     await expect(pendingCount).toHaveText('1')
     await expect(page.getByText('Recent consultations')).toBeVisible()
@@ -141,8 +143,8 @@ test.describe('Student booking journey', () => {
 
     await page.getByRole('button', { name: 'Status' }).click()
     await page.getByRole('option', { name: 'Cancelled' }).click()
-    await expect(page.locator('article', { hasText: 'CANCELLED' })).toBeVisible()
-    await expect(page.locator('article', { hasText: 'PENDING' })).toHaveCount(0)
+    await expect(page.locator('article', { hasText: 'Cancelled' })).toBeVisible()
+    await expect(page.locator('article', { hasText: 'Pending' })).toHaveCount(0)
 
     const pending = await getLatestConsultationForStudent(student.id)
     await page.goto(`/student/consultations/${pending!.id}`)

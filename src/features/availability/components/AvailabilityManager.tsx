@@ -11,9 +11,9 @@ import { initialActionState } from '@/lib/actionState'
 import { createAvailability, deleteAvailability, updateAvailability } from '../actions'
 import type { AvailabilityItem } from '../repositories/availabilityRepository'
 
-const fieldClass = 'grid gap-1.5 text-xs font-bold'
+const fieldClass = 'grid gap-1.5 text-xs font-semibold'
 const controlClass =
-  'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
+  'min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
 
 const modeOptions = [
   { id: 'IN_PERSON', label: 'In person' },
@@ -80,9 +80,16 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
         </form>
       </Modal>
       <section
-        className="mt-4 overflow-hidden rounded-xl border border-border bg-surface"
+        className="mt-5 overflow-hidden rounded-lg border border-border bg-surface"
         aria-label="Upcoming availability"
       >
+        <div className="hidden grid-cols-[1.4fr_1fr_.7fr_1fr_auto] gap-3 border-b border-border bg-background px-4 py-3 text-xs font-semibold tracking-wide text-muted uppercase lg:grid">
+          <span>Date</span>
+          <span>Time</span>
+          <span>Status</span>
+          <span>Mode or location</span>
+          <span>Actions</span>
+        </div>
         {slots.length === 0 ? (
           <p className="p-8 text-center text-muted">No upcoming availability.</p>
         ) : (
@@ -102,13 +109,24 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                   )}
                 </time>
               </Button>
-              <strong>
+              <strong className="font-semibold">
+                <span className="mb-1 block text-xs font-semibold text-muted lg:hidden">Time</span>
                 {slot.start_time.slice(0, 5)}–{slot.end_time.slice(0, 5)}
               </strong>
-              <StatusBadge status={slot.status} />
-              <span>{slot.mode === 'IN_PERSON' ? slot.location : 'Online'}</span>
-              {slot.status === 'OPEN' && (
-                <>
+              <div>
+                <span className="mb-1 block text-xs font-semibold text-muted lg:hidden">
+                  Status
+                </span>
+                <StatusBadge status={slot.status} />
+              </div>
+              <span>
+                <span className="mb-1 block text-xs font-semibold text-muted lg:hidden">
+                  Mode or location
+                </span>
+                {slot.mode === 'IN_PERSON' ? slot.location : 'Online'}
+              </span>
+              {slot.status === 'OPEN' ? (
+                <div className="flex flex-wrap gap-2">
                   <Button variant="secondary" onPress={() => setEditSlot(slot)}>
                     Edit
                   </Button>
@@ -120,7 +138,9 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                     submitAction={deleteAvailability}
                     variant="danger"
                   />
-                </>
+                </div>
+              ) : (
+                <span className="text-sm text-muted">No actions</span>
               )}
             </article>
           ))
@@ -227,7 +247,9 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
               {detailsSlot.start_time.slice(0, 5)}–{detailsSlot.end_time.slice(0, 5)}
             </dd>
             <dt>Status</dt>
-            <dd>{detailsSlot.status}</dd>
+            <dd>
+              <StatusBadge status={detailsSlot.status} />
+            </dd>
             <dt>Mode</dt>
             <dd>{detailsSlot.mode === 'IN_PERSON' ? detailsSlot.location : 'Online'}</dd>
           </dl>

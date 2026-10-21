@@ -50,7 +50,7 @@ export function ApplicationFilters({
     ...departments.map((item) => ({ id: item.id, label: item.code })),
   ]
   return (
-    <div className="grid items-end gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-2 lg:flex">
+    <div className="grid items-end gap-3 border-y border-border py-4 sm:grid-cols-2 lg:flex">
       <SearchInput
         label="Search"
         value={search}
@@ -75,7 +75,7 @@ export function ApplicationFilters({
         value={current.get('department') ?? 'all'}
         onChange={(value) => update('department', value === 'all' ? '' : value)}
       />
-      <div className="flex items-end sm:col-span-2 lg:pl-2">{action}</div>
+      <div className="flex items-end sm:col-span-2 lg:ml-auto lg:pl-2">{action}</div>
     </div>
   )
 }

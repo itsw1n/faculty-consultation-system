@@ -121,8 +121,8 @@ export function ApplicationReviewList({
           {message}
         </p>
       ) : null}
-      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
-        <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-border bg-subtle px-4 py-3 text-xs font-bold text-muted md:grid">
+      <div className="mt-5 overflow-hidden rounded-lg border border-border bg-surface">
+        <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-border bg-background px-4 py-3 text-xs font-semibold tracking-wide text-muted uppercase md:grid">
           <span>User</span>
           <span>Department</span>
           <span>Position</span>
@@ -141,11 +141,22 @@ export function ApplicationReviewList({
                 <strong>{application.full_name}</strong>
                 <p className="mt-1 text-sm text-muted">{application.email}</p>
               </div>
-              <p className="text-sm text-muted">{application.department_name ?? '—'}</p>
               <p className="text-sm text-muted">
+                <span className="mb-1 block text-xs font-semibold text-foreground md:hidden">
+                  Department
+                </span>
+                {application.department_name ?? '—'}
+              </p>
+              <p className="text-sm text-muted">
+                <span className="mb-1 block text-xs font-semibold text-foreground md:hidden">
+                  Position
+                </span>
                 {application.role === 'FACULTY' ? (application.position_title ?? '—') : '—'}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="w-full text-xs font-semibold text-foreground md:hidden">
+                  Role and status
+                </span>
                 <StatusBadge status={application.role} />
                 <StatusBadge status={application.account_status} />
               </div>

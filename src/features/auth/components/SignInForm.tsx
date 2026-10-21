@@ -9,7 +9,7 @@ import { signInWithPassword } from '../actions'
 
 const fieldClass = 'grid gap-1.5 text-sm font-semibold'
 const controlClass =
-  'min-h-12 w-full rounded-lg border border-border bg-surface px-3 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus'
+  'min-h-12 w-full rounded-md border border-border bg-surface px-3 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus'
 
 export function SignInForm() {
   const [state, formAction] = useActionState(signInWithPassword, initialActionState)
@@ -49,7 +49,7 @@ export function SignInForm() {
         </p>
       ) : null}
       <SubmitButton pendingLabel="Signing in…" className="mt-2">
-        Sign in →
+        Sign in
       </SubmitButton>
       <p className="text-center text-sm text-muted">
         Don&apos;t have an account?{' '}

@@ -28,13 +28,13 @@ function AddFacultyForm({
   return (
     <form action={action} className="mt-5 grid gap-4">
       <p className="text-sm text-muted">
-        The person must already have a registered, verified Student account. Their existing login
-        will become a Faculty login.
+        This person must already have a verified student account. Their existing login will be
+        promoted to faculty.
       </p>
-      <label className="grid gap-1.5 text-xs font-bold">
+      <label className="grid gap-1.5 text-xs font-semibold">
         School email
         <input
-          className="min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
+          className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
           name="email"
           type="email"
           autoComplete="off"
@@ -49,10 +49,10 @@ function AddFacultyForm({
         placeholder="Select a department"
         isRequired
       />
-      <label className="grid gap-1.5 text-xs font-bold">
+      <label className="grid gap-1.5 text-xs font-semibold">
         Position title
         <input
-          className="min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
+          className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
           name="positionTitle"
           required
           maxLength={120}

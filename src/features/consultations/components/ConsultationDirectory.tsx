@@ -36,12 +36,12 @@ export function ConsultationDirectory({
     )
     return () => clearTimeout(timeout)
   }, [search, status, reload])
-  const field = 'grid flex-1 gap-1.5 text-xs font-bold'
+  const field = 'grid flex-1 gap-1.5 text-xs font-semibold'
   const control =
-    'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
+    'min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
   return (
     <>
-      <div className="grid items-end gap-3 rounded-xl border border-border bg-surface p-4 sm:flex">
+      <div className="grid items-end gap-3 border-y border-border py-4 sm:flex">
         <label className={field}>
           <span>Search</span>
           <input
@@ -58,7 +58,7 @@ export function ConsultationDirectory({
               { id: 'all', label: 'All statuses' },
               ...['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => ({
                 id: value,
-                label: value,
+                label: value.charAt(0) + value.slice(1).toLowerCase(),
               })),
             ]}
             value={status || 'all'}
@@ -66,7 +66,13 @@ export function ConsultationDirectory({
           />
         )}
       </div>
-      <section className="mt-4 overflow-hidden rounded-xl border border-border bg-surface">
+      <section className="mt-5 overflow-hidden rounded-lg border border-border bg-surface">
+        <div className="hidden grid-cols-[2fr_1fr_.8fr_auto] gap-4 border-b border-border bg-background px-4 py-3 text-xs font-semibold tracking-wide text-muted uppercase lg:grid">
+          <span>{viewer === 'STUDENT' ? 'Faculty' : 'Student'}</span>
+          <span>Schedule</span>
+          <span>Status</span>
+          <span>Action</span>
+        </div>
         {page.items.length === 0 ? (
           <p className="p-8 text-center text-muted">No consultations found.</p>
         ) : (
@@ -76,16 +82,26 @@ export function ConsultationDirectory({
               key={item.id}
             >
               <div>
-                <strong>{viewer === 'STUDENT' ? item.faculty_name : item.student_name}</strong>
+                <strong className="font-semibold text-primary">
+                  {viewer === 'STUDENT' ? item.faculty_name : item.student_name}
+                </strong>
                 <p className="mt-1 text-sm text-muted">{categoryLabel(item.purpose)}</p>
               </div>
-              <div>
+              <div className="text-sm">
+                <span className="mb-1 block text-xs font-semibold text-foreground lg:hidden">
+                  Schedule
+                </span>
                 <time>{item.slot_date}</time>
                 <p className="mt-1 text-sm text-muted">
                   {item.start_time.slice(0, 5)}–{item.end_time.slice(0, 5)}
                 </p>
               </div>
-              <StatusBadge status={item.consultation_status} />
+              <div>
+                <span className="mb-1 block text-xs font-semibold text-foreground lg:hidden">
+                  Status
+                </span>
+                <StatusBadge status={item.consultation_status} />
+              </div>
               <div className="flex gap-2">
                 {viewer !== 'ADMIN' && (
                   <Link

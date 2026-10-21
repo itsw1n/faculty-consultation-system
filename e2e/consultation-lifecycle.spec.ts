@@ -106,7 +106,7 @@ test.describe('Consultation lifecycle', () => {
     // ...and shows up as approved in the history list.
     await page.goto('/faculty/consultations')
     const historyRow = page.locator('article', { hasText: studentName })
-    await expect(historyRow.getByText('APPROVED')).toBeVisible()
+    await expect(historyRow.getByText('Approved')).toBeVisible()
 
     // 3. Faculty completes with an outcome note.
     await historyRow.getByRole('link', { name: 'Complete' }).click()
@@ -153,7 +153,7 @@ test.describe('Consultation lifecycle', () => {
     const row = page.locator('article', { hasText: facultyName })
     await row.getByRole('button', { name: 'Cancel' }).click()
     await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click()
-    await expect(row.getByText('CANCELLED')).toBeVisible({ timeout: 30_000 })
+    await expect(row.getByText('Cancelled')).toBeVisible({ timeout: 30_000 })
 
     expect((await getConsultation(consultationId))?.status).toBe('CANCELLED')
     expect((await getSlot(slot.id))?.status).toBe('OPEN')

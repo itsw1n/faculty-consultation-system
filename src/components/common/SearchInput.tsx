@@ -14,14 +14,14 @@ export function SearchInput({
 }) {
   return (
     <SearchField
-      className="grid flex-1 gap-1.5 text-xs font-bold"
+      className="grid flex-1 gap-1.5 text-xs font-semibold"
       value={value}
       onChange={onChange}
     >
       <Label>{label}</Label>
       <div className="relative">
         <Input
-          className="min-h-11 w-full rounded-lg border border-border bg-surface px-3 pr-10 outline-none focus-visible:ring-3 focus-visible:ring-focus"
+          className="min-h-11 w-full rounded-md border border-border bg-surface px-3 pr-10 outline-none focus-visible:ring-3 focus-visible:ring-focus"
           placeholder={placeholder}
         />
         {value && (

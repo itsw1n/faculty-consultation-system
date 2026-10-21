@@ -7,8 +7,8 @@ import {
 import { listDepartments } from '@/features/admin/repositories/adminRepository'
 import { ApplicationFilters } from '@/features/applications/components/ApplicationFilters'
 import { AddFacultyButton } from '@/features/applications/components/AddFacultyButton'
-import { GraduationCap, ShieldCheck, UserRound, Users } from 'lucide-react'
 import { requireRole } from '@/features/auth/repositories/authRepository'
+import { SummaryStats } from '@/components/common/SummaryStats'
 
 export default async function ManageUsersPage({
   searchParams,
@@ -22,31 +22,21 @@ export default async function ManageUsersPage({
     listDepartments(),
     getAccountCounts(),
   ])
-  const summaries = [
-    { label: 'Total users', value: counts.total, icon: Users },
-    { label: 'Students', value: counts.students, icon: UserRound },
-    { label: 'Faculty', value: counts.faculty, icon: GraduationCap },
-    { label: 'Admins', value: counts.admins, icon: ShieldCheck },
-  ]
   return (
     <>
       <PageHeading
         title="Manage Users"
         description="Everyone with a school email is a student by default. Promote faculty here."
       />
-      <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-4">
-        {summaries.map(({ label, value, icon: Icon }) => (
-          <section
-            className="rounded-xl border border-border bg-surface p-5 shadow-card"
-            key={label}
-          >
-            <div className="flex items-center justify-between text-accent">
-              <span className="text-sm font-semibold">{label}</span>
-              <Icon size={19} aria-hidden="true" />
-            </div>
-            <strong className="mt-4 block text-3xl text-primary">{value}</strong>
-          </section>
-        ))}
+      <div className="mb-5">
+        <SummaryStats
+          items={[
+            { label: 'Total users', value: counts.total },
+            { label: 'Students', value: counts.students },
+            { label: 'Faculty', value: counts.faculty },
+            { label: 'Admins', value: counts.admins },
+          ]}
+        />
       </div>
       <ApplicationFilters
         departments={departments}

@@ -75,7 +75,7 @@ test.describe('Manage Users directory', () => {
 
     await page.reload()
     await expect(
-      page.locator('article', { hasText: studentEmail }).getByText('FACULTY')
+      page.locator('article', { hasText: studentEmail }).getByText('Faculty')
     ).toBeVisible()
   })
 })

@@ -7,7 +7,7 @@ export default function ClaimAdminPage() {
     <main>
       <Section className="grid min-h-screen place-items-center">
         <Container>
-          <div className="mx-auto w-full max-w-2xl rounded-xl border border-border bg-surface p-8 text-center shadow-card sm:p-12">
+          <div className="mx-auto w-full max-w-2xl rounded-lg border border-border bg-surface p-8 text-center sm:p-12">
             <p className="text-xs font-bold tracking-[0.12em] text-primary uppercase">
               First administrator
             </p>

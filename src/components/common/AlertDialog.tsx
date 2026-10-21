@@ -31,11 +31,11 @@ export function AlertDialog({
         className="fixed inset-0 z-50 grid place-items-center bg-primary/55 p-4"
         isDismissable
       >
-        <Modal className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-dialog">
+        <Modal className="w-full max-w-lg rounded-lg border border-border bg-surface p-6 shadow-dialog">
           <Dialog role="alertdialog" className="outline-none">
             {({ close }) => (
               <>
-                <Heading slot="title" className="text-xl font-bold">
+                <Heading slot="title" className="text-xl font-semibold text-primary">
                   {title}
                 </Heading>
                 <p className="mt-2 text-muted">{description}</p>

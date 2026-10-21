@@ -48,7 +48,7 @@ export function FacultyDirectory({
 
   return (
     <>
-      <div className="grid items-end gap-3 rounded-xl border border-border bg-surface p-4 sm:flex">
+      <div className="grid items-end gap-3 border-y border-border py-4 sm:flex">
         <SearchInput
           label="Faculty name"
           value={search}
@@ -65,20 +65,23 @@ export function FacultyDirectory({
           onChange={(value) => changeDepartment(value === 'all' ? '' : value)}
         />
       </div>
-      <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4">
+      <div className="mt-5 divide-y divide-border border-y border-border bg-surface">
         {page.items.map((member) => (
           <article
-            className="rounded-xl border border-border bg-surface p-5 shadow-card"
+            className="grid gap-4 px-1 py-5 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-4"
             key={member.id}
           >
-            <div className="grid size-10 place-items-center rounded-full bg-primary font-extrabold text-white">
+            <div className="grid size-10 place-items-center rounded-full bg-subtle font-semibold text-primary">
               {member.full_name[0]}
             </div>
-            <h2 className="mt-3 font-bold">{member.full_name}</h2>
-            <p className="mt-1 text-sm text-muted">{member.position_title}</p>
-            <p className="mt-1 text-sm text-muted">{member.department_name}</p>
+            <div>
+              <h2 className="font-semibold text-primary">{member.full_name}</h2>
+              <p className="mt-1 text-sm text-muted">
+                {member.position_title} · {member.department_name}
+              </p>
+            </div>
             <Link
-              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover focus-visible:outline-3 focus-visible:outline-focus"
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-semibold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-focus"
               href={`/student/book/${member.id}`}
             >
               View schedule

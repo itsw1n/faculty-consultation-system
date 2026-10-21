@@ -23,16 +23,16 @@ export async function AppShell({
   const unread = notifications.filter((item) => !item.read_at).length
 
   return (
-    <div data-ui="app-shell" className="min-h-screen md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col bg-primary p-5 text-white md:flex">
+    <div data-ui="app-shell" className="min-h-screen md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-screen flex-col bg-primary px-4 py-5 text-white md:flex">
         <Link
-          className="mb-8 flex items-center gap-3 rounded-lg text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="mb-8 flex items-center gap-3 rounded-md px-2 text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           href={`/${role.toLowerCase()}`}
         >
-          <span className="grid size-10 place-items-center rounded-lg border border-white font-extrabold">
+          <span className="grid size-9 place-items-center rounded-md border border-white/50 text-sm font-bold">
             ACD
           </span>
-          <strong>Assumption College of Davao</strong>
+          <strong className="text-sm leading-tight">Assumption College of Davao</strong>
         </Link>
         <Navigation role={role} />
         <details className="group relative mt-auto">
@@ -72,7 +72,7 @@ export async function AppShell({
       <div className="min-w-0">
         <header
           data-ui="topbar"
-          className="flex h-18 items-center gap-4 border-b border-border bg-surface px-4 sm:px-6 lg:px-10"
+          className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-surface/95 px-4 backdrop-blur-sm sm:px-6 lg:px-8"
         >
           <details className="relative md:hidden">
             <summary
@@ -119,7 +119,7 @@ export async function AppShell({
                 notifications.map((item) => (
                   <article
                     key={item.id}
-                    className={cn('border-b border-border p-3', !item.read_at && 'bg-blue-50')}
+                    className={cn('border-b border-border p-3', !item.read_at && 'bg-subtle')}
                   >
                     <strong>{item.title}</strong>
                     <p className="mt-1 text-sm text-muted">{item.message}</p>

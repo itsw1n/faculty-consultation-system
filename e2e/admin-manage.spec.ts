@@ -25,13 +25,12 @@ async function setupAdmin(prefix: string) {
 
 async function dashboardCounts(page: Page) {
   await page.goto('/admin')
-  const students = page.locator('//span[text()="Students"]/ancestor::section[1]/strong')
-  const faculty = page.locator('//span[text()="Active faculty"]/ancestor::section[1]/strong')
-  const consultations = page.locator('//span[text()="Consultations"]/ancestor::section[1]/strong')
+  const valueFor = (label: string) =>
+    page.locator('dt', { hasText: label }).locator('xpath=..').locator('dd')
   return {
-    students: Number(await students.textContent()),
-    faculty: Number(await faculty.textContent()),
-    consultations: Number(await consultations.textContent()),
+    students: Number(await valueFor('Students').textContent()),
+    faculty: Number(await valueFor('Faculty').textContent()),
+    consultations: Number(await valueFor('Consultations').textContent()),
   }
 }
 

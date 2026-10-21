@@ -56,7 +56,7 @@ test.describe('Manage Users directory', () => {
     await signInAs(page, adminEmail, 'Password123!')
     await page.goto('/admin/users')
 
-    const row = page.locator('article', { hasText: studentEmail })
+    const row = page.getByRole('row').filter({ hasText: studentEmail })
     await expect(row).toBeVisible()
     await row.getByRole('button', { name: 'Edit User' }).click()
 
@@ -75,7 +75,7 @@ test.describe('Manage Users directory', () => {
 
     await page.reload()
     await expect(
-      page.locator('article', { hasText: studentEmail }).getByText('Faculty')
+      page.getByRole('row').filter({ hasText: studentEmail }).getByText('Faculty')
     ).toBeVisible()
   })
 })

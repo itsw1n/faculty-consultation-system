@@ -79,8 +79,9 @@ test.describe('Admin management', () => {
     await expect(page.getByText('Status', { exact: true })).toHaveCount(0)
     await expect(page.getByText('Approved', { exact: true })).toHaveCount(0)
     await page.getByRole('searchbox', { name: 'Search' }).fill(name)
-    await expect(page.locator('article', { hasText: name }).first()).toBeVisible()
-    await expect(page.locator('article', { hasText: name }).first()).toHaveText(/Instructor I/)
+    const facultyRow = page.getByRole('row').filter({ hasText: name })
+    await expect(facultyRow).toBeVisible()
+    await expect(facultyRow).toHaveText(/Instructor I/)
 
     await page.getByRole('searchbox', { name: 'Search' }).fill(`Nope${Date.now()}`)
     await expect(page.getByText('No accounts match these filters.')).toBeVisible()

@@ -2,7 +2,9 @@
 
 import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Cell, Column, Row, TableBody, TableHeader } from 'react-aria-components'
 import { Button } from '@/components/common/button/Button'
+import { DataTable } from '@/components/common/table/DataTable'
 import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
@@ -120,58 +122,50 @@ export function ApplicationReviewList({
           {message}
         </p>
       ) : null}
-      <div className="mt-5 overflow-hidden rounded-lg border border-border bg-surface">
-        <div className="hidden grid-cols-[minmax(17rem,2fr)_minmax(11rem,1.2fr)_minmax(8rem,1fr)_minmax(6rem,0.65fr)_auto] gap-4 border-b border-border bg-background px-5 py-3 text-xs font-semibold tracking-wide text-muted uppercase md:grid">
-          <span>User</span>
-          <span>Department</span>
-          <span>Position</span>
-          <span>Role</span>
-          <span>Action</span>
-        </div>
-        {page.items.length === 0 ? (
-          <p className="p-8 text-center text-muted">No accounts match these filters.</p>
-        ) : (
-          page.items.map((application) => (
-            <article
-              className="grid items-center gap-4 border-b border-border px-5 py-4 last:border-0 md:grid-cols-[minmax(17rem,2fr)_minmax(11rem,1.2fr)_minmax(8rem,1fr)_minmax(6rem,0.65fr)_auto]"
-              key={application.id}
-            >
-              <div>
-                <strong>{application.full_name}</strong>
-                <p className="mt-1 text-sm text-muted">{application.email}</p>
-              </div>
-              <p className="text-sm text-muted">
-                <span className="mb-1 block text-xs font-semibold text-foreground md:hidden">
-                  Department
-                </span>
-                {application.department_name ?? '—'}
-              </p>
-              <p className="text-sm text-muted">
-                <span className="mb-1 block text-xs font-semibold text-foreground md:hidden">
-                  Position
-                </span>
-                {application.role === 'FACULTY' ? (application.position_title ?? '—') : '—'}
-              </p>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="w-full text-xs font-semibold text-foreground md:hidden">Role</span>
-                <StatusBadge status={application.role} />
-              </div>
-              {application.role !== 'ADMIN' ? (
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    onPress={() => {
-                      setMessage('')
-                      setCorrectTarget(application)
-                    }}
-                  >
-                    Edit User
-                  </Button>
-                </div>
-              ) : null}
-            </article>
-          ))
-        )}
+      <div className="mt-5">
+        <DataTable aria-label="User accounts">
+          <TableHeader className="border-b border-border bg-background text-xs font-semibold tracking-wide text-muted uppercase">
+            <Column isRowHeader className="w-[34%] px-5 py-3">
+              User
+            </Column>
+            <Column className="w-[22%] px-5 py-3">Department</Column>
+            <Column className="w-[17%] px-5 py-3">Position</Column>
+            <Column className="w-[12%] px-5 py-3">Role</Column>
+            <Column className="w-[15%] px-5 py-3 text-right">Action</Column>
+          </TableHeader>
+          <TableBody items={page.items} renderEmptyState={() => 'No accounts match these filters.'}>
+            {(application) => (
+              <Row className="border-b border-border last:border-0 data-[focus-visible-within]:outline-3 data-[focus-visible-within]:outline-focus">
+                <Cell className="px-5 py-4 align-middle">
+                  <strong className="font-semibold text-primary">{application.full_name}</strong>
+                  <p className="mt-1 text-sm text-muted">{application.email}</p>
+                </Cell>
+                <Cell className="px-5 py-4 text-sm text-muted">
+                  {application.department_name ?? '—'}
+                </Cell>
+                <Cell className="px-5 py-4 text-sm text-muted">
+                  {application.role === 'FACULTY' ? (application.position_title ?? '—') : '—'}
+                </Cell>
+                <Cell className="px-5 py-4">
+                  <StatusBadge status={application.role} />
+                </Cell>
+                <Cell className="px-5 py-4 text-right">
+                  {application.role !== 'ADMIN' ? (
+                    <Button
+                      variant="secondary"
+                      onPress={() => {
+                        setMessage('')
+                        setCorrectTarget(application)
+                      }}
+                    >
+                      Edit User
+                    </Button>
+                  ) : null}
+                </Cell>
+              </Row>
+            )}
+          </TableBody>
+        </DataTable>
       </div>
       <Modal
         title="Edit User"

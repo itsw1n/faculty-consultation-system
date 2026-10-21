@@ -56,9 +56,11 @@ describe('ApplicationReviewList directory', () => {
     )
 
     expect(screen.getByText('Alex Reyes')).toBeInTheDocument()
+    expect(screen.getByRole('grid', { name: 'User accounts' })).toBeInTheDocument()
+    expect(screen.getAllByRole('columnheader')).toHaveLength(5)
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Edit User' })).toHaveLength(2)
-    expect(screen.getAllByText('Position')).toHaveLength(3)
+    expect(screen.getByRole('columnheader', { name: 'Position' })).toBeInTheDocument()
   })
 
   it('prefills the correction form with the account values and its id', () => {

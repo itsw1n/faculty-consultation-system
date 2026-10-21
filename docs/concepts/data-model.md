@@ -191,6 +191,7 @@ RLS is enabled on every user-facing table.
 - **Availability** — `create_availability(...)`, `update_open_availability(...)`, `delete_open_availability(target_slot_id)`, `list_own_availability()`, `count_own_open_availability()`.
 - **Discovery and booking** — `list_faculty_page(...)`, `list_faculty_slots(...)`, `book_consultation(target_slot_id, consultation_purpose, consultation_notes)`.
 - **Lifecycle** — `decide_consultation(...)`, `cancel_consultation(...)`, `complete_consultation_with_outcome(...)`, `search_my_consultations(...)`, `get_consultation_detail(target_id)`.
+- **Faculty dashboard** — `faculty_dashboard_summary()`, `list_my_upcoming_consultations(result_limit)`.
 - **Admin** — `list_application_page(...)`, `consultation_summary(start_date, end_date)`, `admin_consultation_count()`, `admin_dashboard_summary()`.
 - **Email outbox** — `queue_tomorrow_reminders()`, `claim_email_batch(batch_size)`, `mark_email_sent(target_id)`.
 

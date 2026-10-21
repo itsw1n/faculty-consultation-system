@@ -11,4 +11,7 @@ export type ConsultationItem = {
   mode: 'IN_PERSON' | 'ONLINE'
   location: string | null
   created_at: string
+  outcome?: string | null
+  student_department: string | null
+  faculty_department: string | null
 }

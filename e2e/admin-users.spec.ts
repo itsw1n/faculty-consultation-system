@@ -8,6 +8,7 @@ import {
   setProfile,
   uniqueEmail,
 } from './helpers/testDatabase'
+import { waitForHydration } from './helpers/hydration'
 import { signInAs } from './helpers/testSession'
 
 test.describe('Manage Users directory', () => {
@@ -58,6 +59,7 @@ test.describe('Manage Users directory', () => {
 
     const row = page.getByRole('row').filter({ hasText: studentEmail })
     await expect(row).toBeVisible()
+    await waitForHydration(page, row.getByRole('button', { name: 'Edit User' }))
     await row.getByRole('button', { name: 'Edit User' }).click()
 
     const dialog = page.getByRole('dialog')

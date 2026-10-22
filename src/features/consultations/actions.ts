@@ -13,6 +13,7 @@ const refresh = () => {
   revalidatePath('/faculty')
   revalidatePath('/faculty/requests')
   revalidatePath('/faculty/consultations')
+  revalidatePath('/student')
   revalidatePath('/student/consultations')
   revalidatePath('/faculty/consultations/[id]', 'page')
   revalidatePath('/student/consultations/[id]', 'page')

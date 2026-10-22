@@ -134,10 +134,10 @@ function NextConsultation({ summary }: { summary: StudentDashboardSummary }) {
           <div className="flex items-start gap-2">
             <dt className="flex items-center gap-2 font-semibold text-primary">
               <UserRound className="size-4 shrink-0 text-muted" aria-hidden="true" />
-              Purpose
+              Category
             </dt>
             <dd className="ml-auto text-right text-muted">
-              {summary.next_purpose ? categoryLabel(summary.next_purpose) : 'Not set'}
+              {summary.next_category ? categoryLabel(summary.next_category) : 'Not set'}
             </dd>
           </div>
           <div className="flex items-start gap-2">
@@ -205,9 +205,9 @@ function PendingRequests({ items, count }: { items: ConsultationItem[]; count: n
                 </time>
               </p>
               <div className="mt-2 flex items-center justify-between gap-3">
-                <p className="text-sm text-primary">{categoryLabel(item.purpose)}</p>
+                <p className="text-sm text-primary">{categoryLabel(item.category)}</p>
                 <Link
-                  aria-label={`View details for ${categoryLabel(item.purpose)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
+                  aria-label={`View details for ${categoryLabel(item.category)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
                   className="text-sm font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus"
                   href={`/student/consultations/${item.id}`}
                 >
@@ -273,14 +273,14 @@ function RecentConsultations({ items }: { items: ConsultationItem[] }) {
                   <p className="font-semibold text-primary">{item.faculty_name}</p>
                   <p className="text-sm text-muted">
                     <time dateTime={item.slot_date}>{formatDate(item.slot_date)}</time> ·{' '}
-                    {categoryLabel(item.purpose)}
+                    {categoryLabel(item.category)}
                   </p>
                 </div>
                 <StatusBadge status={item.consultation_status} />
               </div>
               <div className="mt-1 text-right">
                 <Link
-                  aria-label={`View details for ${categoryLabel(item.purpose)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
+                  aria-label={`View details for ${categoryLabel(item.category)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
                   className="text-sm font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus"
                   href={`/student/consultations/${item.id}`}
                 >

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { databaseTestsEnabled } from './helpers/environment'
 import {
   bookConsultationAs,
@@ -12,6 +12,7 @@ import {
   tomorrowIso,
   uniqueEmail,
 } from './helpers/testDatabase'
+import { waitForHydration } from './helpers/hydration'
 import { signInAs } from './helpers/testSession'
 
 const password = 'Password123!'
@@ -25,10 +26,20 @@ async function setupFaculty(prefix: string) {
   return { faculty, email }
 }
 
-async function openAvailability(page: import('@playwright/test').Page, email: string) {
+async function openAvailability(page: Page, email: string) {
   await signInAs(page, email, password)
   await page.goto('/faculty/availability')
   await page.waitForTimeout(300)
+}
+
+async function openRowDialog(page: Page, trigger: Locator): Promise<Locator> {
+  const dialog = page.getByRole('dialog')
+  await waitForHydration(page, trigger)
+  await expect(async () => {
+    if (!(await dialog.isVisible())) await trigger.click()
+    await expect(dialog).toBeVisible({ timeout: 2_000 })
+  }).toPass({ timeout: 10_000 })
+  return dialog
 }
 
 test.describe('Faculty availability management', () => {
@@ -79,9 +90,7 @@ test.describe('Faculty availability management', () => {
 
     await openAvailability(page, email)
     const row = page.getByRole('row').filter({ hasText: 'Room 101' })
-    await row.getByRole('button', { name: 'Edit' }).click()
-
-    const dialog = page.getByRole('dialog')
+    const dialog = await openRowDialog(page, row.getByRole('button', { name: 'Edit' }))
     await dialog.getByLabel('End').fill('11:00')
     await dialog.getByLabel('Location').fill('Room 205')
     await dialog.getByRole('button', { name: 'Save changes' }).click()
@@ -97,8 +106,15 @@ test.describe('Faculty availability management', () => {
 
     await openAvailability(page, email)
     const row = page.getByRole('row').filter({ hasText: 'Room 101' })
-    await row.getByRole('button', { name: 'Remove' }).click()
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Remove' }).click()
+    const removeButton = row.getByRole('button', { name: 'Remove' })
+    await waitForHydration(page, removeButton)
+
+    const dialog = page.getByRole('alertdialog')
+    await expect(async () => {
+      if (!(await dialog.isVisible())) await removeButton.click()
+      await expect(dialog).toBeVisible({ timeout: 2_000 })
+    }).toPass({ timeout: 10_000 })
+    await dialog.getByRole('button', { name: 'Remove' }).click()
 
     await expect(row).toHaveCount(0)
     await expect(page.getByText('No upcoming availability.')).toBeVisible()
@@ -120,7 +136,7 @@ test.describe('Faculty availability management', () => {
     await expect(row.getByRole('button', { name: 'Edit' })).toHaveCount(0)
     await expect(row.getByRole('button', { name: 'Remove' })).toHaveCount(0)
 
-    await row.getByRole('button', { name: 'View' }).click()
+    await openRowDialog(page, row.getByRole('button', { name: 'View' }))
     await expect(page.getByRole('dialog').getByText('Availability details')).toBeVisible()
   })
 
@@ -140,7 +156,7 @@ test.describe('Faculty availability management', () => {
     await expect(row.getByRole('button', { name: 'Edit' })).toHaveCount(0)
     await expect(row.getByRole('button', { name: 'Remove' })).toHaveCount(0)
 
-    await row.getByRole('button', { name: 'View' }).click()
+    await openRowDialog(page, row.getByRole('button', { name: 'View' }))
     await expect(page.getByRole('dialog').getByText('Availability details')).toBeVisible()
   })
 })

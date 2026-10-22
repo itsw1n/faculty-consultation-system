@@ -46,7 +46,11 @@ export async function setProfile(
 ): Promise<void> {
   const { error } = await getServiceClient()
     .from('profiles')
-    .update({ role: profile.role, account_status: profile.account_status })
+    .update({
+      role: profile.role,
+      account_status: profile.account_status,
+      position_title: profile.role === 'FACULTY' ? 'Instructor I' : null,
+    })
     .eq('id', userId)
   if (error) throw error
 }
@@ -57,15 +61,11 @@ export async function ensureFacultyProfile(
   positionTitle = 'Instructor I'
 ): Promise<void> {
   const service = getServiceClient()
-  const { error: profileError } = await service
+  const { error } = await service
     .from('profiles')
-    .update({ department_id: departmentId })
+    .update({ department_id: departmentId, position_title: positionTitle })
     .eq('id', userId)
-  if (profileError) throw profileError
-  const { error: facultyError } = await service
-    .from('faculty_profiles')
-    .upsert({ user_id: userId, position_title: positionTitle }, { onConflict: 'user_id' })
-  if (facultyError) throw facultyError
+  if (error) throw error
 }
 
 export async function getProfileByEmail(email: string): Promise<{
@@ -86,9 +86,9 @@ export async function getFacultyProfile(
   userId: string
 ): Promise<{ position_title: string | null } | null> {
   const { data, error } = await getServiceClient()
-    .from('faculty_profiles')
+    .from('profiles')
     .select('position_title')
-    .eq('user_id', userId)
+    .eq('id', userId)
     .maybeSingle()
   if (error) throw error
   return data
@@ -160,13 +160,13 @@ export async function bookConsultationAs(
   email: string,
   password: string,
   slotId: string,
-  purpose = 'ACADEMIC',
+  category = 'ACADEMIC',
   notes: string | null = null
 ): Promise<string> {
   const client = await authenticatedClient(email, password)
   const { data, error } = await client.rpc('book_consultation', {
     target_slot_id: slotId,
-    consultation_purpose: purpose,
+    consultation_category: category,
     consultation_notes: notes,
   })
   if (error) throw error
@@ -334,12 +334,6 @@ function assertDelete(error: { message: string } | null, subject: string): void 
 /** Remove records owned by the E2E suite while preserving seeded demo and developer data. */
 export async function cleanupE2EData(): Promise<void> {
   const service = getServiceClient()
-  const { data: departments, error: departmentQueryError } = await service
-    .from('departments')
-    .select('id')
-    .ilike('name', 'E2E Department %')
-  if (departmentQueryError) throw departmentQueryError
-
   const { data: profiles, error: profileError } = await service
     .from('profiles')
     .select('id')
@@ -405,17 +399,6 @@ export async function cleanupE2EData(): Promise<void> {
     'legacy account notifications'
   )
 
-  assertDelete(
-    (await service.from('faculty_invites').delete().ilike('email', 'e2e-%@acdeducation.com')).error,
-    'faculty invitations'
-  )
-  const departmentIds = departments.map((department) => department.id)
-  if (departmentIds.length > 0) {
-    assertDelete(
-      (await service.from('faculty_invites').delete().in('department_id', departmentIds)).error,
-      'faculty invitations for test departments'
-    )
-  }
   assertDelete(
     (await service.from('departments').delete().ilike('name', 'E2E Department %')).error,
     'departments'

@@ -43,5 +43,6 @@ docs/superpowers/
 .supabase/
 supabase/.branches/
 supabase/.temp/
+supabase/snippets/
 supabase/.env
 supabase/.env.local

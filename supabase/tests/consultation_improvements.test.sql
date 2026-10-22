@@ -8,7 +8,7 @@ values
 ('33000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','other-improvements@school.edu','',now(),'{}','{}',now(),now()),
 ('44000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000000','authenticated','authenticated','admin-improvements@school.edu','',now(),'{}','{}',now(),now());
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id in ('11000000-0000-0000-0000-000000000001','33000000-0000-0000-0000-000000000003');
-update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='22000000-0000-0000-0000-000000000002';
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='22000000-0000-0000-0000-000000000002';
 update public.profiles set role='ADMIN',account_status='APPROVED' where id='44000000-0000-0000-0000-000000000004';
 insert into public.availability_slots(id,faculty_id,date,start_time,end_time,mode,location)
 values ('55000000-0000-0000-0000-000000000005','22000000-0000-0000-0000-000000000002',(now() at time zone 'Asia/Manila')::date + 1,'09:00','10:00','IN_PERSON','Room 1');

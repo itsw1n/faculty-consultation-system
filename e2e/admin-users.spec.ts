@@ -59,11 +59,16 @@ test.describe('Manage Users directory', () => {
 
     const row = page.getByRole('row').filter({ hasText: studentEmail })
     await expect(row).toBeVisible()
-    await waitForHydration(page, row.getByRole('button', { name: 'Edit User' }))
-    await row.getByRole('button', { name: 'Edit User' }).click()
+    const editButton = row.getByRole('button', { name: 'Edit User' })
+    await waitForHydration(page, editButton)
 
     const dialog = page.getByRole('dialog')
-    await dialog.getByRole('button', { name: 'Role' }).click()
+    const roleButton = dialog.getByRole('button', { name: 'Role' })
+    await expect(async () => {
+      if (!(await dialog.isVisible())) await editButton.click()
+      await expect(roleButton).toBeVisible({ timeout: 2_000 })
+    }).toPass({ timeout: 10_000 })
+    await roleButton.click()
     await page.getByRole('option', { name: 'Faculty' }).click()
     await dialog.getByRole('button', { name: 'Department' }).click()
     await page.getByRole('option', { name: department.name }).click()

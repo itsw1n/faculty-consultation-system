@@ -45,7 +45,7 @@ export function ConsultationDetailView({
           </dd>
         </div>
         <div>
-          <dt className="font-semibold">Purpose</dt>
+          <dt className="font-semibold">Category</dt>
           <dd>{categoryLabel(detail.category)}</dd>
         </div>
         <div>

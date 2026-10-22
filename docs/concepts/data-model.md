@@ -32,27 +32,15 @@ Seed departments: IT, HM, BSBA, BSED, BSSW.
 id              uuid PK -> auth.users.id
 email           text unique
 full_name       text, 1–160 characters
-avatar_url      text nullable
 role            user_role nullable
-requested_role  user_role nullable, never ADMIN
+position_title  text nullable, 1–120 characters for faculty
 department_id   uuid -> departments.id
 account_status  account_status nullable
 created_at      timestamptz
 updated_at      timestamptz
 ```
 
-Constraints: `APPROVED` requires a role; a non-approved profile cannot have a role; `requested_role` cannot be `ADMIN`.
-
-### faculty_profiles
-
-```text
-id                        uuid PK
-user_id                   uuid unique -> profiles.id
-position_title            text, 1–120 characters
-consultation_mode_default consultation_mode nullable
-created_at                timestamptz
-updated_at                timestamptz
-```
+Constraints: `APPROVED` requires a role; a non-approved profile cannot have a role; faculty require `position_title`, while non-faculty must have `position_title = null`.
 
 ### availability_slots
 
@@ -79,14 +67,13 @@ id                   uuid PK
 student_id           uuid -> profiles.id
 faculty_id           uuid -> profiles.id
 availability_slot_id uuid -> availability_slots.id
-purpose              text, 1–200 characters; stores the category code
+category             text, required; GRADE | CAPSTONE | ACADEMIC | PERSONAL | OTHER
 notes                text nullable, up to 2,000 characters
 status               consultation_status, default PENDING
 created_at           timestamptz
 updated_at           timestamptz
 completed_at         timestamptz nullable
 cancelled_at         timestamptz nullable
-category             text, required; GRADE | CAPSTONE | ACADEMIC | PERSONAL | OTHER
 outcome              text nullable, up to 2,000 characters
 ```
 
@@ -110,24 +97,10 @@ created_at    timestamptz
 
 ```text
 domain    text PK, 1–160 characters
-note      text, default ''
 added_at  timestamptz
 ```
 
 Migrations set `acdeducation.com`; local seed data adds `*` and is never applied to hosted environments.
-
-### faculty_invites
-
-Legacy table retained for migration history. New accounts do not consume invitations; the admin UI promotes registered students instead.
-
-```text
-email           text PK, 3–320 characters
-department_id   uuid -> departments.id
-position_title  text, 1–120 characters
-invited_by      uuid -> profiles.id nullable
-consumed_at     timestamptz nullable
-created_at      timestamptz
-```
 
 ### email_outbox
 
@@ -147,12 +120,10 @@ created_at       timestamptz
 
 ```text
 departments 1 ---- * profiles
-profiles    1 ---- 0..1 faculty_profiles
 profiles    1 ---- * availability_slots      (faculty)
 profiles    1 ---- * consultations           (student)
 profiles    1 ---- * consultations           (faculty)
 profiles    1 ---- * notifications
-profiles    1 ---- * faculty_invites         (invited_by)
 availability_slots 1 ---- * consultations    (history)
 consultations 1 ---- * email_outbox
 ```
@@ -161,7 +132,7 @@ consultations 1 ---- * email_outbox
 
 ```text
 departments(code)
-profiles(account_status, requested_role, department_id, created_at DESC)
+profiles(account_status, role, department_id, created_at DESC)
 availability_slots(faculty_id, date, status, start_time)
 consultations(student_id, created_at DESC)
 consultations(faculty_id, status, created_at DESC)
@@ -177,11 +148,10 @@ RLS is enabled on every user-facing table.
 
 - `departments`: authenticated read; admin write.
 - `profiles`: users read their own row; admins manage all.
-- `faculty_profiles`: approved users read; admins manage.
 - `availability_slots`: direct select, insert, update, and delete are revoked; access is through RPCs (original policies remain as defense in depth).
 - `consultations`: participants and admins read; writes go through RPCs.
 - `notifications`: recipients read and update their own `read_at`; admins read.
-- `approved_email_domains`, `faculty_invites`, `email_outbox`: no direct table grants to `anon` or `authenticated`. The `is_approved_email(text)` RPC is callable by `anon` for sign-up validation.
+- `approved_email_domains`, `email_outbox`: no direct table grants to `anon` or `authenticated`. The `is_approved_email(text)` RPC is callable by `anon` for sign-up validation.
 - Email queue functions are granted only to `service_role`.
 - `claim_first_admin` is granted only to `service_role`.
 
@@ -189,7 +159,7 @@ RLS is enabled on every user-facing table.
 
 - **Identity and authorization** — `handle_new_auth_user()`, `is_admin()`, `is_approved_email(text)`, `claim_first_admin(target_user_id, expected_email)`, `correct_user_account(...)`, `promote_registered_faculty(...)`.
 - **Availability** — `create_availability(...)`, `update_open_availability(...)`, `delete_open_availability(target_slot_id)`, `list_own_availability()`, `count_own_open_availability()`.
-- **Discovery and booking** — `list_faculty_page(...)`, `list_faculty_slots(...)`, `book_consultation(target_slot_id, consultation_purpose, consultation_notes)`.
+- **Discovery and booking** — `list_faculty_page(...)`, `list_faculty_slots(...)`, `book_consultation(target_slot_id, consultation_category, consultation_notes)`.
 - **Lifecycle** — `decide_consultation(...)`, `cancel_consultation(...)`, `complete_consultation_with_outcome(...)`, `search_my_consultations(...)`, `get_consultation_detail(target_id)`.
 - **Faculty dashboard** — `faculty_dashboard_summary()`, `list_my_upcoming_consultations(result_limit)`.
 - **Student dashboard** — `student_dashboard_summary()`.
@@ -203,6 +173,6 @@ RLS is enabled on every user-facing table.
 - `claim_first_admin` uses an advisory transaction lock.
 - Email claims use `FOR UPDATE SKIP LOCKED` and a 10-minute lease.
 
-## Legacy objects
+## Removed legacy objects
 
-Migration history is append-only, so these objects remain but must not be used by new code: the `examples` scaffold table; `faculty_invites` and `invite_faculty` (RPC revoked); `list_faculty` and `list_open_faculty_slots`; `review_applications`; `complete_consultation` (revoked; use `complete_consultation_with_outcome`); and `submit_application` / `review_application`.
+The cleanup migration drops the `examples` scaffold table, `faculty_invites`, and `faculty_profiles`. It also removes the redundant `consultations.purpose`, `profiles.avatar_url`, `profiles.requested_role`, and `approved_email_domains.note` columns, along with superseded RPCs such as `invite_faculty`, `list_faculty`, `submit_application`, and `review_application`.

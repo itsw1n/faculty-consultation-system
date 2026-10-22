@@ -51,7 +51,7 @@ There is no faculty application, invitation, or pending faculty state in the cur
 - cannot target the caller and cannot assign `ADMIN`;
 - requires an existing department and an already-`APPROVED` target; faculty promotion requires a verified email;
 - prevents demoting faculty with open or future availability or active consultations;
-- creates, updates, or removes `faculty_profiles` according to the new role.
+- sets or clears `profiles.position_title` according to the new role.
 
 ## Statuses
 
@@ -62,7 +62,7 @@ There is no faculty application, invitation, or pending faculty state in the cur
 
 ## Consultation categories
 
-`consultations.purpose` stores the category code and `consultations.category` mirrors it: `GRADE`, `CAPSTONE`, `ACADEMIC`, `PERSONAL`, `OTHER`. `notes` holds the optional description. Category and notes descriptions are limited to 2,000 characters.
+`consultations.category` stores `GRADE`, `CAPSTONE`, `ACADEMIC`, `PERSONAL`, or `OTHER`. `notes` holds the optional description. Category and notes descriptions are limited to 2,000 characters.
 
 ## Booking transitions
 

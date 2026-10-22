@@ -10,7 +10,7 @@ export type AvailabilityItem = {
   location: string | null
   meeting_link: string | null
   student_name: string | null
-  purpose: string | null
+  category: string | null
 }
 
 export async function listOwnAvailability() {

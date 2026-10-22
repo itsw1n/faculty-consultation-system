@@ -11,8 +11,8 @@ declare
   v_faculty_id uuid;
   v_student_id uuid;
 begin
-  insert into public.approved_email_domains (domain, note)
-  values ('*', 'LOCAL DEV ONLY - allow any email domain')
+  insert into public.approved_email_domains (domain)
+  values ('*')
   on conflict (domain) do nothing;
 
   -- Reuse an existing local account with the same email when one is already
@@ -206,26 +206,35 @@ begin
     identity_data = excluded.identity_data,
     updated_at = excluded.updated_at;
 
-  insert into public.profiles (id, email, full_name, role, requested_role, department_id, account_status)
+  insert into public.profiles (
+    id,
+    email,
+    full_name,
+    role,
+    department_id,
+    account_status,
+    position_title
+  )
   select
     user_account.id,
     demo.email,
     demo.full_name,
     demo.role::public.user_role,
-    null,
     department.id,
-    'APPROVED'::public.account_status
+    'APPROVED'::public.account_status,
+    demo.position_title
   from (
     values
       (
         'admin.demo@acdeducation.com',
         'Demo Admin',
         'ADMIN',
-        'IT'
+        'IT',
+        null
       ),
-      ('faculty.demo@acdeducation.com', 'Demo Faculty', 'FACULTY', 'IT'),
-      ('student.demo@acdeducation.com', 'Demo Student', 'STUDENT', 'IT')
-  ) as demo(email, full_name, role, department_code)
+      ('faculty.demo@acdeducation.com', 'Demo Faculty', 'FACULTY', 'IT', 'Instructor I'),
+      ('student.demo@acdeducation.com', 'Demo Student', 'STUDENT', 'IT', null)
+  ) as demo(email, full_name, role, department_code, position_title)
   join auth.users user_account on lower(user_account.email) = lower(demo.email)
   join public.departments department on department.code = demo.department_code
   on conflict (id) do update
@@ -233,16 +242,9 @@ begin
     email = excluded.email,
     full_name = excluded.full_name,
     role = excluded.role,
-    requested_role = null,
     department_id = excluded.department_id,
-    account_status = excluded.account_status;
-
-  insert into public.faculty_profiles (user_id, position_title, consultation_mode_default)
-  values (v_faculty_id, 'Instructor I', 'IN_PERSON')
-  on conflict (user_id) do update
-  set
-    position_title = excluded.position_title,
-    consultation_mode_default = excluded.consultation_mode_default;
+    account_status = excluded.account_status,
+    position_title = excluded.position_title;
 
   insert into public.availability_slots (
     id,
@@ -350,7 +352,6 @@ begin
     student_id,
     faculty_id,
     availability_slot_id,
-    purpose,
     category,
     notes,
     status,
@@ -367,7 +368,6 @@ begin
       v_faculty_id,
       'b0000000-0000-4000-8000-000000000001',
       'ACADEMIC',
-      'ACADEMIC',
       'Requested help with capstone literature review.',
       'COMPLETED',
       now() - interval '21 days',
@@ -381,7 +381,6 @@ begin
       v_student_id,
       v_faculty_id,
       'b0000000-0000-4000-8000-000000000002',
-      'GRADE',
       'GRADE',
       'Question about a final grade computation.',
       'CANCELLED',
@@ -397,7 +396,6 @@ begin
       v_faculty_id,
       'b0000000-0000-4000-8000-000000000003',
       'CAPSTONE',
-      'CAPSTONE',
       'Wanted feedback on a project proposal.',
       'REJECTED',
       now() - interval '5 days',
@@ -412,7 +410,6 @@ begin
       v_faculty_id,
       'b0000000-0000-4000-8000-000000000004',
       'GRADE',
-      'GRADE',
       'Please review my midterm score.',
       'PENDING',
       now() - interval '2 days',
@@ -426,7 +423,6 @@ begin
       v_student_id,
       v_faculty_id,
       'b0000000-0000-4000-8000-000000000005',
-      'ACADEMIC',
       'ACADEMIC',
       'Discuss practicum requirements.',
       'APPROVED',

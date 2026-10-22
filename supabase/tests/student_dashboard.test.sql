@@ -13,8 +13,8 @@ values
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000001';
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000002';
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000005';
-update public.profiles set role=null,requested_role='STUDENT',account_status='PENDING',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000006';
-update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000003';
+update public.profiles set role=null,account_status='PENDING',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000006';
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='a1000000-0000-0000-0000-000000000003';
 update public.profiles set role='ADMIN',account_status='APPROVED' where id='a1000000-0000-0000-0000-000000000004';
 
 insert into public.availability_slots (id,faculty_id,date,start_time,end_time,status,mode,location)
@@ -27,15 +27,15 @@ values
 ('b1000000-0000-0000-0000-000000000006','a1000000-0000-0000-0000-000000000003',(now() at time zone 'Asia/Manila')::date,'00:00:00','00:00:01','BOOKED','IN_PERSON','Ended room'),
 ('b1000000-0000-0000-0000-000000000007','a1000000-0000-0000-0000-000000000003',(now() at time zone 'Asia/Manila')::date + 1,'12:00','13:00','BOOKED','IN_PERSON','Tomorrow afternoon room');
 
-insert into public.consultations (id,student_id,faculty_id,availability_slot_id,purpose,category,notes,status,completed_at)
+insert into public.consultations (id,student_id,faculty_id,availability_slot_id,category,notes,status,completed_at)
 values
-('c1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000001','ACADEMIC','ACADEMIC',null,'APPROVED',null),
-('c1000000-0000-0000-0000-000000000002','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000002','GRADE','GRADE',null,'APPROVED',null),
-('c1000000-0000-0000-0000-000000000003','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000003','CAPSTONE','CAPSTONE',null,'PENDING',null),
-('c1000000-0000-0000-0000-000000000004','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000004','PERSONAL','PERSONAL',null,'COMPLETED',now()),
-('c1000000-0000-0000-0000-000000000005','a1000000-0000-0000-0000-000000000002','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000005','OTHER','OTHER',null,'APPROVED',null),
-('c1000000-0000-0000-0000-000000000006','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000006','PERSONAL','PERSONAL',null,'APPROVED',null),
-('c1000000-0000-0000-0000-000000000007','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000007','OTHER','OTHER',null,'APPROVED',null);
+('c1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000001','ACADEMIC',null,'APPROVED',null),
+('c1000000-0000-0000-0000-000000000002','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000002','GRADE',null,'APPROVED',null),
+('c1000000-0000-0000-0000-000000000003','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000003','CAPSTONE',null,'PENDING',null),
+('c1000000-0000-0000-0000-000000000004','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000004','PERSONAL',null,'COMPLETED',now()),
+('c1000000-0000-0000-0000-000000000005','a1000000-0000-0000-0000-000000000002','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000005','OTHER',null,'APPROVED',null),
+('c1000000-0000-0000-0000-000000000006','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000006','PERSONAL',null,'APPROVED',null),
+('c1000000-0000-0000-0000-000000000007','a1000000-0000-0000-0000-000000000001','a1000000-0000-0000-0000-000000000003','b1000000-0000-0000-0000-000000000007','OTHER',null,'APPROVED',null);
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"a1000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
@@ -69,7 +69,7 @@ select results_eq(
   'counts exclude past approved consultations and other students'
 );
 select results_eq(
-  $$select next_faculty_name, next_faculty_department, next_purpose, next_slot_date, next_start_time, next_end_time, next_mode, next_location from public.student_dashboard_summary()$$,
+  $$select next_faculty_name, next_faculty_department, next_category, next_slot_date, next_start_time, next_end_time, next_mode, next_location from public.student_dashboard_summary()$$,
   $$values ('Dashboard Faculty','Information Technology','GRADE',(now() at time zone 'Asia/Manila')::date + 1,'09:00'::time,'10:00'::time,'IN_PERSON'::public.consultation_mode,'Tomorrow room')$$,
   'next appointment is the earliest confirmed future slot'
 );

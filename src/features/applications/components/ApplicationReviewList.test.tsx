@@ -19,7 +19,6 @@ const item = (overrides: Partial<ApplicationItem> = {}): ApplicationItem => ({
   id: '11111111-1111-4111-8111-111111111111',
   full_name: 'Alex Reyes',
   email: 'alex@acdeducation.com',
-  requested_role: null,
   account_status: 'APPROVED',
   department_name: 'IT',
   created_at: '2026-10-01T00:00:00Z',

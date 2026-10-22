@@ -13,7 +13,7 @@ const baseItem: ConsultationItem = {
   id: 'consultation-1',
   student_name: 'Erwin Curato',
   faculty_name: 'Made Win',
-  purpose: 'Academic concern',
+  category: 'Academic concern',
   notes: 'Discuss practicum requirements.',
   consultation_status: 'APPROVED',
   slot_date: '2026-10-28',

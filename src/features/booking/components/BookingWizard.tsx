@@ -90,7 +90,7 @@ export function BookingWizard({
   const [selectedDate, setSelectedDate] = useState(initialDate)
   const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => parseDate(initialDate))
   const [selectedId, setSelectedId] = useState('')
-  const [purpose, setPurpose] = useState<ConsultationCategory | ''>('')
+  const [category, setCategory] = useState<ConsultationCategory | ''>('')
   const [notes, setNotes] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isMonthLoading, setIsMonthLoading] = useState(false)
@@ -427,11 +427,11 @@ export function BookingWizard({
                 </div>
               </div>
               <Select
-                label="Purpose"
+                label="Category"
                 options={Object.entries(categories).map(([value, label]) => ({ id: value, label }))}
-                value={purpose}
+                value={category}
                 placeholder="Select a concern"
-                onChange={(value) => setPurpose(value as ConsultationCategory | '')}
+                onChange={(value) => setCategory(value as ConsultationCategory | '')}
                 isRequired
                 className="mt-5"
               />
@@ -463,7 +463,7 @@ export function BookingWizard({
             </Button>
             <Button
               className="flex-1 sm:flex-none"
-              isDisabled={!purpose.trim() || !selectedOpen}
+              isDisabled={!category.trim() || !selectedOpen}
               onPress={() => setStep('review')}
               aria-label="Review request"
             >
@@ -519,8 +519,8 @@ export function BookingWizard({
               </div>
               <dl className="mt-5 divide-y divide-border border-y border-border text-sm">
                 <div className="grid gap-1 py-3 sm:grid-cols-[6rem_1fr]">
-                  <dt className="font-semibold">Purpose</dt>
-                  <dd>{categoryLabel(purpose)}</dd>
+                  <dt className="font-semibold">Category</dt>
+                  <dd>{categoryLabel(category)}</dd>
                 </div>
                 <div className="grid gap-1 py-3 sm:grid-cols-[6rem_1fr]">
                   <dt className="font-semibold">Description</dt>
@@ -540,7 +540,7 @@ export function BookingWizard({
 
           <form action={formAction} className="mt-5">
             <input type="hidden" name="slotId" value={selected.id} />
-            <input type="hidden" name="purpose" value={purpose} />
+            <input type="hidden" name="category" value={category} />
             <input type="hidden" name="notes" value={notes} />
             {state.error ? (
               <p

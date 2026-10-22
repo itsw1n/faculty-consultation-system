@@ -7,6 +7,7 @@ Core v1 implementation complete; awaiting environment-specific auth email config
 ## Completed
 
 - Supabase schema, RLS, seed data, atomic workflow RPCs, and database tests.
+- Consolidated schema: faculty profile fields live in `profiles`; legacy tables and redundant columns are removed.
 - Email + password sign-in with mandatory verification, self-service sign-up, password recovery, automatic student approval, verified-student faculty promotion, server-only first-admin claim, and admin account correction.
 - Student faculty directory, availability calendar, booking, and consultation management.
 - Faculty availability management and request decisions.

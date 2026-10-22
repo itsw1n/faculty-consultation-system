@@ -3,7 +3,7 @@ import { bookingSchema } from './bookingSchema'
 
 const valid = {
   slotId: '11111111-1111-4111-8111-111111111111',
-  purpose: 'PERSONAL',
+  category: 'PERSONAL',
 } as const
 
 describe('bookingSchema', () => {
@@ -11,8 +11,8 @@ describe('bookingSchema', () => {
     expect(bookingSchema.safeParse({ ...valid, notes: 'Need help' }).success).toBe(true)
   })
 
-  test('rejects an unknown purpose', () => {
-    expect(bookingSchema.safeParse({ ...valid, purpose: 'CHAT' }).success).toBe(false)
+  test('rejects an unknown category', () => {
+    expect(bookingSchema.safeParse({ ...valid, category: 'CHAT' }).success).toBe(false)
   })
 
   test('rejects notes over the limit', () => {

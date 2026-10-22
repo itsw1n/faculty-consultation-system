@@ -1,16 +1,14 @@
 begin;
-select plan(18);
+select plan(16);
 
 select has_table('public', 'departments', 'departments table exists');
 select has_table('public', 'profiles', 'profiles table exists');
-select has_table('public', 'faculty_profiles', 'faculty_profiles table exists');
 select has_table('public', 'availability_slots', 'availability slots table exists');
 select has_table('public', 'consultations', 'consultations table exists');
 select has_table('public', 'notifications', 'notifications table exists');
 
 select ok((select relrowsecurity from pg_class where oid = 'public.departments'::regclass), 'departments has RLS enabled');
 select ok((select relrowsecurity from pg_class where oid = 'public.profiles'::regclass), 'profiles has RLS enabled');
-select ok((select relrowsecurity from pg_class where oid = 'public.faculty_profiles'::regclass), 'faculty profiles has RLS enabled');
 select ok((select relrowsecurity from pg_class where oid = 'public.availability_slots'::regclass), 'availability slots has RLS enabled');
 select ok((select relrowsecurity from pg_class where oid = 'public.consultations'::regclass), 'consultations has RLS enabled');
 select ok((select relrowsecurity from pg_class where oid = 'public.notifications'::regclass), 'notifications has RLS enabled');

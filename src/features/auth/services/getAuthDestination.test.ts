@@ -9,7 +9,6 @@ const profile = (overrides: Partial<AuthProfile> = {}): AuthProfile => ({
   fullName: 'User',
   departmentName: null,
   positionTitle: null,
-  requestedRole: null,
   role: null,
   ...overrides,
 })

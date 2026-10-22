@@ -63,25 +63,60 @@ test.describe('Student booking journey', () => {
   test.skip(!databaseTestsEnabled(), 'needs local Supabase with a service-role key')
   test.setTimeout(180_000)
 
-  test('dashboard counts match the database', async ({ page }) => {
+  test('dashboard shows the next consultation, counts, and deduplicated recent rows', async ({
+    page,
+  }) => {
     const departments = await getDepartments()
-    const { faculty } = await setupFaculty('e2e-dash', departments[0]!.id)
+    const { faculty, name: facultyName } = await setupFaculty('e2e-dash', departments[0]!.id)
     const { email } = await setupStudent('e2e-dash')
+    const pastDate = new Date()
+    pastDate.setDate(pastDate.getDate() - 2)
+    const pastSlot = await ensureSlot(faculty.id, {
+      date: pastDate.toISOString().slice(0, 10),
+      start_time: '09:00',
+      end_time: '10:00',
+    })
     const pendingSlot = await ensureSlot(faculty.id)
     const approvedSlot = await ensureSlot(faculty.id, { start_time: '11:00', end_time: '12:00' })
-    await bookConsultationAs(email, password, pendingSlot.id)
-    const approvedId = await bookConsultationAs(email, password, approvedSlot.id)
+    const pastId = await bookConsultationAs(email, password, pastSlot.id, 'ACADEMIC')
+    await decideConsultationAs(faculty.email, password, pastId, true)
+    await bookConsultationAs(email, password, pendingSlot.id, 'CAPSTONE')
+    const approvedId = await bookConsultationAs(email, password, approvedSlot.id, 'GRADE')
     await decideConsultationAs(faculty.email, password, approvedId, true)
 
     await signInAs(page, email, password)
     await page.goto('/student')
-    const valueFor = (label: string) =>
-      page.locator('dt', { hasText: label }).locator('xpath=..').locator('dd')
-    const upcomingCount = valueFor('Upcoming')
-    const pendingCount = valueFor('Pending')
-    await expect(upcomingCount).toHaveText('1')
-    await expect(pendingCount).toHaveText('1')
+
+    await expect(page.getByText('Next consultation', { exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name: facultyName })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Pending requests/ })).toBeVisible()
+    const pending = page.locator('section[aria-labelledby="pending-heading"]')
+    await expect(pending.getByText('Capstone concern')).toBeVisible()
     await expect(page.getByText('Recent consultations')).toBeVisible()
+
+    const stats = page.getByRole('heading', { name: 'At a glance' }).locator('xpath=..')
+    await expect(stats.getByText('Upcoming').locator('xpath=..').locator('dd')).toHaveText('1')
+    await expect(stats.getByText('Pending').locator('xpath=..').locator('dd')).toHaveText('1')
+
+    const recent = page.locator('section[aria-labelledby="recent-heading"]')
+    await expect(recent.getByRole('listitem')).toHaveCount(1)
+    await expect(recent.getByText('Academic concern')).toBeVisible()
+    await expect(recent.getByText('Grade concern')).toHaveCount(0)
+    await expect(recent.getByText('Capstone concern')).toHaveCount(0)
+  })
+
+  test('empty dashboard points a new student to the faculty directory', async ({ page }) => {
+    const { email } = await setupStudent('e2e-dash-empty')
+    await signInAs(page, email, password)
+    await page.goto('/student')
+
+    await expect(page.getByRole('heading', { name: 'No consultations yet' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Find a faculty member' })).toHaveAttribute(
+      'href',
+      '/student/book'
+    )
+    await expect(page.getByRole('link', { name: 'My consultations', exact: true })).toBeVisible()
+    await expect(page.getByText('Next consultation', { exact: true })).toHaveCount(0)
   })
 
   test('directory search and department filter narrow the list', async ({ page }) => {

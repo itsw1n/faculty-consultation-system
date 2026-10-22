@@ -4,19 +4,25 @@ import { PageHeading } from '@/components/common/PageHeading'
 import { AppShell } from '@/components/layout/AppShell'
 import { getAuthenticatedProfile } from '@/features/auth/repositories/authRepository'
 import { markAllNotificationsRead } from '@/features/notifications/actions'
-import { getNotificationPage } from '@/features/notifications/repositories/notificationRepository'
+import {
+  countUnreadNotifications,
+  getNotificationPage,
+} from '@/features/notifications/repositories/notificationRepository'
 import { NotificationList } from '@/features/notifications/components/NotificationList'
 export default async function NotificationsPage() {
   const profile = await getAuthenticatedProfile()
   if (!profile || profile.accountStatus !== 'APPROVED' || !profile.role) redirect('/auth/continue')
-  const page = await getNotificationPage()
+  const [page, unread] = await Promise.all([
+    getNotificationPage(profile.id),
+    countUnreadNotifications(profile.id),
+  ])
   return (
     <AppShell profile={profile}>
       <PageHeading
         title="Notifications"
         description="Updates about applications and consultations."
       />
-      {page.items.some((item) => !item.read_at) && (
+      {unread > 0 && (
         <form action={markAllNotificationsRead} className="mb-3 text-right">
           <Button variant="ghost" type="submit">
             Mark all as read

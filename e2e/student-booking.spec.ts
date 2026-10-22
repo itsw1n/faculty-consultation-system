@@ -14,6 +14,7 @@ import {
   setProfile,
   uniqueEmail,
 } from './helpers/testDatabase'
+import { waitForHydration } from './helpers/hydration'
 import { signInAs } from './helpers/testSession'
 
 const password = 'Password123!'
@@ -164,8 +165,14 @@ test.describe('Student booking journey', () => {
     await signInAs(page, email, password)
     await page.goto('/notifications')
     await expect(page.getByLabel('2 unread notifications')).toBeVisible()
+    await waitForHydration(page, page.getByRole('button', { name: 'Mark read' }).first())
     await page.getByRole('button', { name: 'Mark read' }).first().click()
     await expect(page.getByLabel('1 unread notifications')).toBeVisible()
+    await expect
+      .poll(
+        async () => (await getNotifications(student.id)).filter((n) => n.read_at === null).length
+      )
+      .toBe(1)
     await page.getByRole('button', { name: 'Mark all as read' }).click()
     // Wait for the server to persist before reading back.
     await expect
@@ -176,5 +183,24 @@ test.describe('Student booking journey', () => {
     await expect(page.getByLabel('0 unread notifications')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Mark read' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Mark all as read' })).toHaveCount(0)
+  })
+
+  test('admin inbox and unread count include only the admin’s notifications', async ({ page }) => {
+    const adminEmail = uniqueEmail('e2e-notif-admin')
+    const admin = await ensureAccount(adminEmail, password, 'E2E Admin')
+    await setProfile(admin.id, { role: 'ADMIN', account_status: 'APPROVED' })
+    const { student } = await setupStudent('e2e-notif-other')
+    await seedNotification(student.id, { title: 'Student private notice' })
+    await seedNotification(admin.id, { title: 'Admin notice' })
+
+    await signInAs(page, adminEmail, password)
+    await page.goto('/notifications')
+    await expect(page.getByLabel('1 unread notifications')).toBeVisible()
+    await waitForHydration(page, page.getByRole('button', { name: 'Mark all as read' }))
+    await expect(page.locator('main').getByText('Admin notice')).toBeVisible()
+    await expect(page.locator('main').getByText('Student private notice')).toHaveCount(0)
+    await page.getByRole('button', { name: 'Mark all as read' }).click()
+    await expect(page.getByLabel('0 unread notifications')).toBeVisible()
+    await expect.poll(async () => (await getNotifications(student.id))[0]?.read_at).toBeNull()
   })
 })

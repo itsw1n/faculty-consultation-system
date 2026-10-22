@@ -1,29 +1,35 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { NotificationItem } from '../types'
-export async function listNotifications(limit = 20) {
+export async function listNotifications(recipientId: string, limit = 20) {
   const { data, error } = await (await createClient())
     .from('notifications')
     .select('id,type,title,message,read_at,created_at')
+    .eq('recipient_id', recipientId)
     .order('created_at', { ascending: false })
     .limit(limit)
   if (error) throw new Error('Unable to load notifications')
   return data as NotificationItem[]
 }
 
-export async function countUnreadNotifications(): Promise<number> {
+export async function countUnreadNotifications(recipientId: string): Promise<number> {
   const { count, error } = await (await createClient())
     .from('notifications')
     .select('id', { count: 'exact', head: true })
+    .eq('recipient_id', recipientId)
     .is('read_at', null)
   if (error) throw new Error('Unable to count notifications')
   return count ?? 0
 }
 
-export async function getNotificationPage(cursor?: { createdAt: string; id: string }) {
+export async function getNotificationPage(
+  recipientId: string,
+  cursor?: { createdAt: string; id: string }
+) {
   let query = (await createClient())
     .from('notifications')
     .select('id,type,title,message,read_at,created_at')
+    .eq('recipient_id', recipientId)
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     .limit(20)

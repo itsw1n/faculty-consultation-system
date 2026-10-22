@@ -84,8 +84,8 @@ The faculty availability view uses the same color language. Include a legend whe
 
 ## Responsive
 
-- **Desktop** — persistent sidebar; weekly calendar grid.
-- **Mobile** — hamburger navigation drawer; day selector with a vertical slot list; card lists replace wide rows.
+- **Desktop** — persistent sidebar; booking shows a monthly calendar beside its slot list.
+- **Mobile** — hamburger navigation drawer; the booking calendar stacks above a vertical slot list; card lists replace wide rows.
 
 Wide data lists use the shared React Aria `DataTable` wrapper, with labelled columns, row headers, keyboard navigation, and horizontal scrolling when the viewport is narrow. Primary actions remain visible without turning every row into a separate card.
 

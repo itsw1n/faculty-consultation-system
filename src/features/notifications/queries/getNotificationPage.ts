@@ -6,7 +6,7 @@ const schema = z.object({
   cursor: z.object({ createdAt: z.iso.datetime(), id: z.uuid() }).nullable(),
 })
 export async function getNotificationPage(input: unknown) {
-  await requireApprovedProfile()
+  const profile = await requireApprovedProfile()
   const value = schema.parse(input)
-  return fetchNotificationPage(value.cursor ?? undefined)
+  return fetchNotificationPage(profile.id, value.cursor ?? undefined)
 }

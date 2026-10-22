@@ -37,7 +37,7 @@ How each role becomes an account is defined in [`rules.md`](rules.md#account-and
 
 Common capabilities:
 
-- **Booking** — a three-step wizard: choose faculty, choose an open slot, add a purpose and optional description, then review and confirm.
+- **Booking** — a three-step wizard: choose faculty, choose an open slot, add a category and optional description, then review and confirm.
 - **Consultations** — cursor paginated lists with search and status filters, participant-only detail pages, and outcome notes.
 - **Notifications** — an in-app bell with unread count and a full notifications page.
 - **Email** — generic status emails and next-day reminders, secondary to in-app notifications.

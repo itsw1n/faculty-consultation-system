@@ -45,7 +45,7 @@ Shared code lives in `src/lib` (`env.ts`, `actionState.ts`, `useInfinitePage.ts`
 
 ## Authentication model
 
-Supabase Auth with email + password and mandatory email verification. Sign-up and password recovery email links are verified by `/auth/confirm`, which exchanges the token hash for a cookie-backed session. Supabase stores only the bcrypt hash in `auth.users.encrypted_password`; the application never sees or stores plaintext passwords. The auth-user trigger `handle_new_auth_user` builds a profile from trusted metadata (`id`, `email`, `full_name` falling back to the email local part, `avatar_url`). The browser is never trusted for email, role, or account status. The sign-in routing and account rules are in [`rules.md`](rules.md#sign-in-routing).
+Supabase Auth with email + password and mandatory email verification. Sign-up and password recovery email links are verified by `/auth/confirm`, which exchanges the token hash for a cookie-backed session. Supabase stores only the bcrypt hash in `auth.users.encrypted_password`; the application never sees or stores plaintext passwords. The auth-user trigger `handle_new_auth_user` builds a profile from trusted metadata (`id`, `email`, `full_name` falling back to the email local part). The browser is never trusted for email, role, or account status. The sign-in routing and account rules are in [`rules.md`](rules.md#sign-in-routing).
 
 ## Authorization
 
@@ -59,7 +59,7 @@ Supabase Auth with email + password and mandatory email verification. Sign-up an
 
 - Untrusted mutation input is validated with Zod at the server boundary.
 - Availability overlap and double booking are protected by database constraints and transactional RPCs, not application checks alone.
-- Privileged fields (`role`, `account_status`, `requested_role`, `department_id`, invite and approval metadata) change only through security-definer RPCs and the auth-user trigger.
+- Privileged fields (`role`, `account_status`, `position_title`, `department_id`, and approval metadata) change only through security-definer RPCs and the auth-user trigger.
 - Browser-visible environment values contain only the project URL, public Supabase key, and canonical site URL. See [`reference/environment.md`](../reference/environment.md).
 - Database and provider errors stay server-side; see [`reference/api.md`](../reference/api.md).
 

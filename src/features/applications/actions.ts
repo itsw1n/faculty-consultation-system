@@ -4,33 +4,40 @@ import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
 import { accountCorrectionSchema } from './schemas/accountCorrectionSchema'
-import { inviteFacultySchema } from './schemas/inviteFacultySchema'
+import { promoteFacultySchema } from './schemas/promoteFacultySchema'
 
-export type InviteResult = { email: string; invited: boolean; reason: string | null }
-
-export async function inviteFaculty(
+export async function promoteFaculty(
   _state: ActionState,
   formData: FormData
-): Promise<ActionState & { results?: InviteResult[] }> {
+): Promise<ActionState> {
   await requireRole('ADMIN')
-  const result = inviteFacultySchema.safeParse({
-    emails: formData.get('emails'),
+  const result = promoteFacultySchema.safeParse({
+    email: formData.get('email'),
     departmentId: formData.get('departmentId'),
     positionTitle: formData.get('positionTitle') || undefined,
   })
   if (!result.success)
-    return { error: result.error.issues[0]?.message ?? 'Check the invite details.' }
+    return { error: result.error.issues[0]?.message ?? 'Check the faculty details.' }
   const input = result.data
   const { data, error } = await (
     await createClient()
-  ).rpc('invite_faculty', {
-    invite_emails: input.emails,
-    invite_department_id: input.departmentId,
-    invite_position_title: input.positionTitle,
+  ).rpc('promote_registered_faculty', {
+    target_email: input.email,
+    new_department_id: input.departmentId,
+    new_position_title: input.positionTitle,
   })
-  if (error) return { error: 'The invites could not be saved. Refresh and try again.' }
+  if (error) return { error: 'The account could not be updated. Refresh and try again.' }
+  const outcomes: Record<string, string> = {
+    DOMAIN_NOT_ALLOWED: 'This email domain is not allowed.',
+    NOT_REGISTERED: 'Ask this person to register and verify their email first.',
+    NOT_VERIFIED: 'Ask this person to verify their email first.',
+    ALREADY_FACULTY: 'This account is already faculty. Use Edit User to change its details.',
+    NOT_ELIGIBLE: 'Only an active Student account can be promoted to Faculty.',
+  }
+  if (data !== 'PROMOTED')
+    return { error: outcomes[String(data)] ?? 'The account could not be updated.' }
   revalidatePath('/admin/users')
-  return { error: null, results: data as InviteResult[] }
+  return { error: null, message: `${input.email} is now a Faculty account.` }
 }
 
 export async function correctUserAccount(
@@ -55,7 +62,13 @@ export async function correctUserAccount(
     new_department_id: input.departmentId,
     position_title: input.positionTitle ?? null,
   })
-  if (error) return { error: 'The account could not be corrected. Refresh and try again.' }
+  if (error) {
+    if (error.message.includes('Resolve active Faculty work first'))
+      return { error: 'Resolve this Faculty member’s open slots and consultations first.' }
+    if (error.message.includes('Email verification is required'))
+      return { error: 'Ask this person to verify their email first.' }
+    return { error: 'The account could not be updated. Refresh and try again.' }
+  }
   revalidatePath('/admin/users')
-  return { error: null }
+  return { error: null, message: 'Account updated.' }
 }

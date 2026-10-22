@@ -23,7 +23,10 @@ export default async function NotificationsPage() {
           </Button>
         </form>
       )}
-      <NotificationList initialPage={page} />
+      <NotificationList
+        key={page.items.map((item) => `${item.id}:${item.read_at ?? 'unread'}`).join('|')}
+        initialPage={page}
+      />
     </AppShell>
   )
 }

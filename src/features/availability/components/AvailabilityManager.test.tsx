@@ -20,6 +20,8 @@ const slot = (overrides: Partial<AvailabilityItem> = {}): AvailabilityItem => ({
   mode: 'IN_PERSON',
   location: 'Room 101',
   meeting_link: null,
+  student_name: null,
+  purpose: null,
   ...overrides,
 })
 
@@ -32,6 +34,20 @@ describe('AvailabilityManager edit', () => {
     )
 
     expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(1)
+  })
+
+  it('offers a view action for booked and reserved slots', () => {
+    render(
+      <AvailabilityManager
+        slots={[
+          slot({ id: '22222222-2222-4222-8222-222222222222', status: 'BOOKED' }),
+          slot({ id: '33333333-3333-4333-8333-333333333333', status: 'RESERVED' }),
+        ]}
+      />
+    )
+
+    expect(screen.getAllByRole('button', { name: 'View' })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
   })
 
   it('prefills the edit form with the slot values and its id', () => {

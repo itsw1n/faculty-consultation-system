@@ -31,7 +31,7 @@ Pages call repositories directly for initial server-rendered reads. `features/*/
 
 ```text
 src/features/auth          sign-in, sign-out, first-admin claim, profile guards
-src/features/applications  account page, invites, corrections
+src/features/applications  account page, faculty promotion, corrections
 src/features/admin         departments, faculty records
 src/features/availability  faculty availability actions and reads
 src/features/booking       faculty directory, slots, booking action

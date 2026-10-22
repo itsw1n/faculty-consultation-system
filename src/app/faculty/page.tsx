@@ -1,66 +1,193 @@
 import Link from 'next/link'
-import { EmptyState } from '@/components/common/EmptyState'
+import { CalendarPlus } from 'lucide-react'
+import { AlertDialog } from '@/components/common/AlertDialog'
 import { PageHeading } from '@/components/common/PageHeading'
+import { decideConsultation } from '@/features/consultations/actions'
+import { categoryLabel } from '@/features/consultations/categories'
+import { ConsultationDetailsDialog } from '@/features/consultations/components/ConsultationDetailsDialog'
+import type { ConsultationItem } from '@/features/consultations/types'
 import { getFacultyDashboard } from '@/features/dashboard/repositories/dashboardRepository'
-import { CalendarPlus, ClipboardCheck, Clock3 } from 'lucide-react'
-const card = 'rounded-xl border border-border bg-surface p-5 shadow-card'
+
+const dayFormatter = new Intl.DateTimeFormat('en-PH', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'Asia/Manila',
+})
+
+const timeFormatter = new Intl.DateTimeFormat('en-PH', {
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZone: 'Asia/Manila',
+})
+
+function formatDay(date: string) {
+  return dayFormatter.format(new Date(`${date}T00:00:00+08:00`))
+}
+
+function formatTimeRange(start: string, end: string) {
+  const startDate = new Date(`1970-01-01T${start}+08:00`)
+  const endDate = new Date(`1970-01-01T${end}+08:00`)
+  return `${timeFormatter.format(startDate)}–${timeFormatter.format(endDate)}`
+}
+
+function modeLabel(item: Pick<ConsultationItem, 'mode' | 'location'>) {
+  return item.mode === 'IN_PERSON' ? item.location : 'Online'
+}
+
 export default async function FacultyDashboard() {
-  const data = await getFacultyDashboard()
+  const { summary, requests, agenda } = await getFacultyDashboard()
+
   return (
     <>
       <PageHeading
         eyebrow="Faculty workspace"
         title="Faculty Dashboard"
-        description="Manage availability and consultation requests."
+        description="Decide requests and prepare for your next consultations."
         action={
           <Link
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 font-bold text-white shadow-sm hover:bg-accent-hover focus-visible:outline-3 focus-visible:outline-focus"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-3 focus-visible:outline-focus"
             href="/faculty/availability"
           >
             <CalendarPlus size={18} aria-hidden="true" /> Add availability
           </Link>
         }
       />
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-4">
-        <section className={card}>
-          <div className="flex items-center justify-between text-accent">
-            <span className="text-sm font-semibold">Pending requests</span>
-            <ClipboardCheck size={19} aria-hidden="true" />
+
+      <section
+        aria-label="Availability status"
+        className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-subtle px-4 py-3 text-sm"
+      >
+        {summary.open_slots > 0 ? (
+          <p>
+            <strong className="font-semibold text-primary">
+              {summary.open_slots} open slot{summary.open_slots === 1 ? '' : 's'}
+            </strong>
+            {summary.next_open_date &&
+            summary.next_open_start_time &&
+            summary.next_open_end_time ? (
+              <>
+                {' '}
+                · Next: {formatDay(summary.next_open_date)}{' '}
+                {formatTimeRange(summary.next_open_start_time, summary.next_open_end_time)}
+              </>
+            ) : null}
+          </p>
+        ) : (
+          <p>
+            <strong className="font-semibold text-primary">No open availability.</strong> Students
+            cannot request a consultation yet.
+          </p>
+        )}
+        <Link className="font-semibold text-primary hover:underline" href="/faculty/availability">
+          Manage availability
+        </Link>
+      </section>
+
+      <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <section
+          aria-labelledby="pending-heading"
+          className="rounded-lg border border-border bg-surface p-5"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="pending-heading" className="text-lg font-semibold text-primary">
+                Needs your decision
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                {summary.pending === 0
+                  ? 'No requests waiting.'
+                  : `${summary.pending} request${summary.pending === 1 ? '' : 's'} waiting.`}
+              </p>
+            </div>
+            <Link className="font-semibold text-primary hover:underline" href="/faculty/requests">
+              View all requests
+            </Link>
           </div>
-          <strong className="mt-4 block text-3xl text-primary">{data.pending}</strong>
-          <p className="mt-1 text-sm text-muted">Requests needing a decision</p>
+          {requests.length === 0 ? (
+            <p className="mt-4 border-t border-border pt-4 text-sm text-muted">
+              You&apos;re all caught up.
+            </p>
+          ) : (
+            <ul className="mt-4 list-none divide-y divide-border border-t border-border p-0">
+              {requests.map((item) => (
+                <li className="py-4" key={item.id}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <strong className="font-semibold text-primary">{item.student_name}</strong>
+                      <p className="mt-1 text-sm text-muted">{categoryLabel(item.purpose)}</p>
+                      <p className="mt-1 text-sm text-muted">
+                        {formatDay(item.slot_date)} ·{' '}
+                        {formatTimeRange(item.start_time, item.end_time)} · {modeLabel(item)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <AlertDialog
+                        label="Approve"
+                        accessibleLabel={`Approve consultation with ${item.student_name}`}
+                        title="Approve consultation?"
+                        description="This confirms the selected schedule."
+                        fields={{ consultationId: item.id, approve: 'true' }}
+                        submitAction={decideConsultation}
+                      />
+                      <AlertDialog
+                        label="Reject"
+                        accessibleLabel={`Reject consultation with ${item.student_name}`}
+                        title="Reject consultation?"
+                        description="The slot will reopen."
+                        fields={{ consultationId: item.id, approve: 'false' }}
+                        submitAction={decideConsultation}
+                        variant="danger"
+                      />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
-        <section className={card}>
-          <div className="flex items-center justify-between text-accent">
-            <span className="text-sm font-semibold">Upcoming</span>
-            <Clock3 size={19} aria-hidden="true" />
+
+        <section
+          aria-labelledby="agenda-heading"
+          className="rounded-lg border border-border bg-surface p-5"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 id="agenda-heading" className="text-lg font-semibold text-primary">
+                Upcoming consultations
+              </h2>
+              <p className="mt-1 text-sm text-muted">Your next confirmed appointments.</p>
+            </div>
+            <Link
+              className="font-semibold text-primary hover:underline"
+              href="/faculty/consultations"
+            >
+              View all consultations
+            </Link>
           </div>
-          <strong className="mt-4 block text-3xl text-primary">{data.upcoming}</strong>
-          <p className="mt-1 text-sm text-muted">Approved consultations</p>
-        </section>
-        <section className={card}>
-          <div className="flex items-center justify-between text-accent">
-            <span className="text-sm font-semibold">Open slots</span>
-            <CalendarPlus size={19} aria-hidden="true" />
-          </div>
-          <strong className="mt-4 block text-3xl text-primary">{data.openSlots}</strong>
-          <p className="mt-1 text-sm text-muted">Available consultation times</p>
+          {agenda.length === 0 ? (
+            <p className="mt-4 border-t border-border pt-4 text-sm text-muted">
+              No confirmed consultations scheduled.
+            </p>
+          ) : (
+            <ul className="mt-4 list-none divide-y divide-border border-t border-border p-0">
+              {agenda.map((item) => (
+                <li className="flex flex-wrap items-start justify-between gap-3 py-4" key={item.id}>
+                  <div>
+                    <p className="text-sm font-semibold text-primary">
+                      <time dateTime={item.slot_date}>{formatDay(item.slot_date)}</time> ·{' '}
+                      {formatTimeRange(item.start_time, item.end_time)}
+                    </p>
+                    <strong className="mt-1 block font-semibold">{item.student_name}</strong>
+                    <p className="mt-1 text-sm text-muted">{modeLabel(item)}</p>
+                  </div>
+                  <ConsultationDetailsDialog item={item} viewer="FACULTY" />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
-      {data.openSlots === 0 && (
-        <EmptyState
-          title="No availability added"
-          description="Add an available time so students can request a consultation."
-          action={
-            <Link
-              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 font-bold text-white"
-              href="/faculty/availability"
-            >
-              Add Availability
-            </Link>
-          }
-        />
-      )}
     </>
   )
 }

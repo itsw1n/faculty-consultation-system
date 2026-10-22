@@ -25,7 +25,7 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 | `/application/*`        | Pending and rejected account screens                 |
 | `/student/*`            | Dashboard, faculty directory, booking, consultations |
 | `/faculty/*`            | Dashboard, availability, requests, consultations     |
-| `/admin/*`              | Dashboard, users, faculty, departments, records      |
+| `/admin/*`              | Dashboard, users, departments, records               |
 | `/notifications`        | Notification list and mark-all-read                  |
 
 ## Server actions
@@ -33,14 +33,14 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 | Module          | Actions                                                                                                            |
 | --------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `auth`          | `signInWithPassword`, `signUpWithPassword`, `requestPasswordReset`, `updatePassword`, `signOut`, `claimFirstAdmin` |
-| `applications`  | `inviteFaculty`, `correctUserAccount`                                                                              |
+| `applications`  | `promoteFaculty`, `correctUserAccount`                                                                             |
 | `admin`         | `createDepartment`, `updateDepartment`                                                                             |
 | `availability`  | `createAvailability`, `updateAvailability`, `deleteAvailability`                                                   |
 | `booking`       | `bookConsultation`                                                                                                 |
-| `consultations` | `decideConsultation`, `cancelConsultation`, `completeConsultation`                                                 |
+| `consultations` | `decideConsultation`, `cancelConsultation`, `completeConsultation`, `completeConsultationWithFeedback`             |
 | `notifications` | `markNotificationRead`, `markAllNotificationsRead`                                                                 |
 
-Each action validates input and performs role authorization. Booking, decisions, cancellation, completion, invites, correction, and first-admin claim delegate to transactional PostgreSQL functions.
+Each action validates input and performs role authorization. Booking, decisions, cancellation, completion, faculty promotion, correction, and first-admin claim delegate to transactional PostgreSQL functions.
 
 ## RPC-backed cursor loaders
 
@@ -51,7 +51,11 @@ Client components fetch additional pages through `'use server'` loaders:
 - `getConsultationPage` → `search_my_consultations`.
 - `getNotificationPage` → `notifications` with a `(created_at, id)` cursor.
 
-These are internal application interfaces, not public HTTP APIs. See the full function catalog in [`../concepts/data-model.md`](../concepts/data-model.md#rpc-catalog).
+These are internal application interfaces, not public HTTP APIs. `getConsultationPage` includes the saved outcome so the details modal can show completed results without a second fetch. See the full function catalog in [`../concepts/data-model.md`](../concepts/data-model.md#rpc-catalog).
+
+The admin dashboard uses `admin_dashboard_summary()` for aggregate account, availability, and consultation counts, and `search_my_consultations` for its redacted recent-activity list.
+
+The faculty dashboard uses `faculty_dashboard_summary()` for pending/open-slot counts and the next open slot, `list_my_upcoming_consultations()` for the next five confirmed consultations, and `search_my_consultations` for its pending queue.
 
 ## Error contract
 

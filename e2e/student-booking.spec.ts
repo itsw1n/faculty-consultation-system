@@ -74,8 +74,10 @@ test.describe('Student booking journey', () => {
 
     await signInAs(page, email, password)
     await page.goto('/student')
-    const upcomingCount = page.locator('//span[text()="Upcoming"]/ancestor::section[1]/strong')
-    const pendingCount = page.locator('//span[text()="Pending"]/ancestor::section[1]/strong')
+    const valueFor = (label: string) =>
+      page.locator('dt', { hasText: label }).locator('xpath=..').locator('dd')
+    const upcomingCount = valueFor('Upcoming')
+    const pendingCount = valueFor('Pending')
     await expect(upcomingCount).toHaveText('1')
     await expect(pendingCount).toHaveText('1')
     await expect(page.getByText('Recent consultations')).toBeVisible()
@@ -141,8 +143,8 @@ test.describe('Student booking journey', () => {
 
     await page.getByRole('button', { name: 'Status' }).click()
     await page.getByRole('option', { name: 'Cancelled' }).click()
-    await expect(page.locator('article', { hasText: 'CANCELLED' })).toBeVisible()
-    await expect(page.locator('article', { hasText: 'PENDING' })).toHaveCount(0)
+    await expect(page.getByRole('row').filter({ hasText: 'Cancelled' })).toBeVisible()
+    await expect(page.getByRole('row').filter({ hasText: 'Pending' })).toHaveCount(0)
 
     const pending = await getLatestConsultationForStudent(student.id)
     await page.goto(`/student/consultations/${pending!.id}`)
@@ -161,6 +163,9 @@ test.describe('Student booking journey', () => {
 
     await signInAs(page, email, password)
     await page.goto('/notifications')
+    await expect(page.getByLabel('2 unread notifications')).toBeVisible()
+    await page.getByRole('button', { name: 'Mark read' }).first().click()
+    await expect(page.getByLabel('1 unread notifications')).toBeVisible()
     await page.getByRole('button', { name: 'Mark all as read' }).click()
     // Wait for the server to persist before reading back.
     await expect
@@ -168,6 +173,7 @@ test.describe('Student booking journey', () => {
       .toBe(true)
     // The inbox lists read items too, so "all read" means no unread actions remain.
     await page.reload()
+    await expect(page.getByLabel('0 unread notifications')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Mark read' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Mark all as read' })).toHaveCount(0)
   })

@@ -12,15 +12,30 @@ const statusColors: Record<string, string> = {
   REJECTED: 'bg-red-50 text-danger',
 }
 
+const statusLabels: Record<string, string> = {
+  STUDENT: 'Student',
+  FACULTY: 'Faculty',
+  ADMIN: 'Admin',
+  OPEN: 'Open',
+  APPROVED: 'Approved',
+  COMPLETED: 'Completed',
+  RESERVED: 'Reserved',
+  PENDING: 'Pending',
+  BOOKED: 'Booked',
+  CLOSED: 'Closed',
+  CANCELLED: 'Cancelled',
+  REJECTED: 'Rejected',
+}
+
 export function StatusBadge({ status }: { status: string | null }) {
   return (
     <span
       className={cn(
-        'inline-flex rounded-full px-2.5 py-1 text-xs font-extrabold',
+        'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold',
         statusColors[status ?? ''] ?? 'bg-subtle text-primary'
       )}
     >
-      {status ?? 'Unknown'}
+      {statusLabels[status ?? ''] ?? status ?? 'Unknown'}
     </span>
   )
 }

@@ -12,7 +12,7 @@ export default async function ResetPasswordPage() {
     <main>
       <Section className="grid min-h-screen place-items-center">
         <Container>
-          <div className="mx-auto w-full max-w-lg rounded-xl border border-border bg-surface p-8 shadow-card sm:p-12">
+          <div className="mx-auto w-full max-w-lg rounded-lg border border-border bg-surface p-8 sm:p-12">
             <p className="text-xs font-bold tracking-[0.12em] text-primary uppercase">
               Password recovery
             </p>

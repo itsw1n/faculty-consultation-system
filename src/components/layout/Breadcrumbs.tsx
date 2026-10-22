@@ -9,7 +9,6 @@ const labels: Record<string, string> = {
   availability: 'My Availability',
   requests: 'Consultation Requests',
   users: 'Manage Users',
-  faculty: 'Manage Faculty',
   departments: 'Departments',
   notifications: 'Notifications',
 }

@@ -46,7 +46,7 @@ export function Select({
   className,
 }: SelectProps) {
   return (
-    <div className={cn('grid flex-1 gap-1.5 text-xs font-bold', className)}>
+    <div className={cn('grid flex-1 gap-1.5 text-xs font-semibold', className)}>
       {label ? <Label>{label}</Label> : null}
       <AriaSelect
         selectedKey={value}
@@ -61,7 +61,7 @@ export function Select({
       >
         {({ isOpen }) => (
           <>
-            <Button className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 text-left transition-colors outline-none hover:bg-subtle focus-visible:ring-3 focus-visible:ring-focus data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+            <Button className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 text-left transition-colors outline-none hover:bg-subtle focus-visible:ring-3 focus-visible:ring-focus data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
               <SelectValue className="flex-1 truncate data-[placeholder]:text-muted" />
               {isOpen ? (
                 <ChevronUp size={18} aria-hidden="true" className="shrink-0 text-muted" />

@@ -85,8 +85,14 @@ test.describe('Auth routing and gates', () => {
 
     await signInAs(page, email, password)
     await page.goto('/student')
-    await page.locator('aside details summary').click()
-    await page.getByRole('button', { name: 'Sign out' }).click()
+    const mobileMenu = page.getByLabel('Open navigation')
+    if (await mobileMenu.isVisible()) {
+      await mobileMenu.click()
+      await page.locator('header').getByRole('button', { name: 'Sign out' }).click()
+    } else {
+      await page.locator('aside details summary').click()
+      await page.locator('aside').getByRole('button', { name: 'Sign out' }).click()
+    }
     await expect(page).toHaveURL('/')
 
     await page.goto('/student')

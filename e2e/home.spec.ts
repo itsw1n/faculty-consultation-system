@@ -6,7 +6,7 @@ test('presents the branded email authentication entry point', async ({ page }) =
   await expect(
     page.getByRole('heading', { name: 'Welcome to Assumption College of Davao' })
   ).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Welcome back!' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
   await expect(page.getByLabel('School email')).toBeVisible()
   await expect(page.getByLabel('Password', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: /^Sign in/ })).toBeVisible()

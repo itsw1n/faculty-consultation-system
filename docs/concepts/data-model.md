@@ -118,6 +118,8 @@ Migrations set `acdeducation.com`; local seed data adds `*` and is never applied
 
 ### faculty_invites
 
+Legacy table retained for migration history. New accounts do not consume invitations; the admin UI promotes registered students instead.
+
 ```text
 email           text PK, 3–320 characters
 department_id   uuid -> departments.id
@@ -179,16 +181,18 @@ RLS is enabled on every user-facing table.
 - `availability_slots`: direct select, insert, update, and delete are revoked; access is through RPCs (original policies remain as defense in depth).
 - `consultations`: participants and admins read; writes go through RPCs.
 - `notifications`: recipients read and update their own `read_at`; admins read.
-- `approved_email_domains`, `faculty_invites`, `email_outbox`: no grants to `anon` or `authenticated`.
+- `approved_email_domains`, `faculty_invites`, `email_outbox`: no direct table grants to `anon` or `authenticated`. The `is_approved_email(text)` RPC is callable by `anon` for sign-up validation.
 - Email queue functions are granted only to `service_role`.
+- `claim_first_admin` is granted only to `service_role`.
 
 ## RPC catalog
 
-- **Identity and authorization** — `handle_new_auth_user()`, `is_admin()`, `is_approved_email(text)`, `claim_first_admin(expected_email)`, `correct_user_account(...)`, `invite_faculty(...)`.
+- **Identity and authorization** — `handle_new_auth_user()`, `is_admin()`, `is_approved_email(text)`, `claim_first_admin(target_user_id, expected_email)`, `correct_user_account(...)`, `promote_registered_faculty(...)`.
 - **Availability** — `create_availability(...)`, `update_open_availability(...)`, `delete_open_availability(target_slot_id)`, `list_own_availability()`, `count_own_open_availability()`.
 - **Discovery and booking** — `list_faculty_page(...)`, `list_faculty_slots(...)`, `book_consultation(target_slot_id, consultation_purpose, consultation_notes)`.
 - **Lifecycle** — `decide_consultation(...)`, `cancel_consultation(...)`, `complete_consultation_with_outcome(...)`, `search_my_consultations(...)`, `get_consultation_detail(target_id)`.
-- **Admin** — `list_application_page(...)`, `consultation_summary(start_date, end_date)`, `admin_consultation_count()`.
+- **Faculty dashboard** — `faculty_dashboard_summary()`, `list_my_upcoming_consultations(result_limit)`.
+- **Admin** — `list_application_page(...)`, `consultation_summary(start_date, end_date)`, `admin_consultation_count()`, `admin_dashboard_summary()`.
 - **Email outbox** — `queue_tomorrow_reminders()`, `claim_email_batch(batch_size)`, `mark_email_sent(target_id)`.
 
 ## Concurrency
@@ -200,4 +204,4 @@ RLS is enabled on every user-facing table.
 
 ## Legacy objects
 
-Migration history is append-only, so these objects remain but must not be used by new code: the `examples` scaffold table; `list_faculty` and `list_open_faculty_slots`; `review_applications`; `complete_consultation` (revoked; use `complete_consultation_with_outcome`); and `submit_application` / `review_application`.
+Migration history is append-only, so these objects remain but must not be used by new code: the `examples` scaffold table; `faculty_invites` and `invite_faculty` (RPC revoked); `list_faculty` and `list_open_faculty_slots`; `review_applications`; `complete_consultation` (revoked; use `complete_consultation_with_outcome`); and `submit_application` / `review_application`.

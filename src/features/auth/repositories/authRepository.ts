@@ -22,6 +22,13 @@ export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
 
   if (error) return null
 
+  const currentEmail = claimsData.claims.email
+  if (typeof currentEmail !== 'string') return null
+  const { data: allowed, error: domainError } = await supabase.rpc('is_approved_email', {
+    candidate_email: currentEmail,
+  })
+  if (domainError || !allowed) return null
+
   return {
     accountStatus: data.account_status,
     email: data.email,

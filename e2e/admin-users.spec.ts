@@ -4,7 +4,6 @@ import {
   ensureAccount,
   getFacultyProfile,
   getFirstDepartment,
-  getInviteByEmail,
   getProfileByEmail,
   setProfile,
   uniqueEmail,
@@ -20,26 +19,29 @@ test.describe('Manage Users directory', () => {
     await expect(page.getByLabel('School email')).toBeVisible()
   })
 
-  test('admin invites faculty and the invite persists in the database', async ({ page }) => {
+  test('admin promotes a registered Student through Add Faculty', async ({ page }) => {
     const adminEmail = uniqueEmail('e2e-admin')
     const admin = await ensureAccount(adminEmail, 'Password123!', 'E2E Admin')
     await setProfile(admin.id, { role: 'ADMIN', account_status: 'APPROVED' })
     const department = await getFirstDepartment()
-    const inviteEmail = uniqueEmail('e2e-invite')
+    const facultyEmail = uniqueEmail('e2e-promote')
+    const faculty = await ensureAccount(facultyEmail, 'Password123!', 'E2E New Faculty')
 
     await signInAs(page, adminEmail, 'Password123!')
     await page.goto('/admin/users')
 
-    const inviteForm = page.getByRole('region', { name: 'Invite faculty' })
-    await inviteForm.locator('textarea[name="emails"]').fill(inviteEmail)
-    await inviteForm.getByRole('button', { name: 'Department' }).click()
+    await page.getByRole('button', { name: 'Add Faculty' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Add Faculty' })
+    await dialog.getByLabel('School email').fill(facultyEmail)
+    await dialog.getByRole('button', { name: 'Department' }).click()
     await page.getByRole('option', { name: department.name }).click()
-    await inviteForm.getByPlaceholder('e.g. Instructor').fill('Instructor I')
-    await inviteForm.getByRole('button', { name: 'Invite faculty' }).click()
+    await dialog.getByPlaceholder('e.g. Instructor').fill('Instructor I')
+    await dialog.getByRole('button', { name: 'Add Faculty' }).click()
 
-    // The screen must say what the database says: invited, not skipped.
-    await expect(inviteForm.getByText(`${inviteEmail} — invited`)).toBeVisible()
-    await expect.poll(() => getInviteByEmail(inviteEmail)).not.toBeNull()
+    await expect(dialog).not.toBeVisible()
+    await expect(page.getByRole('status')).toContainText('now a Faculty account')
+    await expect.poll(async () => (await getProfileByEmail(facultyEmail))?.role).toBe('FACULTY')
+    expect((await getFacultyProfile(faculty.id))?.position_title).toBe('Instructor I')
   })
 
   test('admin promotes an approved student and the directory shows it', async ({ page }) => {
@@ -54,26 +56,26 @@ test.describe('Manage Users directory', () => {
     await signInAs(page, adminEmail, 'Password123!')
     await page.goto('/admin/users')
 
-    const row = page.locator('article', { hasText: studentEmail })
+    const row = page.getByRole('row').filter({ hasText: studentEmail })
     await expect(row).toBeVisible()
-    await row.getByRole('button', { name: 'Correct' }).click()
+    await row.getByRole('button', { name: 'Edit User' }).click()
 
     const dialog = page.getByRole('dialog')
     await dialog.getByRole('button', { name: 'Role' }).click()
     await page.getByRole('option', { name: 'Faculty' }).click()
     await dialog.getByRole('button', { name: 'Department' }).click()
     await page.getByRole('option', { name: department.name }).click()
-    await dialog.getByPlaceholder('Leave blank to keep current').fill('Instructor I')
-    await dialog.getByRole('button', { name: 'Save correction' }).click()
+    await dialog.getByPlaceholder('e.g. Instructor').fill('Instructor I')
+    await dialog.getByRole('button', { name: 'Save changes' }).click()
 
-    // The write must land even though this form gives no inline confirmation.
+    await expect(dialog).not.toBeVisible()
     await expect.poll(async () => (await getProfileByEmail(studentEmail))?.role).toBe('FACULTY')
     const facultyProfile = await getFacultyProfile(student.id)
     expect(facultyProfile?.position_title).toBe('Instructor I')
 
     await page.reload()
     await expect(
-      page.locator('article', { hasText: studentEmail }).getByText('FACULTY')
+      page.getByRole('row').filter({ hasText: studentEmail }).getByText('Faculty')
     ).toBeVisible()
   })
 })

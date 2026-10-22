@@ -1,24 +1,47 @@
 'use client'
 
 import { useActionState, useState } from 'react'
+import { Cell, Column, Row, TableBody, TableHeader } from 'react-aria-components'
+import { MapPin, Monitor, Search } from 'lucide-react'
 import { Button } from '@/components/common/button/Button'
 import { AlertDialog } from '@/components/common/AlertDialog'
+import { DataTable } from '@/components/common/table/DataTable'
+import { PageHeading } from '@/components/common/PageHeading'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Modal } from '@/components/common/modal/Modal'
 import { Select } from '@/components/common/select/Select'
 import { initialActionState } from '@/lib/actionState'
+import { categoryLabel } from '@/features/consultations/categories'
 import { createAvailability, deleteAvailability, updateAvailability } from '../actions'
 import type { AvailabilityItem } from '../repositories/availabilityRepository'
 
-const fieldClass = 'grid gap-1.5 text-xs font-bold'
+const fieldClass = 'grid gap-1.5 text-xs font-semibold'
 const controlClass =
-  'min-h-11 rounded-lg border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
+  'min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
 
 const modeOptions = [
   { id: 'IN_PERSON', label: 'In person' },
   { id: 'ONLINE', label: 'Online' },
 ]
+
+const statusOptions = [
+  { id: 'ALL', label: 'All Statuses' },
+  { id: 'OPEN', label: 'Open' },
+  { id: 'RESERVED', label: 'Reserved' },
+  { id: 'BOOKED', label: 'Booked' },
+  { id: 'CLOSED', label: 'Closed' },
+]
+
+const dateFormatter = new Intl.DateTimeFormat('en-PH', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+})
+
+function formatDate(date: string) {
+  return dateFormatter.format(new Date(`${date}T00:00:00`))
+}
 
 export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
   const [state, formAction] = useActionState(createAvailability, initialActionState)
@@ -26,10 +49,49 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
   const [addOpen, setAddOpen] = useState(false)
   const [editSlot, setEditSlot] = useState<AvailabilityItem | null>(null)
   const [detailsSlot, setDetailsSlot] = useState<AvailabilityItem | null>(null)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'ALL' | AvailabilityItem['status']>('ALL')
+  const query = search.trim().toLowerCase()
+  const visibleSlots = slots.filter((slot) => {
+    if (statusFilter !== 'ALL' && slot.status !== statusFilter) return false
+    if (!query) return true
+    return [
+      slot.student_name ?? '',
+      slot.purpose ? categoryLabel(slot.purpose) : '',
+      slot.location ?? '',
+      slot.mode === 'ONLINE' ? 'online' : '',
+    ].some((value) => value.toLowerCase().includes(query))
+  })
 
   return (
     <>
-      <Button onPress={() => setAddOpen(true)}>Add Availability</Button>
+      <PageHeading
+        title="My Availability"
+        description="Create consultation times and review their booking status."
+        action={<Button onPress={() => setAddOpen(true)}>Add Availability</Button>}
+      />
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem]">
+        <label className="relative block">
+          <span className="sr-only">Search by student name or purpose</span>
+          <Search
+            size={18}
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
+          />
+          <input
+            className={`${controlClass} w-full pl-10`}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by student name or purpose..."
+          />
+        </label>
+        <Select
+          ariaLabel="Filter by status"
+          options={statusOptions}
+          value={statusFilter}
+          onChange={(value) => setStatusFilter(value as 'ALL' | AvailabilityItem['status'])}
+        />
+      </div>
       <Modal
         title="Add Availability"
         isOpen={addOpen}
@@ -79,53 +141,100 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
           </div>
         </form>
       </Modal>
-      <section
-        className="mt-4 overflow-hidden rounded-xl border border-border bg-surface"
-        aria-label="Upcoming availability"
-      >
-        {slots.length === 0 ? (
-          <p className="p-8 text-center text-muted">No upcoming availability.</p>
-        ) : (
-          slots.map((slot) => (
-            <article
-              className="grid items-center gap-3 border-b border-border p-4 last:border-0 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_.7fr_1fr_auto]"
-              key={slot.id}
-            >
-              <Button
-                variant="ghost"
-                className="justify-start px-0 text-left"
-                onPress={() => setDetailsSlot(slot)}
-              >
-                <time dateTime={slot.date}>
-                  {new Intl.DateTimeFormat('en-PH', { dateStyle: 'medium' }).format(
-                    new Date(`${slot.date}T00:00:00`)
+      <div className="mt-5">
+        <DataTable aria-label="Upcoming availability">
+          <TableHeader className="border-b border-border bg-background text-xs font-semibold tracking-wide text-muted uppercase">
+            <Column isRowHeader className="w-[22%] px-5 py-3">
+              Schedule
+            </Column>
+            <Column className="w-[18%] px-5 py-3">Mode / location</Column>
+            <Column className="w-[12%] px-5 py-3">Status</Column>
+            <Column className="w-[25%] px-5 py-3">Linked request or student</Column>
+            <Column className="w-[23%] px-5 py-3 text-right">Actions</Column>
+          </TableHeader>
+          <TableBody
+            items={visibleSlots}
+            renderEmptyState={() =>
+              slots.length === 0
+                ? 'No upcoming availability.'
+                : 'No availability matches your filters.'
+            }
+          >
+            {(slot) => (
+              <Row className="border-b border-border last:border-0 data-[focus-visible-within]:outline-3 data-[focus-visible-within]:outline-focus">
+                <Cell className="px-5 py-4">
+                  <p className="font-semibold text-primary">
+                    <time dateTime={slot.date}>{formatDate(slot.date)}</time>
+                  </p>
+                  <p className="mt-1 text-sm text-muted">
+                    {slot.start_time.slice(0, 5)}–{slot.end_time.slice(0, 5)}
+                  </p>
+                </Cell>
+                <Cell className="px-5 py-4 text-sm text-muted">
+                  <span className="flex items-center gap-2">
+                    {slot.mode === 'IN_PERSON' ? (
+                      <MapPin size={16} aria-hidden="true" />
+                    ) : (
+                      <Monitor size={16} aria-hidden="true" />
+                    )}
+                    {slot.mode === 'IN_PERSON' ? slot.location || 'Not specified' : 'Online'}
+                  </span>
+                </Cell>
+                <Cell className="px-5 py-4">
+                  <StatusBadge status={slot.status} />
+                </Cell>
+                <Cell className="px-5 py-4">
+                  {slot.student_name ? (
+                    <>
+                      <p className="font-semibold text-primary">{slot.student_name}</p>
+                      {slot.purpose ? (
+                        <p className="mt-1 text-sm text-muted">{categoryLabel(slot.purpose)}</p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <span className="text-muted">—</span>
                   )}
-                </time>
-              </Button>
-              <strong>
-                {slot.start_time.slice(0, 5)}–{slot.end_time.slice(0, 5)}
-              </strong>
-              <StatusBadge status={slot.status} />
-              <span>{slot.mode === 'IN_PERSON' ? slot.location : 'Online'}</span>
-              {slot.status === 'OPEN' && (
-                <>
-                  <Button variant="secondary" onPress={() => setEditSlot(slot)}>
-                    Edit
-                  </Button>
-                  <AlertDialog
-                    label="Remove"
-                    title="Remove availability?"
-                    description="Students will no longer be able to request this time."
-                    fields={{ slotId: slot.id }}
-                    submitAction={deleteAvailability}
-                    variant="danger"
-                  />
-                </>
-              )}
-            </article>
-          ))
-        )}
-      </section>
+                </Cell>
+                <Cell className="px-5 py-4">
+                  {slot.status === 'OPEN' ? (
+                    <div className="flex flex-nowrap items-center justify-end gap-1.5">
+                      <Button
+                        variant="secondary"
+                        size="compact"
+                        className="min-w-0"
+                        onPress={() => setEditSlot(slot)}
+                      >
+                        Edit
+                      </Button>
+                      <AlertDialog
+                        label="Remove"
+                        title="Remove availability?"
+                        description="Students will no longer be able to request this time."
+                        fields={{ slotId: slot.id }}
+                        submitAction={deleteAvailability}
+                        variant="danger"
+                      />
+                    </div>
+                  ) : slot.status === 'BOOKED' || slot.status === 'RESERVED' ? (
+                    <div className="flex justify-end">
+                      <Button
+                        variant="secondary"
+                        size="compact"
+                        className="min-w-0"
+                        onPress={() => setDetailsSlot(slot)}
+                      >
+                        View
+                      </Button>
+                    </div>
+                  ) : (
+                    <span className="block text-right text-sm text-muted">No actions</span>
+                  )}
+                </Cell>
+              </Row>
+            )}
+          </TableBody>
+        </DataTable>
+      </div>
       <Modal
         title="Edit availability"
         isOpen={editSlot !== null}
@@ -221,15 +330,33 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
         {detailsSlot ? (
           <dl className="mt-2 grid grid-cols-[7rem_1fr] [&>dd]:m-0 [&>dd]:border-b [&>dd]:border-border [&>dd]:p-2 [&>dt]:border-b [&>dt]:border-border [&>dt]:p-2 [&>dt]:font-bold">
             <dt>Date</dt>
-            <dd>{detailsSlot.date}</dd>
+            <dd>{formatDate(detailsSlot.date)}</dd>
             <dt>Time</dt>
             <dd>
               {detailsSlot.start_time.slice(0, 5)}–{detailsSlot.end_time.slice(0, 5)}
             </dd>
             <dt>Status</dt>
-            <dd>{detailsSlot.status}</dd>
+            <dd>
+              <StatusBadge status={detailsSlot.status} />
+            </dd>
             <dt>Mode</dt>
-            <dd>{detailsSlot.mode === 'IN_PERSON' ? detailsSlot.location : 'Online'}</dd>
+            <dd>
+              {detailsSlot.mode === 'IN_PERSON'
+                ? detailsSlot.location || 'Not specified'
+                : 'Online'}
+            </dd>
+            {detailsSlot.student_name ? (
+              <>
+                <dt>Student</dt>
+                <dd>{detailsSlot.student_name}</dd>
+              </>
+            ) : null}
+            {detailsSlot.purpose ? (
+              <>
+                <dt>Purpose</dt>
+                <dd>{categoryLabel(detailsSlot.purpose)}</dd>
+              </>
+            ) : null}
           </dl>
         ) : null}
       </Modal>

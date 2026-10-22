@@ -14,6 +14,7 @@ import {
   uniqueEmail,
 } from './helpers/testDatabase'
 import { signInAs } from './helpers/testSession'
+import { waitForHydration } from './helpers/hydration'
 
 const password = 'Password123!'
 
@@ -64,6 +65,7 @@ test.describe('Consultation lifecycle', () => {
     // 1. Student books through the real wizard.
     await signInAs(page, studentEmail, password)
     await page.goto('/student/book')
+    await waitForHydration(page, page.getByLabel('Faculty name'))
     await page.getByLabel('Faculty name').fill(facultyName)
     // Wait for the search debounce to flush so the card is stable before clicking.
     await page.waitForURL('**/student/book?search=**', { timeout: 30_000 })
@@ -78,8 +80,8 @@ test.describe('Consultation lifecycle', () => {
     await page.getByRole('button', { name: 'Review request' }).click()
     await expect(page.getByText('Academic concern')).toBeVisible()
     await page.getByRole('button', { name: 'Confirm booking request' }).click()
-    await expect(page).toHaveURL('/student/consultations')
-    await expect(page.locator('article', { hasText: facultyName })).toBeVisible()
+    await expect(page).toHaveURL('/student/consultations', { timeout: 30_000 })
+    await expect(page.getByRole('row').filter({ hasText: facultyName })).toBeVisible()
 
     const booked = await getLatestConsultationForStudent(student.id)
     expect(booked?.status).toBe('PENDING')
@@ -91,9 +93,11 @@ test.describe('Consultation lifecycle', () => {
     // 2. Faculty approves. The request leaves the pending queue...
     await signInAs(page, facultyEmail, password)
     await page.goto('/faculty/requests')
-    const row = page.locator('article', { hasText: studentName })
+    const row = page.getByRole('row').filter({ hasText: studentName })
+    await waitForHydration(page, row.getByRole('button', { name: 'Approve' }))
     await row.getByRole('button', { name: 'Approve' }).click()
     const dialog = page.getByRole('alertdialog')
+    await waitForHydration(page, dialog.getByRole('button', { name: 'Approve' }))
     await dialog.getByRole('button', { name: 'Approve' }).click()
     await expect(row).toHaveCount(0, { timeout: 30_000 })
 
@@ -105,14 +109,26 @@ test.describe('Consultation lifecycle', () => {
 
     // ...and shows up as approved in the history list.
     await page.goto('/faculty/consultations')
-    const historyRow = page.locator('article', { hasText: studentName })
-    await expect(historyRow.getByText('APPROVED')).toBeVisible()
+    const historyRow = page.getByRole('row').filter({ hasText: studentName })
+    await waitForHydration(
+      page,
+      historyRow.getByRole('button', { name: `View consultation details with ${studentName}` })
+    )
+    await expect(historyRow.getByText('Approved')).toBeVisible()
 
-    // 3. Faculty completes with an outcome note.
-    await historyRow.getByRole('link', { name: 'Complete' }).click()
-    await page.getByLabel('Outcome note (optional)').fill('Reviewed study plan.')
-    await page.getByRole('button', { name: 'Mark completed' }).click()
-    await expect(page.getByText('Reviewed study plan.')).toBeVisible()
+    // 3. Faculty completes from the details modal with an outcome note.
+    await historyRow
+      .getByRole('button', { name: `View consultation details with ${studentName}` })
+      .click()
+    const details = page.getByRole('dialog')
+    await details.getByLabel('Outcome Note').fill('Reviewed study plan.')
+    await details.getByRole('button', { name: 'Mark as Completed' }).click()
+    const confirmation = page.getByRole('alertdialog')
+    await expect(confirmation.getByText('Mark consultation as completed?')).toBeVisible()
+    await waitForHydration(page, confirmation.getByRole('button', { name: 'Mark as Completed' }))
+    await confirmation.getByRole('button', { name: 'Mark as Completed' }).click()
+    await expect(details.getByRole('status')).toHaveText('Consultation marked as completed.')
+    await expect(historyRow.getByText('Completed')).toBeVisible()
 
     expect((await getConsultation(booked!.id))?.status).toBe('COMPLETED')
     expect((await getSlot(slot.id))?.status).toBe('CLOSED')
@@ -120,6 +136,7 @@ test.describe('Consultation lifecycle', () => {
     // 4. Student sees the outcome on the detail page.
     await signInAs(page, studentEmail, password)
     await page.goto(`/student/consultations/${booked!.id}`)
+    await waitForHydration(page)
     await expect(page.getByText('Reviewed study plan.')).toBeVisible()
   })
 
@@ -129,9 +146,12 @@ test.describe('Consultation lifecycle', () => {
 
     await signInAs(page, facultyEmail, password)
     await page.goto('/faculty/requests')
-    const row = page.locator('article', { hasText: studentName })
+    const row = page.getByRole('row').filter({ hasText: studentName })
+    await waitForHydration(page, row.getByRole('button', { name: 'Reject' }))
     await row.getByRole('button', { name: 'Reject' }).click()
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Reject' }).click()
+    const dialog = page.getByRole('alertdialog')
+    await waitForHydration(page, dialog.getByRole('button', { name: 'Reject' }))
+    await dialog.getByRole('button', { name: 'Reject' }).click()
     await expect
       .poll(() => getConsultation(consultationId).then((row) => row?.status), { timeout: 30_000 })
       .toBe('REJECTED')
@@ -150,10 +170,13 @@ test.describe('Consultation lifecycle', () => {
 
     await signInAs(page, studentEmail, password)
     await page.goto('/student/consultations')
-    const row = page.locator('article', { hasText: facultyName })
+    const row = page.getByRole('row').filter({ hasText: facultyName })
+    await waitForHydration(page, row.getByRole('button', { name: 'Cancel' }))
     await row.getByRole('button', { name: 'Cancel' }).click()
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click()
-    await expect(row.getByText('CANCELLED')).toBeVisible({ timeout: 30_000 })
+    const dialog = page.getByRole('alertdialog')
+    await waitForHydration(page, dialog.getByRole('button', { name: 'Cancel' }))
+    await dialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(row.getByText('Cancelled')).toBeVisible({ timeout: 30_000 })
 
     expect((await getConsultation(consultationId))?.status).toBe('CANCELLED')
     expect((await getSlot(slot.id))?.status).toBe('OPEN')
@@ -171,6 +194,7 @@ test.describe('Consultation lifecycle', () => {
 
     await signInAs(page, otherEmail, password)
     await page.goto('/student/book')
+    await waitForHydration(page, page.getByLabel('Faculty name'))
     await page.getByLabel('Faculty name').fill(facultyName)
     // Wait for the search debounce to flush so the card is stable before clicking.
     await page.waitForURL('**/student/book?search=**', { timeout: 30_000 })

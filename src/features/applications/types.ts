@@ -8,4 +8,5 @@ export type ApplicationItem = {
   created_at: string
   role: 'STUDENT' | 'FACULTY' | 'ADMIN' | null
   department_id: string | null
+  position_title: string | null
 }

@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getServerEnvironment } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
@@ -29,6 +30,10 @@ export async function signInWithPassword(
   }
 
   const supabase = await createClient()
+  const { data: allowed, error: domainError } = await supabase.rpc('is_approved_email', {
+    candidate_email: parsed.data.email,
+  })
+  if (domainError || !allowed) return { error: 'Incorrect email or password.' }
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error) {
     if (error.code === 'email_not_confirmed') {
@@ -54,6 +59,11 @@ export async function signUpWithPassword(
   }
 
   const supabase = await createClient()
+  const { data: allowed, error: domainError } = await supabase.rpc('is_approved_email', {
+    candidate_email: parsed.data.email,
+  })
+  if (domainError) return { error: 'Unable to verify this school email. Try again.' }
+  if (!allowed) return { error: 'Use an approved school email address.' }
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -137,7 +147,12 @@ export async function claimFirstAdmin(_state: ActionState): Promise<ActionState>
     profile.email.toLowerCase() !== environment.INITIAL_ADMIN_EMAIL.toLowerCase()
   )
     return { error: 'Admin claim is not available for this account.' }
-  const { error } = await supabase.rpc('claim_first_admin', {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!serviceKey || !url) return { error: 'Admin bootstrap is not configured.' }
+  const admin = createAdminClient(url, serviceKey, { auth: { persistSession: false } })
+  const { error } = await admin.rpc('claim_first_admin', {
+    target_user_id: userId,
     expected_email: environment.INITIAL_ADMIN_EMAIL,
   })
   if (error) return { error: 'Admin claim is not available for this account.' }

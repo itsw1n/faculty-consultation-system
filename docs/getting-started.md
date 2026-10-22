@@ -22,6 +22,7 @@ Point the app at the local stack in `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<local key from supabase status>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SUPABASE_SERVICE_ROLE_KEY=<local secret key from supabase status>
 ```
 
 See [`reference/environment.md`](reference/environment.md) for every variable.
@@ -40,23 +41,48 @@ Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domai
 delete from public.approved_email_domains where domain = '*';
 ```
 
+## Demo accounts
+
+`supabase db reset` loads exactly three local demo accounts, five consultations covering every lifecycle state, and sample notifications:
+
+| Role    | Email                           | Password       |
+| ------- | ------------------------------- | -------------- |
+| Admin   | `admin.demo@acdeducation.com`   | `Password123!` |
+| Faculty | `faculty.demo@acdeducation.com` | `Password123!` |
+| Student | `student.demo@acdeducation.com` | `Password123!` |
+
+Re-apply just the demo data without rebuilding the database:
+
+```bash
+make seed
+```
+
+Remove the demo data by rebuilding only the local database from migrations, without applying the seed:
+
+```bash
+make reset
+```
+
+Both targets pass `--local`, so they never touch a linked or hosted Supabase project. `make reset` also clears any other local development data.
+
+The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
+
 ## First administrator
 
 1. Add `INITIAL_ADMIN_EMAIL` to `.env.local`.
 2. Restart the dev server.
-3. Sign in with that email and password.
+3. Register that address, confirm it through the local mail catcher, then sign in with the app password.
 4. Open `/auth/claim-admin` and claim the first admin role.
 
 The claim only succeeds while no approved admin exists. On success the account redirects to `/admin`.
 
 ## Faculty onboarding
 
-1. Sign in as an admin.
-2. Open `/admin/users`.
-3. Enter 1–50 school emails, a department, and a position title.
-4. Invite the faculty.
+1. Ask the faculty member to register with their email and an app password, then verify the email.
+2. Sign in as an admin and open `/admin/users`.
+3. Select **Add Faculty**, enter the registered email, department, and position, then submit.
 
-Each invited address becomes approved faculty the first time its owner signs in, with the invited department and position. Admins can later correct an approved account's role or department from the same page. See [`concepts/rules.md`](concepts/rules.md) for the full lifecycle.
+The existing student account becomes faculty immediately. No invitation or pending faculty record is created. Admins can later correct an approved account's role or department from the same page. See [`concepts/rules.md`](concepts/rules.md) for the full lifecycle.
 
 ## Validate
 
@@ -68,6 +94,8 @@ npm run test:e2e
 ```
 
 `npm run check` runs format, lint, typecheck, and unit tests. End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `password-auth`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it with `supabase status -o env`) and skip automatically when it is unavailable. Password specs exercise the real sign-in form; fixtures create users through the Auth Admin API and generate verification tokens where a test must not depend on reading mail. Assertions check both the screen and the database row.
+
+Database-backed browser tests run only against localhost. Their setup and teardown remove accounts and departments reserved with the `e2e-` / `E2E Department` prefixes, so test fixtures do not remain in the development UI. Seeded demo accounts and developer-created records are preserved.
 
 Commit the generated `package-lock.json`; CI uses `npm ci`.
 

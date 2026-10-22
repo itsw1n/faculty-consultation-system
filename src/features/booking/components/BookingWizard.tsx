@@ -81,15 +81,15 @@ export function BookingWizard({
   if (!slots.length)
     return (
       <>
-        <p className="rounded-xl border border-border bg-surface p-8 text-center text-muted">
+        <p className="border-y border-border py-10 text-center text-muted">
           No schedules in the next four weeks.
         </p>
         {refreshControl}
       </>
     )
-  const field = 'grid gap-2 font-bold'
+  const field = 'grid gap-2 font-semibold'
   const control =
-    'rounded-lg border border-border bg-surface p-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
+    'rounded-md border border-border bg-surface p-3 outline-none focus-visible:ring-3 focus-visible:ring-focus'
   return (
     <section>
       <ol className="mb-4 flex list-none gap-2 p-0" aria-label="Booking progress">
@@ -152,7 +152,7 @@ export function BookingWizard({
             {week.map((day, index) => (
               <button
                 className={cn(
-                  'min-h-10 cursor-pointer rounded-lg border border-border px-3 text-sm font-bold transition-colors hover:bg-subtle disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus',
+                  'min-h-10 cursor-pointer rounded-md border border-border px-3 text-sm font-semibold transition-colors hover:bg-subtle disabled:opacity-40 focus-visible:outline-3 focus-visible:outline-focus',
                   'min-w-17',
                   mobileDay === index
                     ? 'bg-primary text-white hover:bg-primary-hover'
@@ -169,11 +169,11 @@ export function BookingWizard({
               </button>
             ))}
           </div>
-          <div className="grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
+          <div className="grid overflow-hidden rounded-lg border border-border sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
             {week.map((day, index) => (
               <section
                 className={cn(
-                  'min-h-48 rounded-xl border border-border bg-surface p-3',
+                  'min-h-48 border-r border-border bg-surface p-3 last:border-r-0',
                   mobileDay !== index && 'hidden sm:block'
                 )}
                 key={day.dateKey}
@@ -194,7 +194,7 @@ export function BookingWizard({
                       disabled={slot.slot_status !== 'OPEN'}
                       aria-pressed={selectedId === slot.id}
                       className={cn(
-                        'my-2 grid w-full cursor-pointer gap-1 rounded-lg border border-border p-3 text-left text-success transition hover:brightness-95 disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
+                        'my-2 grid w-full cursor-pointer gap-1 rounded-md border border-border p-3 text-left text-success transition hover:brightness-95 disabled:cursor-not-allowed focus-visible:outline-3 focus-visible:outline-accent',
                         slot.slot_status === 'OPEN' && 'bg-emerald-50',
                         slot.slot_status === 'RESERVED' && 'bg-amber-50 text-warning',
                         slot.slot_status === 'BOOKED' && 'bg-blue-50 text-blue-800',
@@ -225,7 +225,7 @@ export function BookingWizard({
         </>
       )}
       {step === 'details' && (
-        <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
+        <div className="max-w-2xl border-y border-border bg-surface py-5">
           <Button variant="ghost" onPress={() => setStep('schedule')}>
             Back to schedule
           </Button>
@@ -257,7 +257,7 @@ export function BookingWizard({
         </div>
       )}
       {step === 'review' && selected && (
-        <div className="max-w-2xl rounded-xl border border-border bg-surface p-6">
+        <div className="max-w-2xl border-y border-border bg-surface py-5">
           <Button variant="ghost" onPress={() => setStep('details')}>
             Back to details
           </Button>

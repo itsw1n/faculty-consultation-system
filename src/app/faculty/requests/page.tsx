@@ -12,6 +12,7 @@ export default async function RequestsPage() {
         initialPage={await getConsultationPage({ status: 'PENDING' })}
         viewer="FACULTY"
         fixedStatus="PENDING"
+        allowDecisions
       />
     </>
   )

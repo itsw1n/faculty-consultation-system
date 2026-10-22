@@ -28,7 +28,7 @@ export function PasswordField({
       <div className="relative">
         <input
           id={id}
-          className="min-h-12 w-full rounded-lg border border-border bg-surface px-3 pr-11 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus"
+          className="min-h-12 w-full rounded-md border border-border bg-surface px-3 pr-11 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus"
           name={name}
           type={showPassword ? 'text' : 'password'}
           autoComplete={autoComplete}

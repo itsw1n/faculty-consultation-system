@@ -19,7 +19,7 @@ export default async function ConsultationRecords() {
         <label className="grid gap-1 text-sm font-semibold">
           From{' '}
           <input
-            className="min-h-11 rounded border border-border bg-surface px-3"
+            className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
             type="date"
             name="from"
             defaultValue={from}
@@ -29,14 +29,16 @@ export default async function ConsultationRecords() {
         <label className="grid gap-1 text-sm font-semibold">
           To{' '}
           <input
-            className="min-h-11 rounded border border-border bg-surface px-3"
+            className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
             type="date"
             name="to"
             defaultValue={today}
             required
           />
         </label>
-        <Button type="submit">Download summary CSV</Button>
+        <Button type="submit" variant="secondary">
+          Download summary CSV
+        </Button>
       </form>
       <ConsultationDirectory initialPage={await getConsultationPage({})} viewer="ADMIN" />
     </>

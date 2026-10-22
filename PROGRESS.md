@@ -7,10 +7,10 @@ Core v1 implementation complete; awaiting environment-specific auth email config
 ## Completed
 
 - Supabase schema, RLS, seed data, atomic workflow RPCs, and database tests.
-- Email + password sign-in with mandatory verification, self-service sign-up, password recovery, automatic student approval, invite-based faculty onboarding, first-admin claim, and admin account correction.
+- Email + password sign-in with mandatory verification, self-service sign-up, password recovery, automatic student approval, verified-student faculty promotion, server-only first-admin claim, and admin account correction.
 - Student faculty directory, availability calendar, booking, and consultation management.
 - Faculty availability management and request decisions.
-- Admin users, faculty, department, and consultation record views with CSV export.
+- Admin user, department, and consultation record views with CSV export.
 - In-app notifications with read state and unread counts.
 - Email outbox with status notifications, next-day reminders, Resend delivery, and a protected scheduled route.
 - Responsive layouts, accessible dialogs, inline filters, cursor loading, and desktop/mobile E2E coverage.

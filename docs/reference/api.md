@@ -57,6 +57,8 @@ The admin dashboard uses `admin_dashboard_summary()` for aggregate account, avai
 
 The faculty dashboard uses `faculty_dashboard_summary()` for pending/open-slot counts and the next open slot, `list_my_upcoming_consultations()` for the next five confirmed consultations, and `search_my_consultations` for its pending queue.
 
+The student dashboard uses `student_dashboard_summary()` for pending, upcoming, and completed counts plus the next confirmed consultation. It loads up to three pending requests and up to fifty recent consultation candidates through `search_my_consultations`, then excludes every pending row and the next appointment, keeping the newest three remaining rows.
+
 ## Error contract
 
 - Invalid submitted fields return a safe validation message or reject the action.

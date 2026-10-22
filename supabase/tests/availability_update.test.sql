@@ -6,7 +6,7 @@ values
 ('aa000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','owner-update@school.edu','',now(),'{}','{}',now(),now()),
 ('bb000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','other-update@school.edu','',now(),'{}','{}',now(),now()),
 ('cc000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','student-update@school.edu','',now(),'{}','{}',now(),now());
-update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id in ('aa000000-0000-0000-0000-000000000001','bb000000-0000-0000-0000-000000000002');
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id in ('aa000000-0000-0000-0000-000000000001','bb000000-0000-0000-0000-000000000002');
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='cc000000-0000-0000-0000-000000000003';
 
 set local role authenticated;
@@ -32,9 +32,9 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"aa000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
 select results_eq(
-  $$select purpose, student_name is not null from public.list_own_availability() where id=(select id from test_slot)$$,
+  $$select category, student_name is not null from public.list_own_availability() where id=(select id from test_slot)$$,
   $$values ('PERSONAL'::text, true)$$,
-  'linked request includes the student and purpose'
+  'linked request includes the student and category'
 );
 select throws_ok($$select public.update_open_availability((select id from test_slot),current_date+1,'16:00','17:00','IN_PERSON','Room 2',null)$$,'23514','Open availability not found','reserved slot cannot be updated');
 select throws_ok($$select public.update_open_availability((select id from test_slot),current_date-1,'16:00','17:00','IN_PERSON','Room 2',null)$$,'22023','Availability cannot be in the past','past date is rejected');

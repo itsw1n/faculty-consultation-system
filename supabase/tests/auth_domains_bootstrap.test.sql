@@ -1,5 +1,5 @@
 begin;
-select plan(17);
+select plan(15);
 
 delete from public.approved_email_domains where domain = '*';
 
@@ -24,7 +24,7 @@ values ('d4000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-00000000
 delete from public.approved_email_domains where domain = 'gmail.com';
 
 update public.profiles
-set requested_role = 'STUDENT', department_id = (select id from public.departments where code='IT'),
+set department_id = (select id from public.departments where code='IT'),
     account_status = 'PENDING', role = null
 where id in ('d4000000-0000-0000-0000-000000000004', 'd5000000-0000-0000-0000-000000000005');
 
@@ -55,8 +55,6 @@ reset role;
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"d3000000-0000-0000-0000-000000000003","role":"authenticated"}',true);
-select lives_ok($$select public.review_application('d5000000-0000-0000-0000-000000000005','APPROVED')$$, 'legacy school application can be approved');
-select throws_ok($$select public.review_application('d4000000-0000-0000-0000-000000000004','APPROVED')$$, '22023', 'School email required', 'legacy outside application cannot be approved');
 select lives_ok($$select public.correct_user_account('d2000000-0000-0000-0000-000000000002','FACULTY',(select id from public.departments where code='IT'),'Lecturer')$$, 'admin corrects role and department');
 select lives_ok($$select public.correct_user_account('d2000000-0000-0000-0000-000000000002','FACULTY',(select id from public.departments where code='IT'),null)$$, 'repeat correction keeps position');
 select throws_ok($$select public.correct_user_account('d2000000-0000-0000-0000-000000000002','ADMIN',(select id from public.departments where code='IT'),null)$$, '22023', 'Invalid role', 'Admin role cannot be granted through correction');
@@ -64,7 +62,7 @@ select throws_ok($$select public.correct_user_account('d3000000-0000-0000-0000-0
 reset role;
 
 select results_eq($$select role::text from public.profiles where id='d2000000-0000-0000-0000-000000000002'$$, array['FACULTY'::text], 'corrected role persists');
-select results_eq($$select position_title from public.faculty_profiles where user_id='d2000000-0000-0000-0000-000000000002'$$, array['Lecturer'::text], 'existing position is retained');
+select results_eq($$select position_title from public.profiles where id='d2000000-0000-0000-0000-000000000002'$$, array['Lecturer'::text], 'existing position is retained');
 
 select * from finish();
 rollback;

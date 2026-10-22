@@ -8,9 +8,9 @@ values
 ('77000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dashboard-other@school.edu','',now(),'{}','{"full_name":"Other Faculty"}',now(),now()),
 ('77000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dashboard-admin@school.edu','',now(),'{}','{"full_name":"Dashboard Admin"}',now(),now());
 
-update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='77000000-0000-0000-0000-000000000001';
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='77000000-0000-0000-0000-000000000001';
 update public.profiles set role='STUDENT',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='77000000-0000-0000-0000-000000000002';
-update public.profiles set role='FACULTY',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='77000000-0000-0000-0000-000000000003';
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED',department_id=(select id from public.departments where code='IT') where id='77000000-0000-0000-0000-000000000003';
 update public.profiles set role='ADMIN',account_status='APPROVED' where id='77000000-0000-0000-0000-000000000004';
 
 insert into public.availability_slots (id,faculty_id,date,start_time,end_time,status,mode,location)
@@ -24,13 +24,13 @@ values
 ('88000000-0000-0000-0000-000000000007','77000000-0000-0000-0000-000000000003',(now() at time zone 'Asia/Manila')::date + 1,'09:00','10:00','OPEN','IN_PERSON','Other room'),
 ('88000000-0000-0000-0000-000000000008','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date - 2,'15:00','16:00','CLOSED','IN_PERSON','Past closed room');
 
-insert into public.consultations (id,student_id,faculty_id,availability_slot_id,purpose,category,notes,status)
+insert into public.consultations (id,student_id,faculty_id,availability_slot_id,category,notes,status)
 values
-('99000000-0000-0000-0000-000000000001','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000003','ACADEMIC','ACADEMIC','Pending notes','PENDING'),
-('99000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000004','GRADE','GRADE',null,'APPROVED'),
-('99000000-0000-0000-0000-000000000003','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000005','CAPSTONE','CAPSTONE',null,'APPROVED'),
-('99000000-0000-0000-0000-000000000004','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000008','PERSONAL','PERSONAL',null,'APPROVED'),
-('99000000-0000-0000-0000-000000000005','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000003','88000000-0000-0000-0000-000000000007','OTHER','OTHER',null,'APPROVED');
+('99000000-0000-0000-0000-000000000001','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000003','ACADEMIC','Pending notes','PENDING'),
+('99000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000004','GRADE',null,'APPROVED'),
+('99000000-0000-0000-0000-000000000003','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000005','CAPSTONE',null,'APPROVED'),
+('99000000-0000-0000-0000-000000000004','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','88000000-0000-0000-0000-000000000008','PERSONAL',null,'APPROVED'),
+('99000000-0000-0000-0000-000000000005','77000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000003','88000000-0000-0000-0000-000000000007','OTHER',null,'APPROVED');
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"77000000-0000-0000-0000-000000000002","role":"authenticated"}',true);

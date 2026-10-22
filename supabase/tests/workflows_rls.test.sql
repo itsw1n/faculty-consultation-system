@@ -7,9 +7,8 @@ values
 ('20000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','faculty@school.edu','',now(),'{}','{"full_name":"Faculty One"}',now(),now()),
 ('30000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000000','authenticated','authenticated','other@school.edu','',now(),'{}','{"full_name":"Other Student"}',now(),now());
 
-update public.profiles set role='STUDENT',requested_role='STUDENT',account_status='APPROVED' where id in ('10000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000003');
-update public.profiles set role='FACULTY',requested_role='FACULTY',account_status='APPROVED' where id='20000000-0000-0000-0000-000000000002';
-insert into public.faculty_profiles(user_id,position_title) values('20000000-0000-0000-0000-000000000002','Instructor');
+update public.profiles set role='STUDENT',account_status='APPROVED' where id in ('10000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-000000000003');
+update public.profiles set role='FACULTY',position_title='Instructor',account_status='APPROVED' where id='20000000-0000-0000-0000-000000000002';
 insert into public.availability_slots(id,faculty_id,date,start_time,end_time,mode,location) values('40000000-0000-0000-0000-000000000004','20000000-0000-0000-0000-000000000002',current_date+1,'09:00','10:00','IN_PERSON','Room 1');
 
 set local role anon;

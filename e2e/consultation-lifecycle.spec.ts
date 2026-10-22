@@ -75,7 +75,7 @@ test.describe('Consultation lifecycle', () => {
     await page.waitForURL(/\/student\/book\/[0-9a-f-]{36}/, { timeout: 90_000 })
     await (await findVisibleSlot(page, 'OPEN')).click()
     await page.getByRole('button', { name: 'Continue' }).click()
-    await page.getByRole('button', { name: 'Purpose' }).click()
+    await page.getByRole('button', { name: 'Category' }).click()
     await page.getByRole('option', { name: 'Academic concern' }).click()
     await page.getByRole('button', { name: 'Review request' }).click()
     await expect(page.getByText('Academic concern')).toBeVisible()

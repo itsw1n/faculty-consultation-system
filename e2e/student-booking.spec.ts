@@ -159,7 +159,7 @@ test.describe('Student booking journey', () => {
 
     const reviewButton = page.getByRole('button', { name: 'Review request' })
     await expect(reviewButton).toBeDisabled()
-    await page.getByRole('button', { name: 'Purpose' }).click()
+    await page.getByRole('button', { name: 'Category' }).click()
     await page.getByRole('option', { name: 'Personal concern' }).click()
     await expect(reviewButton).toBeEnabled()
   })

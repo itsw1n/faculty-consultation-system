@@ -14,9 +14,7 @@ export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select(
-      'account_status,email,full_name,requested_role,role,departments(name),faculty_profiles(position_title)'
-    )
+    .select('account_status,email,full_name,role,position_title,departments(name)')
     .eq('id', userId)
     .single()
 
@@ -35,8 +33,7 @@ export async function getAuthenticatedProfile(): Promise<AuthProfile | null> {
     email: data.email,
     fullName: data.full_name,
     departmentName: data.departments?.[0]?.name ?? null,
-    positionTitle: data.faculty_profiles?.[0]?.position_title ?? null,
-    requestedRole: data.requested_role,
+    positionTitle: data.position_title,
     role: data.role,
   }
 }

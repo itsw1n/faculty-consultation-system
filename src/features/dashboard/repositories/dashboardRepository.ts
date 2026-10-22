@@ -23,7 +23,7 @@ export type StudentDashboardSummary = {
   next_consultation_id: string | null
   next_faculty_name: string | null
   next_faculty_department: string | null
-  next_purpose: string | null
+  next_category: string | null
   next_slot_date: string | null
   next_start_time: string | null
   next_end_time: string | null

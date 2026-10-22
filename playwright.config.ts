@@ -7,6 +7,7 @@ export default defineConfig({
   testDir: './e2e',
   globalSetup: './e2e/globalSetup.ts',
   globalTeardown: './e2e/globalTeardown.ts',
+  workers: 1,
   use: { baseURL },
   webServer: externalBaseUrl
     ? undefined

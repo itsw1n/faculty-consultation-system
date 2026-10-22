@@ -153,8 +153,8 @@ export function ConsultationDetailsDialog({
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-semibold">Purpose</dt>
-                      <dd>{categoryLabel(item.purpose)}</dd>
+                      <dt className="font-semibold">Category</dt>
+                      <dd>{categoryLabel(item.category)}</dd>
                     </div>
                     <div>
                       <dt className="font-semibold">Description</dt>

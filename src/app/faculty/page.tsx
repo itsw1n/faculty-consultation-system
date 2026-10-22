@@ -115,7 +115,7 @@ export default async function FacultyDashboard() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <strong className="font-semibold text-primary">{item.student_name}</strong>
-                      <p className="mt-1 text-sm text-muted">{categoryLabel(item.purpose)}</p>
+                      <p className="mt-1 text-sm text-muted">{categoryLabel(item.category)}</p>
                       <p className="mt-1 text-sm text-muted">
                         {formatDay(item.slot_date)} ·{' '}
                         {formatTimeRange(item.start_time, item.end_time)} · {modeLabel(item)}

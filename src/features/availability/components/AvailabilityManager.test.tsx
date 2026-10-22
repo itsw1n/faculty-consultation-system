@@ -21,7 +21,7 @@ const slot = (overrides: Partial<AvailabilityItem> = {}): AvailabilityItem => ({
   location: 'Room 101',
   meeting_link: null,
   student_name: null,
-  purpose: null,
+  category: null,
   ...overrides,
 })
 

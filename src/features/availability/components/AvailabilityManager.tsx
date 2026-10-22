@@ -57,7 +57,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
     if (!query) return true
     return [
       slot.student_name ?? '',
-      slot.purpose ? categoryLabel(slot.purpose) : '',
+      slot.category ? categoryLabel(slot.category) : '',
       slot.location ?? '',
       slot.mode === 'ONLINE' ? 'online' : '',
     ].some((value) => value.toLowerCase().includes(query))
@@ -72,7 +72,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
       />
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem]">
         <label className="relative block">
-          <span className="sr-only">Search by student name or purpose</span>
+          <span className="sr-only">Search by student name or category</span>
           <Search
             size={18}
             aria-hidden="true"
@@ -82,7 +82,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
             className={`${controlClass} w-full pl-10`}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by student name or purpose..."
+            placeholder="Search by student name or category..."
           />
         </label>
         <Select
@@ -187,8 +187,8 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                   {slot.student_name ? (
                     <>
                       <p className="font-semibold text-primary">{slot.student_name}</p>
-                      {slot.purpose ? (
-                        <p className="mt-1 text-sm text-muted">{categoryLabel(slot.purpose)}</p>
+                      {slot.category ? (
+                        <p className="mt-1 text-sm text-muted">{categoryLabel(slot.category)}</p>
                       ) : null}
                     </>
                   ) : (
@@ -351,10 +351,10 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                 <dd>{detailsSlot.student_name}</dd>
               </>
             ) : null}
-            {detailsSlot.purpose ? (
+            {detailsSlot.category ? (
               <>
-                <dt>Purpose</dt>
-                <dd>{categoryLabel(detailsSlot.purpose)}</dd>
+                <dt>Category</dt>
+                <dd>{categoryLabel(detailsSlot.category)}</dd>
               </>
             ) : null}
           </dl>

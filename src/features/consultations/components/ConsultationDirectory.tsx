@@ -85,8 +85,8 @@ export function ConsultationDirectory({
             onChange={(event) => setSearch(event.target.value)}
             placeholder={
               viewer === 'STUDENT'
-                ? 'Search faculty name or purpose...'
-                : 'Search student name or purpose...'
+                ? 'Search faculty name or category...'
+                : 'Search student name or category...'
             }
           />
         </label>
@@ -112,7 +112,7 @@ export function ConsultationDirectory({
               {viewer === 'STUDENT' ? 'Faculty' : 'Student'}
             </Column>
             <Column className="w-[16%] px-5 py-3">Schedule</Column>
-            <Column className="w-[16%] px-5 py-3">Purpose</Column>
+            <Column className="w-[16%] px-5 py-3">Category</Column>
             <Column className="w-[12%] px-5 py-3">Status</Column>
             <Column className="w-[34%] px-5 py-3 text-right">Action</Column>
           </TableHeader>
@@ -133,7 +133,7 @@ export function ConsultationDirectory({
                     {item.start_time.slice(0, 5)}–{item.end_time.slice(0, 5)}
                   </p>
                 </Cell>
-                <Cell className="px-5 py-4 text-sm text-muted">{categoryLabel(item.purpose)}</Cell>
+                <Cell className="px-5 py-4 text-sm text-muted">{categoryLabel(item.category)}</Cell>
                 <Cell className="px-5 py-4">
                   <StatusBadge status={item.consultation_status} />
                 </Cell>

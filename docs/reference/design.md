@@ -71,6 +71,8 @@ Use the standard Tailwind spacing scale; avoid one-off values. Keep radii consis
 - **Shadows** — reserve the stronger dialog shadow for overlays. Ordinary page content uses borders and spacing instead of stacked shadows.
 - **Search and filters** — consistent control height and radius; search is the primary wide field; filters sit inline on desktop and stack below on mobile. There is no separate filter drawer.
 
+The student dashboard is action-first: the next confirmed consultation and pending requests lead the page, status counts and quick actions sit in a side rail, and up to three deduplicated recent rows close the page. On mobile the side rail follows pending requests and precedes recent activity. Without a confirmed appointment, pending requests and a discovery card take its place; students with no consultation history see the discovery empty state alongside the side rail.
+
 ## Calendar status
 
 ```text

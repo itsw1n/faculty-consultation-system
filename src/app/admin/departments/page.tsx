@@ -3,8 +3,10 @@ import { PageHeading } from '@/components/common/PageHeading'
 import { createDepartment } from '@/features/admin/actions'
 import { DepartmentTable } from '@/features/admin/components/DepartmentTable'
 import { listDepartments } from '@/features/admin/repositories/adminRepository'
+import { requireRole } from '@/features/auth/repositories/authRepository'
 
 export default async function DepartmentsPage() {
+  await requireRole('ADMIN')
   const departments = await listDepartments()
 
   return (

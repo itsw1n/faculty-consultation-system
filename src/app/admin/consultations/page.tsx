@@ -2,7 +2,9 @@ import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { ConsultationDirectory } from '@/features/consultations/components/ConsultationDirectory'
 import { getConsultationPage } from '@/features/consultations/repositories/consultationRepository'
+import { requireRole } from '@/features/auth/repositories/authRepository'
 export default async function ConsultationRecords() {
+  await requireRole('ADMIN')
   const today = new Date().toISOString().slice(0, 10)
   const from = `${today.slice(0, 4)}-01-01`
   return (

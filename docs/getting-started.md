@@ -43,13 +43,15 @@ delete from public.approved_email_domains where domain = '*';
 
 ## Demo accounts
 
-`supabase db reset` loads exactly three local demo accounts, five consultations covering every lifecycle state, and sample notifications:
+`supabase db reset` loads five local demo accounts (one admin, three faculty, and one student), twenty availability slots, twelve consultations covering every lifecycle state, sample notifications, and email outbox history:
 
-| Role    | Email                           | Password       |
-| ------- | ------------------------------- | -------------- |
-| Admin   | `admin.demo@acdeducation.com`   | `Password123!` |
-| Faculty | `faculty.demo@acdeducation.com` | `Password123!` |
-| Student | `student.demo@acdeducation.com` | `Password123!` |
+| Role    | Name                       | Email                                | Password       |
+| ------- | -------------------------- | ------------------------------------ | -------------- |
+| Admin   | Demo Admin                 | `admin.demo@acdeducation.com`        | `Password123!` |
+| Faculty | Maria Cristina D. Reyes    | `faculty.demo@acdeducation.com`      | `Password123!` |
+| Faculty | Jose Miguel A. Santos      | `jose.santos@acdeducation.com`       | `Password123!` |
+| Faculty | Angela Marie L. Villanueva | `angela.villanueva@acdeducation.com` | `Password123!` |
+| Student | Erwin James P. Dela Cruz   | `student.demo@acdeducation.com`      | `Password123!` |
 
 Re-apply just the demo data without rebuilding the database:
 

@@ -21,6 +21,7 @@ const baseItem: ConsultationItem = {
   end_time: '14:00:00',
   mode: 'ONLINE',
   location: null,
+  meeting_link: 'https://meet.example.com/room/1',
   created_at: '2026-10-20T00:00:00Z',
   outcome: null,
   student_department: 'Information Technology',
@@ -45,6 +46,21 @@ describe('ConsultationDetailsDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Mark as Completed' }))
     const confirmation = screen.getByRole('alertdialog')
     expect(within(confirmation).getByText('Mark consultation as completed?')).toBeInTheDocument()
+  })
+
+  test('shows the meeting link for approved online consultations', () => {
+    renderDialog(baseItem, 'STUDENT')
+
+    expect(screen.getByRole('link', { name: 'Join online consultation' })).toHaveAttribute(
+      'href',
+      'https://meet.example.com/room/1'
+    )
+  })
+
+  test('hides meeting links that are not http or https', () => {
+    renderDialog({ ...baseItem, meeting_link: 'javascript:alert(1)' }, 'STUDENT')
+
+    expect(screen.queryByRole('link', { name: 'Join online consultation' })).not.toBeInTheDocument()
   })
 
   test('keeps approved consultations read-only for students', () => {

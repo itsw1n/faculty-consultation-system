@@ -6,6 +6,7 @@ import { Info } from 'lucide-react'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Button } from '@/components/common/button/Button'
 import { initialActionState } from '@/lib/actionState'
+import { safeHttpUrl } from '@/lib/safeNavigation'
 import { categoryLabel } from '../categories'
 import { completeConsultationWithFeedback } from '../actions'
 import type { ConsultationItem } from '../types'
@@ -58,6 +59,10 @@ export function ConsultationDetailsDialog({
 
   const completed = savedOutcome !== null || item.consultation_status === 'COMPLETED'
   const status = completed ? 'COMPLETED' : item.consultation_status
+  const meetingLink =
+    item.meeting_link && ['APPROVED', 'COMPLETED'].includes(status)
+      ? safeHttpUrl(item.meeting_link)
+      : null
   const canComplete = viewer === 'FACULTY' && status === 'APPROVED'
   const savedNote = savedOutcome ?? item.outcome ?? ''
 
@@ -146,6 +151,21 @@ export function ConsultationDetailsDialog({
                       <dt className="font-semibold">Mode</dt>
                       <dd>{modeLabel(item)}</dd>
                     </div>
+                    {meetingLink ? (
+                      <div>
+                        <dt className="font-semibold">Meeting link</dt>
+                        <dd>
+                          <a
+                            className="font-semibold text-primary underline"
+                            href={meetingLink}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Join online consultation
+                          </a>
+                        </dd>
+                      </div>
+                    ) : null}
                     <div>
                       <dt className="font-semibold">Status</dt>
                       <dd>

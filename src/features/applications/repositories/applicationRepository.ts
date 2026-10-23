@@ -11,7 +11,10 @@ export type ApplicationFilters = {
 export async function getAccountCounts() {
   const supabase = await createClient()
   const [total, students, faculty, admins] = await Promise.all([
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_status', 'APPROVED'),
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })

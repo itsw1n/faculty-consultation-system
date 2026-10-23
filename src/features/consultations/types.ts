@@ -10,6 +10,7 @@ export type ConsultationItem = {
   end_time: string
   mode: 'IN_PERSON' | 'ONLINE'
   location: string | null
+  meeting_link: string | null
   created_at: string
   outcome?: string | null
   student_department: string | null

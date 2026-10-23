@@ -1,7 +1,9 @@
 'use client'
+import { useState } from 'react'
+import { Button } from '@/components/common/button/Button'
 import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
-import { markNotificationRead } from '../actions'
+import { markAllNotificationsRead, markNotificationRead } from '../actions'
 import { getNotificationPage } from '../queries/getNotificationPage'
 import type { NotificationItem } from '../types'
 
@@ -9,15 +11,41 @@ type Cursor = { createdAt: string; id: string }
 
 export function NotificationList({
   initialPage,
+  unread,
 }: {
   initialPage: InfinitePage<NotificationItem, Cursor>
+  unread: number
 }) {
-  const { page, pending, markerRef } = useInfinitePage<NotificationItem, Cursor>({
+  const [markingAll, setMarkingAll] = useState(false)
+  const { page, setPage, pending, markerRef } = useInfinitePage<NotificationItem, Cursor>({
     initialPage,
     fetchPage: (cursor) => getNotificationPage({ cursor }),
+    getKey: (item) => item.id,
   })
+
+  async function markAll() {
+    setMarkingAll(true)
+    try {
+      await markAllNotificationsRead()
+      const readAt = new Date().toISOString()
+      setPage((current) => ({
+        ...current,
+        items: current.items.map((item) => (item.read_at ? item : { ...item, read_at: readAt })),
+      }))
+    } finally {
+      setMarkingAll(false)
+    }
+  }
+
   return (
     <>
+      {unread > 0 ? (
+        <form action={markAll} className="mb-3 text-right">
+          <Button variant="ghost" type="submit" isDisabled={markingAll}>
+            {markingAll ? 'Marking…' : 'Mark all as read'}
+          </Button>
+        </form>
+      ) : null}
       <section className="overflow-hidden rounded-lg border border-border bg-surface">
         {page.items.length === 0 ? (
           <p className="p-8 text-center text-muted">No notifications yet.</p>

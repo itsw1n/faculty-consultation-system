@@ -10,6 +10,7 @@ import {
   type AuthContext,
   type RoleAccess,
 } from '@/features/auth/services/roleAccess'
+import { departmentName } from '@/features/auth/services/departmentName'
 
 const loadAuthContext = cache(async (): Promise<AuthContext> => {
   const supabase = await createClient()
@@ -41,7 +42,7 @@ const loadAuthContext = cache(async (): Promise<AuthContext> => {
       accountStatus: data.account_status,
       email: data.email,
       fullName: data.full_name,
-      departmentName: data.departments?.[0]?.name ?? null,
+      departmentName: departmentName(data.departments),
       positionTitle: data.position_title,
       role: data.role,
     },

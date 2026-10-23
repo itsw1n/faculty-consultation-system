@@ -26,6 +26,7 @@ import { Select } from '@/components/common/select/Select'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { initialActionState } from '@/lib/actionState'
 import { cn } from '@/lib/cn'
+import { addDays, isPastSlot, manilaDateKey } from '@/lib/manilaTime'
 import {
   categories,
   categoryLabel,
@@ -63,6 +64,10 @@ function monthKey(date: CalendarDate) {
   return `${date.year}-${String(date.month).padStart(2, '0')}`
 }
 
+function isOpenSlot(slot: SlotResult) {
+  return slot.slot_status === 'OPEN' && !isPastSlot(slot.slot_date, slot.start_time)
+}
+
 const steps: { value: Step; label: string }[] = [
   { value: 'schedule', label: 'Schedule' },
   { value: 'details', label: 'Details' },
@@ -82,8 +87,8 @@ export function BookingWizard({
 }) {
   const [state, formAction] = useActionState(bookConsultation, initialActionState)
   const initialDate =
-    initialSlots.find((slot) => slot.slot_status === 'OPEN')?.slot_date ??
-    initialSlots[0]?.slot_date ??
+    initialSlots.find(isOpenSlot)?.slot_date ??
+    initialSlots.find((slot) => !isPastSlot(slot.slot_date, slot.start_time))?.slot_date ??
     TODAY.toString()
   const [slots, setSlots] = useState(initialSlots)
   const [step, setStep] = useState<Step>('schedule')
@@ -105,9 +110,9 @@ export function BookingWizard({
         .sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [slots, selectedDate]
   )
-  const openSlots = slotsForDate.filter((slot) => slot.slot_status === 'OPEN')
+  const openSlots = slotsForDate.filter(isOpenSlot)
   const facultyName = slots.find((slot) => slot.faculty_name)?.faculty_name ?? 'Selected faculty'
-  const selectedOpen = selected?.slot_status === 'OPEN'
+  const selectedOpen = selected ? isOpenSlot(selected) : false
 
   const fetchMonth = useCallback(
     async (date: CalendarDate) => {
@@ -145,19 +150,31 @@ export function BookingWizard({
   )
 
   async function refreshSchedules() {
+    const currentRequest = ++requestId.current
+    const start = manilaDateKey()
+    const end = addDays(start, 28)
     setIsRefreshing(true)
     setScheduleError(null)
     try {
       const response = await fetch(`/api/faculty/${facultyId}/availability`)
       const body = (await response.json()) as { slots?: unknown }
       if (!response.ok || !Array.isArray(body.slots)) throw new Error('refresh failed')
+      if (currentRequest !== requestId.current) return
       const fresh = body.slots as SlotResult[]
-      setSlots(fresh)
-      setSelectedId((current) => (fresh.some((slot) => slot.id === current) ? current : ''))
+      const outsideRange = slots.filter((slot) => slot.slot_date < start || slot.slot_date > end)
+      const merged = [...outsideRange, ...fresh].sort(
+        (a, b) => a.slot_date.localeCompare(b.slot_date) || a.start_time.localeCompare(b.start_time)
+      )
+      setSlots(merged)
+      setSelectedId((current) =>
+        merged.some((slot) => slot.id === current && isOpenSlot(slot)) ? current : ''
+      )
     } catch {
-      setScheduleError('Could not refresh schedules. Showing last loaded times.')
+      if (currentRequest === requestId.current) {
+        setScheduleError('Could not refresh schedules. Showing last loaded times.')
+      }
     } finally {
-      setIsRefreshing(false)
+      if (currentRequest === requestId.current) setIsRefreshing(false)
     }
   }
 
@@ -190,7 +207,7 @@ export function BookingWizard({
   }
 
   function chooseSlot(slot: SlotResult) {
-    if (slot.slot_status !== 'OPEN') return
+    if (!isOpenSlot(slot)) return
     setSelectedId(slot.id)
   }
 
@@ -314,7 +331,7 @@ export function BookingWizard({
                 </div>
               ) : (
                 slotsForDate.map((slot) => {
-                  const open = slot.slot_status === 'OPEN'
+                  const open = isOpenSlot(slot)
                   const active = selectedId === slot.id
                   return (
                     <button

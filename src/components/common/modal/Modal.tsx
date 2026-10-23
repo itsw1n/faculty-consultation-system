@@ -23,7 +23,7 @@ export function Modal({ title, isOpen, onOpenChange, children, className }: Moda
     >
       <AriaModal
         className={cn(
-          'flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-surface shadow-dialog',
+          'flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-dialog',
           className
         )}
       >

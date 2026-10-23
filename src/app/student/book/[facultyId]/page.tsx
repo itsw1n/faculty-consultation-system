@@ -12,8 +12,8 @@ export default async function ChooseSchedule({
   return (
     <>
       <PageHeading
-        title="Choose Schedule"
-        description="Choose an open time, add details, then review your request."
+        title="Book a Consultation"
+        description="Choose an available schedule, add details, and review your request."
       />
       <BookingWizard facultyId={facultyId} initialSlots={await listFacultySlots(facultyId)} />
     </>

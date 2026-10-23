@@ -3,12 +3,12 @@ import { getAuthDestination } from './getAuthDestination'
 import type { AuthProfile } from '@/features/auth/types'
 
 const profile = (overrides: Partial<AuthProfile> = {}): AuthProfile => ({
+  id: '11111111-1111-4111-8111-111111111111',
   accountStatus: null,
   email: 'user@school.edu',
   fullName: 'User',
   departmentName: null,
   positionTitle: null,
-  requestedRole: null,
   role: null,
   ...overrides,
 })

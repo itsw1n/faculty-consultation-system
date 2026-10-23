@@ -9,6 +9,8 @@ export type AvailabilityItem = {
   mode: 'IN_PERSON' | 'ONLINE'
   location: string | null
   meeting_link: string | null
+  student_name: string | null
+  category: string | null
 }
 
 export async function listOwnAvailability() {

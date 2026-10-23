@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { getFacultyAvailability } from './facultyAvailability'
+import { availabilityRangeSchema, getFacultyAvailability } from './facultyAvailability'
 import type { SlotResult } from '../types'
 
 const slot = (overrides: Partial<SlotResult> = {}): SlotResult => ({
@@ -10,6 +10,7 @@ const slot = (overrides: Partial<SlotResult> = {}): SlotResult => ({
   slot_status: 'OPEN',
   mode: 'IN_PERSON',
   location: 'Room 101',
+  faculty_name: 'Dr. Ada Lovelace',
   ...overrides,
 })
 
@@ -34,4 +35,22 @@ describe('getFacultyAvailability', () => {
     })
     expect(result).toEqual(slots)
   })
+})
+test('passes an explicit availability range to the repository', async () => {
+  let received: unknown[] = []
+  await getFacultyAvailability('33333333-3333-4333-8333-333333333333', {
+    start: '2026-11-01',
+    end: '2026-11-30',
+    listSlots: async (...args) => {
+      received = args
+      return []
+    },
+  })
+  expect(received).toEqual(['33333333-3333-4333-8333-333333333333', '2026-11-01', '2026-11-30'])
+})
+
+test('rejects a reversed availability range', () => {
+  expect(
+    availabilityRangeSchema.safeParse({ start: '2026-11-30', end: '2026-11-01' }).success
+  ).toBe(false)
 })

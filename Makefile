@@ -5,7 +5,7 @@
 .DEFAULT_GOAL := help
 NPM_DIR := .
 
-.PHONY: help dev build lint test test-e2e db-start db-stop db-reset db-test
+.PHONY: help dev build lint test test-e2e seed reset db-start db-stop db-reset db-test
 
 help: ## Show all commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -25,6 +25,12 @@ test: ## Run Vitest
 
 test-e2e: ## Run Playwright E2E tests
 	npm --prefix $(NPM_DIR) run test:e2e --if-present
+
+seed: ## Load local demo accounts and sample consultations
+	npm --prefix $(NPM_DIR) run supabase:seed
+
+reset: ## Rebuild local DB from migrations only (no seed data)
+	npm --prefix $(NPM_DIR) run supabase:reset:empty
 
 db-start: ## Start local Supabase stack
 	npm --prefix $(NPM_DIR) run supabase:start

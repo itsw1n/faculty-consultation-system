@@ -14,13 +14,13 @@ Values with `NEXT_PUBLIC_` are bundled into client code and must never contain s
 
 ## Server-only values
 
-| Variable                    | Required for    | Purpose                                             |
-| --------------------------- | --------------- | --------------------------------------------------- |
-| `RESEND_API_KEY`            | email delivery  | Resend API credential.                              |
-| `RESEND_FROM_EMAIL`         | email delivery  | Verified sender address.                            |
-| `SUPABASE_SERVICE_ROLE_KEY` | email queue     | Queue processor access to the private email outbox. |
-| `CRON_SECRET`               | scheduled email | Bearer token for the scheduled email route.         |
-| `INITIAL_ADMIN_EMAIL`       | first admin     | Address allowed to claim the first admin role.      |
+| Variable                    | Required for                      | Purpose                                                           |
+| --------------------------- | --------------------------------- | ----------------------------------------------------------------- |
+| `RESEND_API_KEY`            | email delivery                    | Resend API credential.                                            |
+| `RESEND_FROM_EMAIL`         | email delivery                    | Verified sender address.                                          |
+| `SUPABASE_SERVICE_ROLE_KEY` | email queue and first-admin claim | Server-only access to the private email outbox and bootstrap RPC. |
+| `CRON_SECRET`               | scheduled email                   | Bearer token for the scheduled email route.                       |
+| `INITIAL_ADMIN_EMAIL`       | first admin                       | Address allowed to claim the first admin role.                    |
 
 Do not prefix these with `NEXT_PUBLIC_`. Email delivery is optional locally; without Resend credentials the outbox processor returns zero claimed and sent emails.
 
@@ -35,3 +35,5 @@ For a hosted project, configure SMTP or Supabase's email service in the Supabase
 ## Approved email domains
 
 `approved_email_domains` is database data, not an environment variable. Migrations set the confirmed school domain. Local seed data adds a `*` wildcard for development only; never add that row to a hosted environment.
+
+New accounts are checked against this table when created, and sign-in and faculty promotion check it again. The local wildcard permits any domain only while that row exists. Email confirmation remains required with or without the wildcard.

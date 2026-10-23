@@ -16,18 +16,19 @@ vi.mock('@/features/booking/services/facultyAvailability', async (importOriginal
 })
 
 const profile = (overrides: Partial<AuthProfile> = {}): AuthProfile => ({
+  id: '11111111-1111-4111-8111-111111111111',
   accountStatus: 'APPROVED',
   email: 'student@school.edu',
   fullName: 'Student',
   departmentName: null,
   positionTitle: null,
-  requestedRole: null,
   role: 'STUDENT',
   ...overrides,
 })
 
 const VALID_ID = '33333333-3333-4333-8333-333333333333'
-const request = () => new Request(`http://localhost/api/faculty/${VALID_ID}/availability`)
+const request = (query = '') =>
+  new Request(`http://localhost/api/faculty/${VALID_ID}/availability${query}`)
 const params = (facultyId: string) => ({ params: Promise.resolve({ facultyId }) })
 
 beforeEach(() => {
@@ -76,6 +77,7 @@ describe('GET /api/faculty/[facultyId]/availability', () => {
         slot_status: 'OPEN',
         mode: 'IN_PERSON',
         location: 'Room 101',
+        faculty_name: 'Dr. Ada Lovelace',
       },
     ]
     vi.mocked(getFacultyAvailability).mockResolvedValue(slots)
@@ -93,4 +95,21 @@ describe('GET /api/faculty/[facultyId]/availability', () => {
     const body = await response.json()
     expect(JSON.stringify(body)).not.toContain('secret_table')
   })
+})
+test('forwards a valid date range to the service', async () => {
+  vi.mocked(getAuthenticatedProfile).mockResolvedValue(profile())
+  vi.mocked(getFacultyAvailability).mockResolvedValue([])
+  const response = await GET(request('?start=2026-11-01&end=2026-11-30'), params(VALID_ID))
+  expect(response.status).toBe(200)
+  expect(vi.mocked(getFacultyAvailability)).toHaveBeenCalledWith(VALID_ID, {
+    start: '2026-11-01',
+    end: '2026-11-30',
+  })
+})
+
+test('returns 400 for an invalid date range', async () => {
+  vi.mocked(getAuthenticatedProfile).mockResolvedValue(profile())
+  const response = await GET(request('?start=2026-11-30&end=2026-11-01'), params(VALID_ID))
+  expect(response.status).toBe(400)
+  expect(vi.mocked(getFacultyAvailability)).not.toHaveBeenCalled()
 })

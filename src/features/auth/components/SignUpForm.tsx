@@ -9,7 +9,7 @@ import { signUpWithPassword } from '../actions'
 
 const fieldClass = 'grid gap-1.5 text-sm font-semibold'
 const controlClass =
-  'min-h-12 w-full rounded-lg border border-border bg-surface px-3 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus'
+  'min-h-12 w-full rounded-md border border-border bg-surface px-3 text-sm outline-none transition focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-focus'
 
 export function SignUpForm() {
   const [state, formAction] = useActionState(signUpWithPassword, initialActionState)

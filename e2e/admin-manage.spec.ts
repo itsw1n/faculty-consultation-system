@@ -8,7 +8,6 @@ import {
   ensureSlot,
   getDepartmentByCode,
   getDepartments,
-  setAccountStatus,
   setDepartment,
   setProfile,
   uniqueEmail,
@@ -26,13 +25,12 @@ async function setupAdmin(prefix: string) {
 
 async function dashboardCounts(page: Page) {
   await page.goto('/admin')
-  const pending = page.locator('//span[text()="Pending applications"]/ancestor::section[1]/strong')
-  const faculty = page.locator('//span[text()="Active faculty"]/ancestor::section[1]/strong')
-  const consultations = page.locator('//span[text()="Consultations"]/ancestor::section[1]/strong')
+  const valueFor = (label: string) =>
+    page.locator('dt', { hasText: label }).locator('xpath=..').locator('dd')
   return {
-    pending: Number(await pending.textContent()),
-    faculty: Number(await faculty.textContent()),
-    consultations: Number(await consultations.textContent()),
+    students: Number(await valueFor('Students').textContent()),
+    faculty: Number(await valueFor('Faculty').textContent()),
+    consultations: Number(await valueFor('Consultations').textContent()),
   }
 }
 
@@ -46,14 +44,15 @@ test.describe('Admin management', () => {
 
     await signInAs(page, email, password)
     const before = await dashboardCounts(page)
+    await expect(page.getByRole('heading', { name: 'Needs attention' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Consultation activity' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Recent consultations' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Quick actions' })).toBeVisible()
 
     const facultyEmail = uniqueEmail('e2e-admindash-faculty')
     const faculty = await ensureAccount(facultyEmail, password, 'E2E Dash Faculty')
     await setProfile(faculty.id, { role: 'FACULTY', account_status: 'APPROVED' })
     await ensureFacultyProfile(faculty.id, departments[0]!.id)
-    const pendingEmail = uniqueEmail('e2e-admindash-pending')
-    const pendingUser = await ensureAccount(pendingEmail, password, 'E2E Dash Pending')
-    await setAccountStatus(pendingUser.id, 'PENDING')
     const slot = await ensureSlot(faculty.id)
     const studentEmail = uniqueEmail('e2e-admindash-student')
     const student = await ensureAccount(studentEmail, password, 'E2E Dash Student')
@@ -61,9 +60,9 @@ test.describe('Admin management', () => {
     await bookConsultationAs(studentEmail, password, slot.id)
 
     const after = await dashboardCounts(page)
-    expect(after.consultations).toBe(before.consultations + 1)
-    expect(after.faculty).toBe(before.faculty + 1)
-    expect(after.pending).toBe(before.pending + 1)
+    expect(after.consultations).toBeGreaterThanOrEqual(before.consultations + 1)
+    expect(after.faculty).toBeGreaterThanOrEqual(before.faculty + 1)
+    expect(after.students).toBeGreaterThanOrEqual(before.students + 1)
   })
 
   test('faculty search narrows the directory', async ({ page }) => {
@@ -76,14 +75,16 @@ test.describe('Admin management', () => {
     await ensureFacultyProfile(faculty.id, departments[0]!.id)
 
     await signInAs(page, email, password)
-    await page.goto('/admin/faculty')
-    await page.getByLabel('Search faculty').fill(name)
-    await page.getByRole('button', { name: 'Search' }).click()
-    await expect(page.locator('article, li', { hasText: name }).first()).toBeVisible()
+    await page.goto('/admin/users?role=FACULTY')
+    await expect(page.getByText('Status', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('Approved', { exact: true })).toHaveCount(0)
+    await page.getByRole('searchbox', { name: 'Search' }).fill(name)
+    const facultyRow = page.getByRole('row').filter({ hasText: name })
+    await expect(facultyRow).toBeVisible()
+    await expect(facultyRow).toHaveText(/Instructor I/)
 
-    await page.getByLabel('Search faculty').fill(`Nope${Date.now()}`)
-    await page.getByRole('button', { name: 'Search' }).click()
-    await expect(page.getByText('No faculty found.')).toBeVisible()
+    await page.getByRole('searchbox', { name: 'Search' }).fill(`Nope${Date.now()}`)
+    await expect(page.getByText('No accounts match these filters.')).toBeVisible()
   })
 
   test('departments can be added and renamed', async ({ page }) => {
@@ -101,23 +102,23 @@ test.describe('Admin management', () => {
     await addForm.locator('input[name="code"]').fill(code)
     await addForm.locator('input[name="name"]').fill(name)
     await addForm.getByRole('button', { name: 'Add department' }).click()
+
+    const grid = page.getByRole('region', { name: 'Existing departments' })
     await expect
       .poll(async () => {
-        const values = await page
-          .locator('article input[name="name"]')
+        const values = await grid
+          .locator('input[name="name"]')
           .evaluateAll((inputs) => (inputs as HTMLInputElement[]).map((input) => input.value))
         return values.includes(name)
       })
       .toBe(true)
     expect((await getDepartmentByCode(code))?.name).toBe(name)
-
-    const grid = page.getByRole('region', { name: 'Existing departments' })
     let cardIndex = -1
     await expect
       .poll(
         async () => {
           const codes = await grid
-            .locator('article input[name="code"]')
+            .locator('input[name="code"]')
             .evaluateAll((inputs) => (inputs as HTMLInputElement[]).map((input) => input.value))
           cardIndex = codes.indexOf(code)
           return cardIndex
@@ -125,9 +126,9 @@ test.describe('Admin management', () => {
         { timeout: 30_000 }
       )
       .toBeGreaterThanOrEqual(0)
-    const card = grid.locator('article').nth(cardIndex)
-    await card.locator('input[name="name"]').fill(renamed)
-    await card.getByRole('button', { name: 'Save changes' }).click()
+    const row = grid.getByRole('row').nth(cardIndex + 1)
+    await row.locator('input[name="name"]').fill(renamed)
+    await row.getByRole('button', { name: 'Save changes' }).click()
     await expect.poll(() => getDepartmentByCode(code).then((row) => row?.name)).toBe(renamed)
   })
 

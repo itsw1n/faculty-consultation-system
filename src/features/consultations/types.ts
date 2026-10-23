@@ -2,7 +2,7 @@ export type ConsultationItem = {
   id: string
   student_name: string
   faculty_name: string
-  purpose: string
+  category: string
   notes: string | null
   consultation_status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED'
   slot_date: string
@@ -11,4 +11,7 @@ export type ConsultationItem = {
   mode: 'IN_PERSON' | 'ONLINE'
   location: string | null
   created_at: string
+  outcome?: string | null
+  student_department: string | null
+  faculty_department: string | null
 }

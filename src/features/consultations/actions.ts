@@ -3,14 +3,17 @@ import { revalidatePath } from 'next/cache'
 import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import { deliverEmails } from '@/features/email/services/deliverEmails'
+import type { ActionState } from '@/lib/actionState'
 import {
   approvalDecisionSchema,
   consultationIdSchema,
   outcomeSchema,
 } from './schemas/consultationSchema'
 const refresh = () => {
+  revalidatePath('/faculty')
   revalidatePath('/faculty/requests')
   revalidatePath('/faculty/consultations')
+  revalidatePath('/student')
   revalidatePath('/student/consultations')
   revalidatePath('/faculty/consultations/[id]', 'page')
   revalidatePath('/student/consultations/[id]', 'page')
@@ -37,15 +40,32 @@ export async function cancelConsultation(formData: FormData) {
   await deliverEmails().catch(() => {})
 }
 export async function completeConsultation(formData: FormData) {
+  const result = await completeConsultationRecord(formData)
+  if (result) throw new Error(result)
+  refresh()
+}
+
+export async function completeConsultationWithFeedback(
+  _state: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const error = await completeConsultationRecord(formData)
+  if (error) return { error }
+  refresh()
+  return { error: null, message: 'Consultation marked as completed.' }
+}
+
+async function completeConsultationRecord(formData: FormData): Promise<string | null> {
   await requireRole('FACULTY')
-  const id = consultationIdSchema.parse(formData.get('consultationId'))
-  const outcome = outcomeSchema.parse(formData.get('outcome') ?? '')
+  const id = consultationIdSchema.safeParse(formData.get('consultationId'))
+  const outcome = outcomeSchema.safeParse(formData.get('outcome') ?? '')
+  if (!id.success || !outcome.success) return 'Check the outcome note and try again.'
   const { error } = await (
     await createClient()
   ).rpc('complete_consultation_with_outcome', {
-    target_consultation_id: id,
-    outcome_text: outcome || null,
+    target_consultation_id: id.data,
+    outcome_text: outcome.data || null,
   })
-  if (error) throw new Error('This consultation cannot be completed.')
-  refresh()
+  if (error) return 'This consultation cannot be completed. Refresh and try again.'
+  return null
 }

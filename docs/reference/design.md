@@ -67,8 +67,11 @@ Use the standard Tailwind spacing scale; avoid one-off values. Keep radii consis
 
 - **Sidebar** — dark navy (`bg-primary`); active item uses a lighter navy highlight; profile details pinned to the bottom on desktop.
 - **Header** — white surface; breadcrumb/page context left, notification bell right.
-- **Cards** — white surface, border, `shadow-card`, clear title hierarchy.
+- **Content surfaces** — prefer divided rows, summary strips, and border-separated sections. Use standalone cards only when the content is a distinct object or task.
+- **Shadows** — reserve the stronger dialog shadow for overlays. Ordinary page content uses borders and spacing instead of stacked shadows.
 - **Search and filters** — consistent control height and radius; search is the primary wide field; filters sit inline on desktop and stack below on mobile. There is no separate filter drawer.
+
+The student dashboard is action-first: the next confirmed consultation and pending requests lead the page, status counts and quick actions sit in a side rail, and up to three deduplicated recent rows close the page. On mobile the side rail follows pending requests and precedes recent activity. Without a confirmed appointment, pending requests and a discovery card take its place; students with no consultation history see the discovery empty state alongside the side rail.
 
 ## Calendar status
 
@@ -83,8 +86,10 @@ The faculty availability view uses the same color language. Include a legend whe
 
 ## Responsive
 
-- **Desktop** — persistent sidebar; weekly calendar grid.
-- **Mobile** — hamburger navigation drawer; day selector with a vertical slot list; card lists replace wide rows.
+- **Desktop** — persistent sidebar; booking shows a monthly calendar beside its slot list.
+- **Mobile** — hamburger navigation drawer; the booking calendar stacks above a vertical slot list; card lists replace wide rows.
+
+Wide data lists use the shared React Aria `DataTable` wrapper, with labelled columns, row headers, keyboard navigation, and horizontal scrolling when the viewport is narrow. Primary actions remain visible without turning every row into a separate card.
 
 ## Accessibility
 

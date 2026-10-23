@@ -11,7 +11,7 @@ export async function bookConsultation(
   await requireRole('STUDENT')
   const result = bookingSchema.safeParse({
     slotId: formData.get('slotId'),
-    purpose: formData.get('purpose'),
+    category: formData.get('category'),
     notes: formData.get('notes') || undefined,
   })
   if (!result.success) return { error: 'Check the consultation details.' }
@@ -20,7 +20,7 @@ export async function bookConsultation(
     await createClient()
   ).rpc('book_consultation', {
     target_slot_id: input.slotId,
-    consultation_purpose: input.purpose,
+    consultation_category: input.category,
     consultation_notes: input.notes ?? null,
   })
   if (error) return { error: 'This time is no longer available. Choose another slot.' }

@@ -25,16 +25,21 @@ export async function getFacultyPage(
     nextCursor: last ? { name: last.full_name, id: last.id } : null,
   }
 }
-export async function listFacultySlots(facultyId: string) {
-  const start = new Date()
-  const end = new Date(start)
-  end.setDate(end.getDate() + 28)
+export async function listFacultySlots(facultyId: string, start?: string, end?: string) {
+  const rangeStart = start ?? new Date().toISOString().slice(0, 10)
+  const rangeEnd =
+    end ??
+    (() => {
+      const value = new Date(`${rangeStart}T00:00:00Z`)
+      value.setUTCDate(value.getUTCDate() + 28)
+      return value.toISOString().slice(0, 10)
+    })()
   const { data, error } = await (
     await createClient()
   ).rpc('list_faculty_slots', {
     target_faculty_id: facultyId,
-    range_start: start.toISOString().slice(0, 10),
-    range_end: end.toISOString().slice(0, 10),
+    range_start: rangeStart,
+    range_end: rangeEnd,
   })
   if (error) throw new Error('Unable to load schedules')
   return data as SlotResult[]

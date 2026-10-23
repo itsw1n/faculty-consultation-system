@@ -13,4 +13,5 @@ export type SlotResult = {
   slot_status: 'OPEN' | 'RESERVED' | 'BOOKED' | 'CLOSED'
   mode: 'IN_PERSON' | 'ONLINE'
   location: string | null
+  faculty_name: string
 }

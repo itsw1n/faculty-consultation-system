@@ -7,10 +7,7 @@ import { Section } from '@/components/layout/Section'
 
 export default function HomePage() {
   return (
-    <main
-      data-ui="login"
-      className="grid min-h-screen bg-linear-to-br from-surface via-surface to-subtle md:grid-cols-[0.92fr_1.08fr]"
-    >
+    <main data-ui="login" className="grid min-h-screen bg-surface md:grid-cols-[0.92fr_1.08fr]">
       <Section
         className="flex flex-col justify-center py-12 md:py-16 lg:py-20"
         aria-labelledby="welcome-title"
@@ -48,7 +45,7 @@ export default function HomePage() {
               community
             </li>
           </ul>
-          <blockquote className="mt-12 max-w-xl rounded-xl border border-border/80 bg-white/65 px-5 py-4 text-sm text-muted shadow-sm sm:mt-16">
+          <blockquote className="mt-12 max-w-xl border-t border-border pt-5 text-sm text-muted sm:mt-16">
             <p className="font-serif italic">“Education thrives when conversations happen.”</p>
             <cite className="mt-2 block text-xs font-semibold not-italic text-primary">
               — Our academic belief
@@ -57,7 +54,7 @@ export default function HomePage() {
         </Container>
       </Section>
       <Section
-        className="relative flex min-h-[38rem] flex-col overflow-hidden bg-linear-to-br from-[#3c6190] via-primary to-[#0b356c] py-12 text-white md:min-h-screen md:py-20"
+        className="relative flex min-h-[38rem] flex-col overflow-hidden bg-primary py-12 text-white md:min-h-screen md:py-20"
         aria-labelledby="signin-title"
       >
         <div
@@ -70,19 +67,21 @@ export default function HomePage() {
             width={484}
             height={474}
             unoptimized
+            loading="eager"
             className="h-auto w-full opacity-10"
           />
         </div>
         <Container className="relative flex h-full max-w-2xl flex-1 flex-col justify-center px-8 md:px-12 lg:px-16">
-          <div className="mx-auto w-full max-w-md rounded-3xl bg-surface p-7 text-foreground shadow-dialog sm:p-9">
+          <div className="mx-auto w-full max-w-md rounded-lg border border-white/15 bg-surface p-7 text-foreground shadow-dialog sm:p-9">
             <div className="flex items-center gap-3 border-b border-border pb-6">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-subtle">
+              <span className="grid size-12 shrink-0 place-items-center rounded-md bg-subtle">
                 <Image
                   src={logo}
                   alt=""
                   width={24}
                   height={24}
                   unoptimized
+                  loading="eager"
                   className="size-6 object-contain"
                 />
               </span>
@@ -92,7 +91,7 @@ export default function HomePage() {
               </p>
             </div>
             <h2 id="signin-title" className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
-              Welcome back!
+              Welcome back
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
               Sign in to manage your consultations and schedules.

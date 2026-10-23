@@ -19,25 +19,25 @@ An approved school account that discovers faculty, requests consultations, views
 
 ### Faculty
 
-An approved account invited by an administrator. Faculty publish availability, decide requests, complete consultations, and record outcomes.
+An existing verified student account promoted by an administrator. Faculty publish availability, decide requests, complete consultations, and record outcomes.
 
 ### Admin
 
-A privileged account that manages departments, invites faculty, corrects approved accounts, and reads consultation metadata.
+A privileged account that manages departments, promotes faculty, corrects approved accounts, and reads consultation metadata.
 
 How each role becomes an account is defined in [`rules.md`](rules.md#account-and-role-rules).
 
 ## What each role can do
 
-| Role    | Screens                                                                    |
-| ------- | -------------------------------------------------------------------------- |
-| Student | Dashboard, Book Consultation, My Consultations                             |
-| Faculty | Dashboard, My Availability, Consultation Requests, My Consultations        |
-| Admin   | Dashboard, Manage Users, Manage Faculty, Departments, Consultation Records |
+| Role    | Screens                                                             |
+| ------- | ------------------------------------------------------------------- |
+| Student | Dashboard, Book Consultation, My Consultations                      |
+| Faculty | Dashboard, My Availability, Consultation Requests, My Consultations |
+| Admin   | Dashboard, Manage Users, Departments, Consultation Records          |
 
 Common capabilities:
 
-- **Booking** — a three-step wizard: choose faculty, choose an open slot, add a purpose and optional description, then review and confirm.
+- **Booking** — a three-step wizard: choose faculty, choose an open slot, add a category and optional description, then review and confirm.
 - **Consultations** — cursor paginated lists with search and status filters, participant-only detail pages, and outcome notes.
 - **Notifications** — an in-app bell with unread count and a full notifications page.
 - **Email** — generic status emails and next-day reminders, secondary to in-app notifications.

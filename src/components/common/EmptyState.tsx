@@ -9,9 +9,9 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <section className="mt-4 rounded-xl border border-border bg-surface px-4 py-12 text-center shadow-card">
-      <h2 className="text-xl font-bold">{title}</h2>
-      <p className="mt-2 text-muted">{description}</p>
+    <section className="mt-5 border-y border-border py-10 text-center">
+      <h2 className="text-lg font-semibold text-primary">{title}</h2>
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted">{description}</p>
       {action}
     </section>
   )

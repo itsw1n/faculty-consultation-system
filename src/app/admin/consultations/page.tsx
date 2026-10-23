@@ -2,7 +2,9 @@ import { Button } from '@/components/common/button/Button'
 import { PageHeading } from '@/components/common/PageHeading'
 import { ConsultationDirectory } from '@/features/consultations/components/ConsultationDirectory'
 import { getConsultationPage } from '@/features/consultations/repositories/consultationRepository'
+import { requireRole } from '@/features/auth/repositories/authRepository'
 export default async function ConsultationRecords() {
+  await requireRole('ADMIN')
   const today = new Date().toISOString().slice(0, 10)
   const from = `${today.slice(0, 4)}-01-01`
   return (
@@ -19,7 +21,7 @@ export default async function ConsultationRecords() {
         <label className="grid gap-1 text-sm font-semibold">
           From{' '}
           <input
-            className="min-h-11 rounded border border-border bg-surface px-3"
+            className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
             type="date"
             name="from"
             defaultValue={from}
@@ -29,14 +31,16 @@ export default async function ConsultationRecords() {
         <label className="grid gap-1 text-sm font-semibold">
           To{' '}
           <input
-            className="min-h-11 rounded border border-border bg-surface px-3"
+            className="min-h-11 rounded-md border border-border bg-surface px-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
             type="date"
             name="to"
             defaultValue={today}
             required
           />
         </label>
-        <Button type="submit">Download summary CSV</Button>
+        <Button type="submit" variant="secondary">
+          Download summary CSV
+        </Button>
       </form>
       <ConsultationDirectory initialPage={await getConsultationPage({})} viewer="ADMIN" />
     </>

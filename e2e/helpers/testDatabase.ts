@@ -46,7 +46,11 @@ export async function setProfile(
 ): Promise<void> {
   const { error } = await getServiceClient()
     .from('profiles')
-    .update({ role: profile.role, account_status: profile.account_status })
+    .update({
+      role: profile.role,
+      account_status: profile.account_status,
+      position_title: profile.role === 'FACULTY' ? 'Instructor I' : null,
+    })
     .eq('id', userId)
   if (error) throw error
 }
@@ -57,15 +61,11 @@ export async function ensureFacultyProfile(
   positionTitle = 'Instructor I'
 ): Promise<void> {
   const service = getServiceClient()
-  const { error: profileError } = await service
+  const { error } = await service
     .from('profiles')
-    .update({ department_id: departmentId })
+    .update({ department_id: departmentId, position_title: positionTitle })
     .eq('id', userId)
-  if (profileError) throw profileError
-  const { error: facultyError } = await service
-    .from('faculty_profiles')
-    .upsert({ user_id: userId, position_title: positionTitle }, { onConflict: 'user_id' })
-  if (facultyError) throw facultyError
+  if (error) throw error
 }
 
 export async function getProfileByEmail(email: string): Promise<{
@@ -86,19 +86,9 @@ export async function getFacultyProfile(
   userId: string
 ): Promise<{ position_title: string | null } | null> {
   const { data, error } = await getServiceClient()
-    .from('faculty_profiles')
+    .from('profiles')
     .select('position_title')
-    .eq('user_id', userId)
-    .maybeSingle()
-  if (error) throw error
-  return data
-}
-
-export async function getInviteByEmail(email: string): Promise<{ email: string } | null> {
-  const { data, error } = await getServiceClient()
-    .from('faculty_invites')
-    .select('email')
-    .eq('email', email)
+    .eq('id', userId)
     .maybeSingle()
   if (error) throw error
   return data
@@ -170,13 +160,13 @@ export async function bookConsultationAs(
   email: string,
   password: string,
   slotId: string,
-  purpose = 'ACADEMIC',
+  category = 'ACADEMIC',
   notes: string | null = null
 ): Promise<string> {
   const client = await authenticatedClient(email, password)
   const { data, error } = await client.rpc('book_consultation', {
     target_slot_id: slotId,
-    consultation_purpose: purpose,
+    consultation_category: category,
     consultation_notes: notes,
   })
   if (error) throw error
@@ -325,4 +315,92 @@ export async function setDepartment(userId: string, departmentId: string): Promi
     .update({ department_id: departmentId })
     .eq('id', userId)
   if (error) throw error
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)]
+}
+
+function batches<T>(values: T[], size = 50): T[][] {
+  return Array.from({ length: Math.ceil(values.length / size) }, (_, index) =>
+    values.slice(index * size, (index + 1) * size)
+  )
+}
+
+function assertDelete(error: { message: string } | null, subject: string): void {
+  if (error) throw new Error(`Unable to clean ${subject}: ${error.message}`)
+}
+
+/** Remove records owned by the E2E suite while preserving seeded demo and developer data. */
+export async function cleanupE2EData(): Promise<void> {
+  const service = getServiceClient()
+  const { data: profiles, error: profileError } = await service
+    .from('profiles')
+    .select('id')
+    .ilike('email', 'e2e-%@acdeducation.com')
+  if (profileError) throw profileError
+
+  const userIds = profiles.map((profile) => profile.id)
+  if (userIds.length > 0) {
+    const consultationIds: string[] = []
+    for (const userBatch of batches(userIds)) {
+      const [asStudent, asFaculty] = await Promise.all([
+        service.from('consultations').select('id').in('student_id', userBatch),
+        service.from('consultations').select('id').in('faculty_id', userBatch),
+      ])
+      if (asStudent.error) throw asStudent.error
+      if (asFaculty.error) throw asFaculty.error
+      consultationIds.push(
+        ...asStudent.data.map((item) => item.id),
+        ...asFaculty.data.map((item) => item.id)
+      )
+
+      assertDelete(
+        (await service.from('email_outbox').delete().in('recipient_id', userBatch)).error,
+        'email outbox recipients'
+      )
+      assertDelete(
+        (await service.from('notifications').delete().in('entity_id', userBatch)).error,
+        'account notifications'
+      )
+    }
+    for (const consultationBatch of batches(unique(consultationIds))) {
+      assertDelete(
+        (await service.from('email_outbox').delete().in('consultation_id', consultationBatch))
+          .error,
+        'email outbox consultations'
+      )
+      assertDelete(
+        (await service.from('consultations').delete().in('id', consultationBatch)).error,
+        'consultations'
+      )
+    }
+    for (const userBatch of batches(userIds)) {
+      assertDelete(
+        (await service.from('availability_slots').delete().in('faculty_id', userBatch)).error,
+        'availability slots'
+      )
+    }
+
+    for (const userId of userIds) {
+      const { error } = await service.auth.admin.deleteUser(userId)
+      if (error) throw new Error(`Unable to clean test user ${userId}: ${error.message}`)
+    }
+  }
+
+  assertDelete(
+    (
+      await service
+        .from('notifications')
+        .delete()
+        .eq('type', 'NEW_APPLICATION')
+        .ilike('message', 'E2E % submitted an application.%')
+    ).error,
+    'legacy account notifications'
+  )
+
+  assertDelete(
+    (await service.from('departments').delete().ilike('name', 'E2E Department %')).error,
+    'departments'
+  )
 }

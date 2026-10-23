@@ -49,11 +49,13 @@ Supabase Auth with email + password and mandatory email verification. Sign-up an
 
 ## Authorization
 
-- `getAuthenticatedProfile()` reads claims and the profile row.
+- `getAuthenticatedProfile()` reads verified claims, the profile row, and the approved-domain check. It is request-memoized so multiple guards in one render share the lookup.
 - `requireRole(role)` redirects unauthenticated users to `/`, and wrong-role or wrong-status users to `/auth/continue`.
+- `authorizeRole(role)` applies the same default-deny rules but returns `401`/`403` so HTTP routes can respond with real status codes instead of redirects.
 - `requireApprovedProfile()` throws without an approved profile and guards shared reads.
-- `RoleLayout` wraps `/student`, `/faculty`, and `/admin` with `requireRole`.
+- `RoleLayout` wraps `/student`, `/faculty`, and `/admin` with `requireRole`; admin pages also guard themselves for defense in depth.
 - Every server action calls one of these helpers before touching data.
+- `src/proxy.ts` only refreshes the session cookie. It does not authorize; authorization happens at layouts, route handlers, server actions, RPCs, and RLS.
 
 ## Reliability and security
 

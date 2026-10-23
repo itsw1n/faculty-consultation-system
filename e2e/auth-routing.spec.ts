@@ -80,6 +80,32 @@ test.describe('Auth routing and gates', () => {
     await expect(page).toHaveURL('/admin')
   })
 
+  test('the admin export API reports explicit authorization statuses', async ({
+    page,
+    request,
+  }) => {
+    const student = await setupUser('e2e-gate-status-student', 'STUDENT')
+    const admin = await setupUser('e2e-gate-status-admin', 'ADMIN')
+    const today = new Date().toISOString().slice(0, 10)
+    const exportPath = `/admin/consultations/export?from=${today.slice(0, 4)}-01-01&to=${today}`
+
+    const anonymous = await request.get(exportPath)
+    expect(anonymous.status()).toBe(401)
+    await expect(anonymous.json()).resolves.toMatchObject({ error: 'Authentication required.' })
+
+    await signInAs(page, student.email, password)
+    const denied = await page.request.get(exportPath)
+    expect(denied.status()).toBe(403)
+    await expect(denied.json()).resolves.toMatchObject({
+      error: 'Administrator access required.',
+    })
+
+    await signInAs(page, admin.email, password)
+    const allowed = await page.request.get(exportPath)
+    expect(allowed.status()).toBe(200)
+    expect(allowed.headers()['content-type']).toContain('text/csv')
+  })
+
   test('sign-out ends the session', async ({ page }) => {
     const { email } = await setupUser('e2e-signout', 'STUDENT', 'E2E Signout User')
 

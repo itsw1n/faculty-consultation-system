@@ -6,6 +6,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { SummaryStats } from '@/components/common/SummaryStats'
 import { getAdminDashboard } from '@/features/dashboard/repositories/dashboardRepository'
 import { AdminRecentConsultationsTable } from '@/features/dashboard/components/AdminRecentConsultationsTable'
+import { requireRole } from '@/features/auth/repositories/authRepository'
 
 const quickActions = [
   {
@@ -29,6 +30,7 @@ const quickActions = [
 ]
 
 export default async function AdminDashboard() {
+  await requireRole('ADMIN')
   const data = await getAdminDashboard()
   const lifecycle = [
     ['Pending', data.pending],

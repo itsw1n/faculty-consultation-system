@@ -4,13 +4,13 @@ The application uses authenticated server actions and Supabase RPCs rather than 
 
 ## HTTP routes
 
-| Method | Route                                                       | Access               | Purpose                                                           |
-| ------ | ----------------------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
-| `GET`  | `/api/health`                                               | Public               | Returns `{ "status": "ok" }`                                      |
-| `GET`  | `/api/faculty/[facultyId]/availability`                     | Approved student     | Slots for one faculty member; optional paired `start`/`end` dates |
-| `GET`  | `/api/cron/email`                                           | Bearer `CRON_SECRET` | Queues reminders and processes the email outbox                   |
-| `GET`  | `/auth/confirm?token_hash=...&type=email\|recovery`         | Email link           | Verifies a signup or recovery token and establishes the session   |
-| `GET`  | `/admin/consultations/export?from=YYYY-MM-DD&to=YYYY-MM-DD` | Admin                | Metadata summary CSV, maximum 366 days                            |
+| Method | Route                                                       | Access               | Purpose                                                            |
+| ------ | ----------------------------------------------------------- | -------------------- | ------------------------------------------------------------------ |
+| `GET`  | `/api/health`                                               | Public               | Returns `{ "status": "ok" }`                                       |
+| `GET`  | `/api/faculty/[facultyId]/availability`                     | Approved student     | Slots for one faculty member; optional paired `start`/`end` dates  |
+| `GET`  | `/api/cron/email`                                           | Bearer `CRON_SECRET` | Queues reminders and processes the email outbox                    |
+| `GET`  | `/auth/confirm?token_hash=...&type=email\|recovery`         | Email link           | Verifies a signup or recovery token and establishes the session    |
+| `GET`  | `/admin/consultations/export?from=YYYY-MM-DD&to=YYYY-MM-DD` | Admin                | Metadata summary CSV, maximum 366 days; `401`/`403` JSON on denial |
 
 ## Pages with server-side effects
 

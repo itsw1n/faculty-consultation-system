@@ -1,5 +1,5 @@
 begin;
-select plan(12);
+select plan(14);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -18,6 +18,18 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
 select results_eq('select email from public.profiles order by email',array['student@school.edu'::text],'student can read only own profile');
+select throws_ok(
+  $$update public.profiles set role='ADMIN', account_status='APPROVED' where id='10000000-0000-0000-0000-000000000001'$$,
+  '42501',
+  'permission denied for table profiles',
+  'student cannot self-assign the admin role'
+);
+select throws_ok(
+  $$select public.correct_user_account('30000000-0000-0000-0000-000000000003','ADMIN',(select id from public.departments where code='IT'),null)$$,
+  '42501',
+  'Admin access required',
+  'student cannot use the admin correction RPC'
+);
 select lives_ok($$select public.book_consultation('40000000-0000-0000-0000-000000000004','ACADEMIC',null)$$,'student can atomically reserve an open slot');
 reset role;
 

@@ -4,6 +4,7 @@ import { Button } from '@/components/common/button/Button'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { completeConsultation } from '../actions'
 import Link from 'next/link'
+import { safeHttpUrl } from '@/lib/safeNavigation'
 
 export function ConsultationDetailView({
   detail,
@@ -13,6 +14,10 @@ export function ConsultationDetailView({
   viewer: 'STUDENT' | 'FACULTY'
 }) {
   const back = `/${viewer.toLowerCase()}/consultations`
+  const meetingLink =
+    detail.meeting_link && ['APPROVED', 'COMPLETED'].includes(detail.consultation_status)
+      ? safeHttpUrl(detail.meeting_link)
+      : null
   return (
     <main className="mx-auto max-w-2xl space-y-6">
       <Link href={back} className="font-semibold text-primary underline">
@@ -38,6 +43,21 @@ export function ConsultationDetailView({
           <dt className="font-semibold">Mode</dt>
           <dd>{detail.mode === 'IN_PERSON' ? detail.location : 'Online'}</dd>
         </div>
+        {meetingLink ? (
+          <div>
+            <dt className="font-semibold">Meeting link</dt>
+            <dd>
+              <a
+                className="font-semibold text-primary underline"
+                href={meetingLink}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Join online consultation
+              </a>
+            </dd>
+          </div>
+        ) : null}
         <div>
           <dt className="font-semibold">Status</dt>
           <dd>

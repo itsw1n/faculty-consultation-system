@@ -22,6 +22,7 @@ const slot = (overrides: Partial<AvailabilityItem> = {}): AvailabilityItem => ({
   meeting_link: null,
   student_name: null,
   category: null,
+  has_history: false,
   ...overrides,
 })
 
@@ -48,6 +49,14 @@ describe('AvailabilityManager edit', () => {
 
     expect(screen.getAllByRole('button', { name: 'View' })).toHaveLength(2)
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+  })
+
+  it('does not offer changes for a slot with consultation history', () => {
+    render(<AvailabilityManager slots={[slot({ status: 'CLOSED', has_history: true })]} />)
+
+    expect(screen.getByText('History')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
   })
 
   it('prefills the edit form with the slot values and its id', () => {

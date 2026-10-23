@@ -11,7 +11,8 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Modal } from '@/components/common/modal/Modal'
 import { Select } from '@/components/common/select/Select'
-import { initialActionState } from '@/lib/actionState'
+import { initialActionState, type ActionState } from '@/lib/actionState'
+import { safeHttpUrl } from '@/lib/safeNavigation'
 import { categoryLabel } from '@/features/consultations/categories'
 import { createAvailability, deleteAvailability, updateAvailability } from '../actions'
 import type { AvailabilityItem } from '../repositories/availabilityRepository'
@@ -44,13 +45,24 @@ function formatDate(date: string) {
 }
 
 export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
-  const [state, formAction] = useActionState(createAvailability, initialActionState)
-  const [editState, editAction] = useActionState(updateAvailability, initialActionState)
   const [addOpen, setAddOpen] = useState(false)
   const [editSlot, setEditSlot] = useState<AvailabilityItem | null>(null)
   const [detailsSlot, setDetailsSlot] = useState<AvailabilityItem | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | AvailabilityItem['status']>('ALL')
+  const [state, formAction] = useActionState(async (previous: ActionState, formData: FormData) => {
+    const result = await createAvailability(previous, formData)
+    if (!result.error) setAddOpen(false)
+    return result
+  }, initialActionState)
+  const [editState, editAction] = useActionState(
+    async (previous: ActionState, formData: FormData) => {
+      const result = await updateAvailability(previous, formData)
+      if (!result.error) setEditSlot(null)
+      return result
+    },
+    initialActionState
+  )
   const query = search.trim().toLowerCase()
   const visibleSlots = slots.filter((slot) => {
     if (statusFilter !== 'ALL' && slot.status !== statusFilter) return false
@@ -196,7 +208,25 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                   )}
                 </Cell>
                 <Cell className="px-5 py-4">
-                  {slot.status === 'OPEN' ? (
+                  {slot.status === 'BOOKED' || slot.status === 'RESERVED' ? (
+                    <div className="flex justify-end">
+                      <Button
+                        variant="secondary"
+                        size="compact"
+                        className="min-w-0"
+                        onPress={() => setDetailsSlot(slot)}
+                      >
+                        View
+                      </Button>
+                    </div>
+                  ) : slot.has_history ? (
+                    <span
+                      className="block text-right text-sm text-muted"
+                      title="This slot has consultation history and cannot be edited."
+                    >
+                      History
+                    </span>
+                  ) : slot.status === 'OPEN' ? (
                     <div className="flex flex-nowrap items-center justify-end gap-1.5">
                       <Button
                         variant="secondary"
@@ -214,17 +244,6 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                         submitAction={deleteAvailability}
                         variant="danger"
                       />
-                    </div>
-                  ) : slot.status === 'BOOKED' || slot.status === 'RESERVED' ? (
-                    <div className="flex justify-end">
-                      <Button
-                        variant="secondary"
-                        size="compact"
-                        className="min-w-0"
-                        onPress={() => setDetailsSlot(slot)}
-                      >
-                        View
-                      </Button>
                     </div>
                   ) : (
                     <span className="block text-right text-sm text-muted">No actions</span>
@@ -355,6 +374,21 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
               <>
                 <dt>Category</dt>
                 <dd>{categoryLabel(detailsSlot.category)}</dd>
+              </>
+            ) : null}
+            {safeHttpUrl(detailsSlot.meeting_link) ? (
+              <>
+                <dt>Meeting link</dt>
+                <dd>
+                  <a
+                    className="font-semibold text-primary underline"
+                    href={safeHttpUrl(detailsSlot.meeting_link) ?? undefined}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Join meeting
+                  </a>
+                </dd>
               </>
             ) : null}
           </dl>

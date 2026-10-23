@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useTransition,
   type Dispatch,
   type RefObject,
   type SetStateAction,
@@ -25,26 +24,64 @@ type UseInfinitePage<TItem, TCursor> = {
   markerRef: RefObject<HTMLDivElement | null>
 }
 
+function mergePage<TItem, TCursor>(
+  fresh: InfinitePage<TItem, TCursor>,
+  current: InfinitePage<TItem, TCursor>,
+  getKey: (item: TItem) => string | number
+): InfinitePage<TItem, TCursor> {
+  const freshKeys = new Set(fresh.items.map(getKey))
+  return {
+    ...fresh,
+    items: [...fresh.items, ...current.items.filter((item) => !freshKeys.has(getKey(item)))],
+  }
+}
+
 export function useInfinitePage<TItem, TCursor>({
   initialPage,
   fetchPage,
+  getKey,
 }: {
   initialPage: InfinitePage<TItem, TCursor>
   fetchPage: (cursor: TCursor) => Promise<InfinitePage<TItem, TCursor>>
+  getKey?: (item: TItem) => string | number
 }): UseInfinitePage<TItem, TCursor> {
   const [page, setPage] = useState(initialPage)
-  const [pending, startTransition] = useTransition()
+  const [pending, setPending] = useState(false)
   const markerRef = useRef<HTMLDivElement>(null)
   const fetchRef = useRef(fetchPage)
+  const getKeyRef = useRef(getKey)
+  const initialRef = useRef(JSON.stringify(initialPage))
+  const generation = useRef(0)
+  const loading = useRef(false)
 
   useEffect(() => {
     fetchRef.current = fetchPage
+    getKeyRef.current = getKey
   })
 
-  const reload = useCallback((load: () => Promise<InfinitePage<TItem, TCursor>>) => {
-    startTransition(async () => {
-      setPage(await load())
+  useEffect(() => {
+    const serialized = JSON.stringify(initialPage)
+    if (serialized === initialRef.current) return
+    initialRef.current = serialized
+    generation.current += 1
+    loading.current = false
+    setPage((current) => {
+      const key = getKeyRef.current
+      return key ? mergePage(initialPage, current, key) : initialPage
     })
+  }, [initialPage])
+
+  const reload = useCallback((load: () => Promise<InfinitePage<TItem, TCursor>>) => {
+    const requestGeneration = ++generation.current
+    loading.current = false
+    setPending(true)
+    void load()
+      .then((next) => {
+        if (requestGeneration === generation.current) setPage(next)
+      })
+      .finally(() => {
+        if (requestGeneration === generation.current) setPending(false)
+      })
   }, [])
 
   useEffect(() => {
@@ -53,11 +90,27 @@ export function useInfinitePage<TItem, TCursor>({
     if (!node || pending || !page.hasMore || !cursor) return
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries[0]?.isIntersecting) return
-        startTransition(async () => {
-          const next = await fetchRef.current(cursor)
-          setPage((current) => ({ ...next, items: [...current.items, ...next.items] }))
-        })
+        if (!entries[0]?.isIntersecting || loading.current) return
+        loading.current = true
+        setPending(true)
+        const requestGeneration = generation.current
+        void fetchRef
+          .current(cursor)
+          .then((next) => {
+            if (requestGeneration !== generation.current) return
+            setPage((current) => {
+              const key = getKeyRef.current
+              return key
+                ? mergePage(next, current, key)
+                : { ...next, items: [...current.items, ...next.items] }
+            })
+          })
+          .finally(() => {
+            if (requestGeneration === generation.current) {
+              loading.current = false
+              setPending(false)
+            }
+          })
       },
       { rootMargin: '200px' }
     )

@@ -20,6 +20,10 @@ function futureKey(): string {
   ).padStart(2, '0')}`
 }
 
+function todayKey(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date())
+}
+
 const slot = (overrides: Partial<SlotResult> = {}): SlotResult => ({
   id: '11111111-1111-4111-8111-111111111111',
   slot_date: futureKey(),
@@ -49,6 +53,22 @@ describe('BookingWizard details', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByText('Select a concern')).toBeInTheDocument()
+  })
+})
+
+describe('BookingWizard past slots', () => {
+  it('keeps slots that have already started unselectable', () => {
+    render(
+      <BookingWizard
+        facultyId={FACULTY_ID}
+        initialSlots={[
+          slot({ slot_date: todayKey(), start_time: '00:00:00', end_time: '01:00:00' }),
+        ]}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: /00:00/ })).toBeDisabled()
+    expect(screen.getByText('0 open slots')).toBeInTheDocument()
   })
 })
 

@@ -102,7 +102,7 @@ export function ApplicationReviewList({
   const [correctTarget, setCorrectTarget] = useState<ApplicationItem | null>(null)
   const [message, setMessage] = useState('')
   const router = useRouter()
-  const { page, setPage, pending, markerRef } = useInfinitePage<ApplicationItem, Cursor>({
+  const { page, pending, markerRef } = useInfinitePage<ApplicationItem, Cursor>({
     initialPage,
     fetchPage: (cursor) =>
       getApplicationPage({
@@ -112,8 +112,6 @@ export function ApplicationReviewList({
         cursor,
       }),
   })
-
-  useEffect(() => setPage(initialPage), [initialPage, setPage])
 
   return (
     <>

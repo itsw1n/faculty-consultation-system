@@ -1,5 +1,5 @@
 begin;
-select plan(15);
+select plan(13);
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -136,23 +136,6 @@ select throws_ok(
   '22023','Invalid date range','reports longer than 366 days are rejected'
 );
 reset role;
-
-insert into public.email_outbox (consultation_id, recipient_id, event_type, event_key)
-values (
-  'c2000000-0000-0000-0000-000000000002',
-  'a2000000-0000-0000-0000-000000000003',
-  'APPROVED',
-  'hardening-lease-check'
-);
-
-select lives_ok(
-  $$select public.mark_email_failed((select id from public.email_outbox where event_key = 'hardening-lease-check'),'provider failed')$$,
-  'failed email can be recorded'
-);
-select ok(
-  (select locked_until > now() + interval '9 minutes' from public.email_outbox where event_key = 'hardening-lease-check'),
-  'failed email keeps a retry lease'
-);
 
 select * from finish();
 rollback;

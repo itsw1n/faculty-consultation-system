@@ -54,3 +54,27 @@ test('rejects a reversed availability range', () => {
     availabilityRangeSchema.safeParse({ start: '2026-11-30', end: '2026-11-01' }).success
   ).toBe(false)
 })
+
+test('rejects invalid calendar dates', () => {
+  expect(
+    availabilityRangeSchema.safeParse({ start: '2026-02-30', end: '2026-03-01' }).success
+  ).toBe(false)
+})
+
+test('rejects availability ranges longer than two months', () => {
+  expect(
+    availabilityRangeSchema.safeParse({ start: '2026-01-01', end: '2026-04-01' }).success
+  ).toBe(false)
+})
+
+test('defaults the range to Manila today through 28 days', async () => {
+  let received: unknown[] = []
+  await getFacultyAvailability('33333333-3333-4333-8333-333333333333', {
+    listSlots: async (...args) => {
+      received = args
+      return []
+    },
+  })
+  expect(received[1]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  expect(received[2]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+})

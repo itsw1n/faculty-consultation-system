@@ -5,6 +5,25 @@ import { requireRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
 import type { ActionState } from '@/lib/actionState'
 import { availabilitySchema } from './schemas/availabilitySchema'
+
+function availabilityError(
+  error: { message: string },
+  action: 'create' | 'update' | 'delete'
+): string {
+  if (error.message.includes('consultation history'))
+    return action === 'delete'
+      ? 'Availability with consultation history cannot be removed.'
+      : 'Availability with consultation history cannot be changed.'
+  if (error.message.includes('must start in the future'))
+    return 'Availability must start in the future.'
+  if (error.message.includes('overlap') || error.message.includes('availability_no_overlap'))
+    return 'This time overlaps an existing slot.'
+  if (error.message.includes('Approved faculty access required')) return 'Faculty access required.'
+  if (action === 'create') return 'Check the availability details.'
+  if (action === 'update') return 'Only open availability can be changed.'
+  return 'Only open availability can be removed.'
+}
+
 export async function createAvailability(
   _state: ActionState,
   formData: FormData
@@ -31,9 +50,9 @@ export async function createAvailability(
     slot_location: input.location ?? null,
     slot_meeting_link: input.meetingLink || null,
   })
-  if (error) return { error: 'Availability overlaps an existing slot or contains invalid details.' }
+  if (error) return { error: availabilityError(error, 'create') }
   revalidatePath('/faculty/availability')
-  return { error: null }
+  return { error: null, message: 'Availability added.' }
 }
 export async function updateAvailability(
   _state: ActionState,
@@ -65,9 +84,9 @@ export async function updateAvailability(
     slot_location: input.location ?? null,
     slot_meeting_link: input.meetingLink || null,
   })
-  if (error) return { error: 'Only open availability can be changed.' }
+  if (error) return { error: availabilityError(error, 'update') }
   revalidatePath('/faculty/availability')
-  return { error: null }
+  return { error: null, message: 'Availability updated.' }
 }
 export async function deleteAvailability(formData: FormData) {
   await requireRole('FACULTY')
@@ -75,6 +94,6 @@ export async function deleteAvailability(formData: FormData) {
   const { error } = await (
     await createClient()
   ).rpc('delete_open_availability', { target_slot_id: slotId })
-  if (error) throw new Error('Only open availability can be removed.')
+  if (error) throw new Error(availabilityError(error, 'delete'))
   revalidatePath('/faculty/availability')
 }

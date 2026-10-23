@@ -15,6 +15,7 @@ export type ConsultationDetail = {
   end_time: string
   mode: string
   location: string | null
+  meeting_link: string | null
 }
 
 export async function getConsultationDetail(id: string) {

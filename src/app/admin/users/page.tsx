@@ -31,7 +31,7 @@ export default async function ManageUsersPage({
       <div className="mb-5">
         <SummaryStats
           items={[
-            { label: 'Total users', value: counts.total },
+            { label: 'Active users', value: counts.total },
             { label: 'Students', value: counts.students },
             { label: 'Faculty', value: counts.faculty },
             { label: 'Admins', value: counts.admins },

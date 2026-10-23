@@ -11,6 +11,7 @@ export type AvailabilityItem = {
   meeting_link: string | null
   student_name: string | null
   category: string | null
+  has_history: boolean
 }
 
 export async function listOwnAvailability() {

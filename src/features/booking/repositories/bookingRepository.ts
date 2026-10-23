@@ -1,5 +1,6 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
+import { addDays, manilaDateKey } from '@/lib/manilaTime'
 import type { FacultyResult, SlotResult } from '../types'
 export type { FacultyResult }
 export async function getFacultyPage(
@@ -26,14 +27,8 @@ export async function getFacultyPage(
   }
 }
 export async function listFacultySlots(facultyId: string, start?: string, end?: string) {
-  const rangeStart = start ?? new Date().toISOString().slice(0, 10)
-  const rangeEnd =
-    end ??
-    (() => {
-      const value = new Date(`${rangeStart}T00:00:00Z`)
-      value.setUTCDate(value.getUTCDate() + 28)
-      return value.toISOString().slice(0, 10)
-    })()
+  const rangeStart = start ?? manilaDateKey()
+  const rangeEnd = end ?? addDays(rangeStart, 28)
   const { data, error } = await (
     await createClient()
   ).rpc('list_faculty_slots', {

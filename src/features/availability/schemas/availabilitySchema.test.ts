@@ -33,4 +33,15 @@ describe('availabilitySchema', () => {
   test('rejects a non-date string', () => {
     expect(availabilitySchema.safeParse({ ...valid, date: 'not-a-date' }).success).toBe(false)
   })
+
+  test('rejects a non-http meeting link', () => {
+    expect(
+      availabilitySchema.safeParse({
+        ...valid,
+        mode: 'ONLINE',
+        location: undefined,
+        meetingLink: 'javascript:alert(1)',
+      }).success
+    ).toBe(false)
+  })
 })

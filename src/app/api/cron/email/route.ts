@@ -1,14 +1,8 @@
-import { timingSafeEqual } from 'node:crypto'
+import { isAuthorizedCronRequest } from '@/features/email/services/cronAuth'
 import { deliverEmails } from '@/features/email/services/deliverEmails'
 
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET
-  const supplied = request.headers.get('authorization')?.replace(/^Bearer /, '') ?? ''
-  if (
-    !secret ||
-    supplied.length !== secret.length ||
-    !timingSafeEqual(Buffer.from(supplied), Buffer.from(secret))
-  ) {
+  if (!isAuthorizedCronRequest(request, process.env.CRON_SECRET)) {
     return new Response('Unauthorized', { status: 401 })
   }
   try {

@@ -37,7 +37,7 @@ select results_eq(
   'linked request includes the student and category'
 );
 select throws_ok($$select public.update_open_availability((select id from test_slot),current_date+1,'16:00','17:00','IN_PERSON','Room 2',null)$$,'23514','Open availability not found','reserved slot cannot be updated');
-select throws_ok($$select public.update_open_availability((select id from test_slot),current_date-1,'16:00','17:00','IN_PERSON','Room 2',null)$$,'22023','Availability cannot be in the past','past date is rejected');
+select throws_ok($$select public.update_open_availability((select id from test_slot),current_date-1,'16:00','17:00','IN_PERSON','Room 2',null)$$,'22023','Availability must start in the future','past date is rejected');
 reset role;
 
 set local role authenticated;

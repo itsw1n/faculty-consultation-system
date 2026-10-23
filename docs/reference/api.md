@@ -66,7 +66,7 @@ The student dashboard uses `student_dashboard_summary()` for pending, upcoming, 
 - Missing authentication redirects to the sign-in flow; a wrong role or status redirects to `/auth/continue`.
 - Booking conflicts report that the slot is no longer available; lifecycle conflicts ask the user to refresh.
 - Duplicate department values report that code and name must be unique.
-- Email processing returns `401` for a bad callback secret and `503` when the outbox is unavailable.
+- Email processing returns `401` for a bad callback secret and `503` when the outbox is unavailable. Cron secrets are compared as UTF-8 bytes with a length check.
 - Unexpected rendering failures use the application error boundary; unknown routes use the not-found page.
 
 Database and provider details stay server-side. Server actions return `{ error, message? }`; cursor loaders return an `InfinitePage` and throw on failure. There is no stable public error-code API in v1.

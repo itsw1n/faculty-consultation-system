@@ -83,21 +83,23 @@ A slot can be requested only while `OPEN`. The conditional update changes at mos
 ## Availability rules
 
 1. Faculty may create availability only for themselves.
-2. The date cannot be in the past.
+2. A slot's start time must be in the future.
 3. End time must be later than start time.
-4. `IN_PERSON` requires a nonblank location; `ONLINE` stores an optional meeting link and no location.
+4. `IN_PERSON` requires a nonblank location; `ONLINE` stores an optional `http`/`https` meeting link and no location.
 5. Active availability for the same faculty cannot overlap (GiST exclusion constraint on non-`CLOSED` slots).
 6. Exact duplicate slots are rejected by a unique constraint.
-7. Only `OPEN` slots can be edited or deleted.
+7. Only future `OPEN` slots without consultation history can be edited or deleted; history makes a slot immutable.
 8. Students cannot mutate availability.
-9. The faculty availability list is capped at 100 upcoming rows.
-10. Dashboard open-slot counts include only current or future `OPEN` slots.
+9. The faculty availability list is capped at 100 upcoming rows and reports `has_history` so the UI can disable changes.
+10. Dashboard open-slot and agenda counts use the slot end time, so a session that already started but has not ended still appears.
 
 ## Visibility
 
 - Students see their own consultations; faculty see consultations assigned to them; admins see metadata and counts.
 - Participants see category, description, and outcome on detail pages.
+- Participants see the meeting link for approved or completed `ONLINE` consultations; admins do not receive it, and the link must be `http` or `https`.
 - Admin list and CSV results replace the description with the category and omit participant-only notes.
+- Consultation summaries group consultations without a department under `UNASSIGNED`.
 
 ## Departments
 
@@ -113,8 +115,8 @@ A slot can be requested only while `OPEN`. The conditional update changes at mos
 3. Admins can correct an approved account's role or department.
 4. Admins cannot correct their own account or assign `ADMIN`.
 5. Consultations cannot be bulk-deleted.
-6. CSV export is metadata only and limited to 366 days.
-7. Manage Users is an active account directory: it shows approved accounts and has no account-status filter or approval action. The legacy statuses remain internal safeguards for historical records and access control.
+6. CSV export is metadata only and limited to 366 inclusive days.
+7. Manage Users is an active account directory: it shows approved accounts, its user total counts approved accounts only, and it has no account-status filter or approval action. The legacy statuses remain internal safeguards for historical records and access control.
 
 ## Search and pagination
 

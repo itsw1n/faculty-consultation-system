@@ -51,7 +51,7 @@ Client components fetch additional pages through `'use server'` loaders:
 - `getConsultationPage` → `search_my_consultations`.
 - `getNotificationPage` → `notifications` with a `(created_at, id)` cursor.
 
-These are internal application interfaces, not public HTTP APIs. `getConsultationPage` includes the saved outcome so the details modal can show completed results without a second fetch. See the full function catalog in [`../concepts/data-model.md`](../concepts/data-model.md#rpc-catalog).
+These are internal application interfaces, not public HTTP APIs. `getConsultationPage` includes the saved outcome and meeting link so the details modal can show completed results without a second fetch. Cursor payloads are validated at the server boundary with the shared offset-datetime schema. See the full function catalog in [`../concepts/data-model.md`](../concepts/data-model.md#rpc-catalog).
 
 The admin dashboard uses `admin_dashboard_summary()` for aggregate account, availability, and consultation counts, and `search_my_consultations` for its redacted recent-activity list.
 

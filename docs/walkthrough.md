@@ -60,7 +60,7 @@ Consultation status emails and next-day reminders are secondary to in-app notifi
 
 ## How to demonstrate the system
 
-A short demonstration can use three separate browser sessions for the [Student, Faculty, and Admin demo accounts](getting-started.md#demo-accounts):
+A short demonstration can use three separate browser sessions for the [Student, Faculty, and Admin demo accounts](getting-started.md#demo-accounts). Use `bitas@acdeducation.com` or `panzo@acdeducation.com` as the Student, `mendoza@acdeducation.com` as the Faculty, and `erwin@acdeducation.com` as the Admin. Jose Santos and Angela Villanueva are supporting faculty for directory and department demonstrations.
 
 1. As Faculty, add a future open slot that does not overlap an existing slot.
 2. As Student, find that faculty member and submit a request for the slot.

@@ -43,15 +43,18 @@ delete from public.approved_email_domains where domain = '*';
 
 ## Demo accounts
 
-`supabase db reset` loads five local demo accounts (one admin, three faculty, and one student), twenty availability slots, twelve consultations covering every lifecycle state, sample notifications, and email outbox history:
+`supabase db reset` loads six local demo accounts (one admin, three faculty, and two students), seventeen availability slots, twelve consultations covering every lifecycle state, twelve notifications, and twelve email outbox records:
 
 | Role    | Name                       | Email                                | Password       |
 | ------- | -------------------------- | ------------------------------------ | -------------- |
-| Admin   | Demo Admin                 | `admin.demo@acdeducation.com`        | `Password123!` |
-| Faculty | Maria Cristina D. Reyes    | `faculty.demo@acdeducation.com`      | `Password123!` |
+| Admin   | Erwin Curato               | `erwin@acdeducation.com`             | `Password123!` |
+| Faculty | Alexandra Mendoza          | `mendoza@acdeducation.com`           | `Password123!` |
 | Faculty | Jose Miguel A. Santos      | `jose.santos@acdeducation.com`       | `Password123!` |
 | Faculty | Angela Marie L. Villanueva | `angela.villanueva@acdeducation.com` | `Password123!` |
-| Student | Erwin James P. Dela Cruz   | `student.demo@acdeducation.com`      | `Password123!` |
+| Student | John Frence Cuevas Bitas   | `bitas@acdeducation.com`             | `Password123!` |
+| Student | Bien Panzo                 | `panzo@acdeducation.com`             | `Password123!` |
+
+Jose and Angela are supporting faculty for department filtering and faculty-directory variety. Jose has no future availability, which demonstrates the admin “faculty without future slots” indicator. Mendoza is the primary faculty account for the Bitas and Panzo bookings.
 
 Re-apply just the demo data without rebuilding the database:
 
@@ -67,7 +70,7 @@ make reset
 
 Both targets pass `--local`, so they never touch a linked or hosted Supabase project. `make reset` also clears any other local development data.
 
-The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
+The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The seeded admin also means `/auth/claim-admin` reports that an administrator already exists.
 
 ## First administrator
 

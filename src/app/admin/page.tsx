@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CalendarDays, ClipboardList, Users } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, ClipboardList, Users } from 'lucide-react'
 import { EmptyState } from '@/components/common/EmptyState'
 import { PageHeading } from '@/components/common/PageHeading'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -12,20 +12,20 @@ const quickActions = [
   {
     href: '/admin/users',
     label: 'Manage users',
-    description: 'Promote registered students and correct account details.',
+    description: 'Accounts, faculty roles, and assignments',
     icon: Users,
-  },
-  {
-    href: '/admin/consultations',
-    label: 'Consultation records',
-    description: 'Review activity and download a summary report.',
-    icon: CalendarDays,
   },
   {
     href: '/admin/departments',
     label: 'Departments',
-    description: 'Maintain the departments used for accounts and faculty.',
+    description: 'Official codes and school directory',
     icon: ClipboardList,
+  },
+  {
+    href: '/admin/consultations',
+    label: 'Consultation records',
+    description: 'Activity records and summary exports',
+    icon: CalendarDays,
   },
 ]
 
@@ -39,15 +39,15 @@ export default async function AdminDashboard() {
     ['Cancelled', data.cancelled],
     ['Rejected', data.rejected],
   ]
-
   return (
     <>
       <PageHeading
         eyebrow="Administration workspace"
         title="Admin Dashboard"
-        description="Manage school accounts, faculty capacity, and consultation activity."
+        description="School accounts, faculty capacity, and consultation activity in one place."
       />
       <SummaryStats
+        className="grid-cols-2 sm:grid-cols-4"
         items={[
           { label: 'Students', value: data.students, description: 'Approved accounts' },
           { label: 'Faculty', value: data.faculty, description: 'Approved accounts' },
@@ -55,109 +55,128 @@ export default async function AdminDashboard() {
           { label: 'Open slots', value: data.open_slots, description: 'Available to students' },
         ]}
       />
-
-      {data.faculty === 0 ? (
+      <section className="mt-6" aria-labelledby="management-heading">
+        <h2
+          id="management-heading"
+          className="mb-3 text-xs font-semibold tracking-wide text-muted uppercase"
+        >
+          Quick actions
+        </h2>
+        <div className="grid gap-3 xl:grid-cols-3">
+          {quickActions.map(({ href, label, description, icon: Icon }) => (
+            <Link
+              href={href}
+              key={href}
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-colors hover:border-primary/30 hover:bg-subtle focus-visible:outline-3 focus-visible:outline-focus"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-subtle text-primary">
+                <Icon size={18} aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <strong className="block text-sm font-semibold text-foreground">{label}</strong>
+                <span className="mt-0.5 block text-xs text-muted">{description}</span>
+              </span>
+              <ArrowUpRight
+                size={15}
+                aria-hidden="true"
+                className="ml-auto shrink-0 text-muted group-hover:text-primary"
+              />
+            </Link>
+          ))}
+        </div>
+      </section>
+      {data.faculty === 0 && (
         <EmptyState
           title="No Faculty accounts yet"
           description="Ask Faculty to register with a school email, then promote them in Manage Users."
           action={
             <Link
-              className="mt-5 inline-flex min-h-11 items-center rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-3 focus-visible:outline-focus"
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover"
               href="/admin/users"
             >
               Manage Users
             </Link>
           }
         />
-      ) : (
-        <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <section className="rounded-lg border border-border bg-surface p-5">
-            <h2 className="text-lg font-semibold text-primary">Needs attention</h2>
-            <p className="mt-1 text-sm text-muted">
-              Items that may need an administrator to follow up.
-            </p>
-            <div className="mt-4 divide-y divide-border border-y border-border">
+      )}
+      <div className="mt-6 grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_17rem]">
+        <section aria-labelledby="activity-heading" className="min-w-0">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 id="activity-heading" className="text-base font-semibold text-foreground">
+                Recent consultations
+              </h2>
+              <p className="mt-1 text-xs text-muted">
+                Latest activity across the school. Consultation content stays private.
+              </p>
+            </div>
+            <Link
+              className="inline-flex min-h-9 items-center gap-1 text-xs font-medium text-primary hover:underline"
+              href="/admin/consultations"
+            >
+              View all records <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          </div>
+          <AdminRecentConsultationsTable items={data.recent} />
+        </section>
+        <aside className="grid items-start gap-5 sm:grid-cols-2 xl:grid-cols-1">
+          <section className="rounded-xl border border-border bg-surface p-5">
+            <h2 className="text-base font-semibold text-foreground">Needs attention</h2>
+            <p className="mt-1 text-xs text-muted">Follow up with the relevant faculty.</p>
+            <div className="mt-4 divide-y divide-border border-t border-border">
               <Link
-                className="flex items-center justify-between gap-4 py-4 hover:text-primary"
+                className="flex items-start justify-between gap-4 py-4 hover:text-primary focus-visible:outline-3 focus-visible:outline-focus"
                 href="/admin/consultations"
               >
                 <span>
-                  <strong className="block font-semibold text-primary">
+                  <strong className="block text-sm font-medium">
                     Pending consultation requests
                   </strong>
-                  <span className="text-sm text-muted">Waiting for a faculty decision</span>
+                  <span className="mt-1 block text-xs text-muted">
+                    Waiting for a faculty decision
+                  </span>
                 </span>
-                <span className="text-2xl font-semibold text-primary">{data.pending}</span>
+                <span className="rounded-md bg-warning/8 px-2 py-1 text-sm font-semibold text-warning">
+                  {data.pending}
+                </span>
               </Link>
               <Link
-                className="flex items-center justify-between gap-4 py-4 hover:text-primary"
+                className="flex items-start justify-between gap-4 pt-4 hover:text-primary focus-visible:outline-3 focus-visible:outline-focus"
                 href="/admin/users?role=FACULTY"
               >
                 <span>
-                  <strong className="block font-semibold text-primary">
+                  <strong className="block text-sm font-medium">
                     Faculty without future slots
                   </strong>
-                  <span className="text-sm text-muted">
-                    May need a reminder to publish availability
+                  <span className="mt-1 block text-xs text-muted">
+                    May need to publish availability
                   </span>
                 </span>
-                <span className="text-2xl font-semibold text-primary">
+                <span className="rounded-md bg-subtle px-2 py-1 text-sm font-semibold text-primary">
                   {data.faculty_without_future_slots}
                 </span>
               </Link>
             </div>
           </section>
-
-          <section className="rounded-lg border border-border bg-surface p-5">
-            <h2 className="text-lg font-semibold text-primary">Consultation activity</h2>
-            <p className="mt-1 text-sm text-muted">
-              A summary of the current consultation lifecycle.
-            </p>
-            <dl className="mt-4 divide-y divide-border border-y border-border">
+          <section className="rounded-xl border border-border bg-surface p-5">
+            <h2 className="text-base font-semibold text-foreground">Consultation activity</h2>
+            <p className="mt-1 text-xs text-muted">All records by current status</p>
+            <dl className="mt-4 divide-y divide-border border-t border-border">
               {lifecycle.map(([status, count]) => (
-                <div className="flex items-center justify-between py-3" key={String(status)}>
+                <div
+                  className="flex items-center justify-between py-2.5 last:pb-0"
+                  key={String(status)}
+                >
                   <dt>
                     <StatusBadge status={String(status).toUpperCase()} />
                   </dt>
-                  <dd className="font-semibold text-primary">{count}</dd>
+                  <dd className="text-sm font-semibold text-foreground tabular-nums">{count}</dd>
                 </div>
               ))}
             </dl>
           </section>
-        </div>
-      )}
-
-      <section className="mt-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
-          <div>
-            <h2 className="text-lg font-semibold text-primary">Recent consultations</h2>
-            <p className="mt-1 text-sm text-muted">
-              Latest consultation activity across the school.
-            </p>
-          </div>
-          <Link className="font-semibold text-primary hover:underline" href="/admin/consultations">
-            View all records
-          </Link>
-        </div>
-        <AdminRecentConsultationsTable items={data.recent} />
-      </section>
-
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold text-primary">Quick actions</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
-          {quickActions.map(({ href, label, description, icon: Icon }) => (
-            <Link
-              className="rounded-lg border border-border bg-surface p-5 transition-colors hover:bg-subtle focus-visible:outline-3 focus-visible:outline-focus"
-              href={href}
-              key={href}
-            >
-              <Icon className="text-accent" size={20} aria-hidden="true" />
-              <strong className="mt-4 block text-primary">{label}</strong>
-              <span className="mt-1 block text-sm leading-relaxed text-muted">{description}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+        </aside>
+      </div>
     </>
   )
 }

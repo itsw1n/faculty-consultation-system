@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Cell, Column, Row, TableBody, TableHeader } from 'react-aria-components'
@@ -80,11 +81,13 @@ function EditUserForm({
           {state.error}
         </p>
       ) : null}
-      <div className="flex justify-end gap-3">
+      <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-4">
         <Button type="button" variant="secondary" onPress={onCancel}>
           Cancel
         </Button>
-        <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
+        <SubmitButton className="w-auto" pendingLabel="Saving…">
+          Save changes
+        </SubmitButton>
       </div>
     </form>
   )
@@ -102,7 +105,7 @@ export function ApplicationReviewList({
   const [correctTarget, setCorrectTarget] = useState<ApplicationItem | null>(null)
   const [message, setMessage] = useState('')
   const router = useRouter()
-  const { page, pending, markerRef } = useInfinitePage<ApplicationItem, Cursor>({
+  const { page, pending, error, retry, markerRef } = useInfinitePage<ApplicationItem, Cursor>({
     initialPage,
     fetchPage: (cursor) =>
       getApplicationPage({
@@ -114,13 +117,21 @@ export function ApplicationReviewList({
   })
 
   return (
-    <>
+    <div data-admin-list="users">
       {message ? (
-        <p className="mt-4 text-sm font-semibold text-success" role="status">
+        <p
+          className="mt-4 rounded-lg border border-success/20 bg-success/8 px-4 py-3 text-sm text-success"
+          role="status"
+        >
           {message}
         </p>
       ) : null}
-      <div className="mt-5">
+      <div className="mt-5" aria-busy={pending}>
+        <p className="mb-3 text-xs text-muted" aria-live="polite">
+          {pending
+            ? 'Loading accounts…'
+            : `${page.items.length}${page.hasMore ? '+' : ''} accounts shown`}
+        </p>
         <DataTable aria-label="User accounts">
           <TableHeader className="border-b border-border bg-background text-xs font-semibold tracking-wide text-muted uppercase">
             <Column isRowHeader className="w-[34%] px-5 py-3">
@@ -131,26 +142,48 @@ export function ApplicationReviewList({
             <Column className="w-[12%] px-5 py-3">Role</Column>
             <Column className="w-[15%] px-5 py-3 text-right">Action</Column>
           </TableHeader>
-          <TableBody items={page.items} renderEmptyState={() => 'No accounts match these filters.'}>
+          <TableBody
+            items={page.items}
+            renderEmptyState={() => (
+              <div className="px-5 py-8 text-center">
+                <p className="font-medium text-foreground">No accounts match these filters.</p>
+                <p className="mt-1 text-sm text-muted">
+                  Try another name, email, role, or department.
+                </p>
+                {(filters.search || filters.role || filters.department) && (
+                  <Link
+                    href="/admin/users"
+                    className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
+                  >
+                    Clear filters
+                  </Link>
+                )}
+              </div>
+            )}
+          >
             {(application) => (
               <Row className="border-b border-border last:border-0 data-[focus-visible-within]:outline-3 data-[focus-visible-within]:outline-focus">
                 <Cell className="px-5 py-4 align-middle">
                   <strong className="font-semibold text-primary">{application.full_name}</strong>
                   <p className="mt-1 text-sm text-muted">{application.email}</p>
                 </Cell>
-                <Cell className="px-5 py-4 text-sm text-muted">
+                <Cell data-label="Department" className="px-5 py-4 text-sm text-muted">
                   {application.department_name ?? '—'}
                 </Cell>
-                <Cell className="px-5 py-4 text-sm text-muted">
+                <Cell data-label="Position" className="px-5 py-4 text-sm text-muted">
                   {application.role === 'FACULTY' ? (application.position_title ?? '—') : '—'}
                 </Cell>
-                <Cell className="px-5 py-4">
+                <Cell data-label="Role" className="px-5 py-4">
                   <StatusBadge status={application.role} />
                 </Cell>
-                <Cell className="px-5 py-4 text-right">
+                <Cell
+                  data-label={application.role === 'ADMIN' ? 'Access' : 'Actions'}
+                  className="px-5 py-4 text-right"
+                >
                   {application.role !== 'ADMIN' ? (
                     <Button
                       variant="secondary"
+                      className="min-w-0"
                       onPress={() => {
                         setMessage('')
                         setCorrectTarget(application)
@@ -158,7 +191,9 @@ export function ApplicationReviewList({
                     >
                       Edit User
                     </Button>
-                  ) : null}
+                  ) : (
+                    <span className="text-xs text-muted">Protected admin account</span>
+                  )}
                 </Cell>
               </Row>
             )}
@@ -171,7 +206,7 @@ export function ApplicationReviewList({
         onOpenChange={(open) => {
           if (!open) setCorrectTarget(null)
         }}
-        className="max-w-3xl"
+        className="max-w-lg"
       >
         {correctTarget ? (
           <EditUserForm
@@ -189,10 +224,12 @@ export function ApplicationReviewList({
       </Modal>
       <InfiniteListMarker
         markerRef={markerRef}
+        error={error}
+        onRetry={retry}
         pending={pending}
         hasMore={page.hasMore}
         pendingLabel="Loading accounts…"
       />
-    </>
+    </div>
   )
 }

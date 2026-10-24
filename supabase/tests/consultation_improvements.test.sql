@@ -49,10 +49,10 @@ select throws_ok($$select public.complete_consultation_with_outcome((select id f
 select results_eq($$select outcome from public.search_my_consultations() where id=(select id from public.consultations limit 1)$$,array['Follow up next week'::text],'listing exposes the outcome to participants');
 reset role;
 
-select results_eq($$select event_type from public.email_outbox where event_type='APPROVED'$$,array['APPROVED'::text],'approval enqueues email');
-select results_eq($$select count(*)::int from public.claim_email_batch(25)$$,array[1],'only current approved email is claimed');
-select results_eq($$select attempts from public.email_outbox where event_type='APPROVED'$$,array[1],'claim records an attempt');
-select lives_ok($$select public.mark_email_sent((select id from public.email_outbox where event_type='APPROVED'))$$,'sent email can be acknowledged');
+select results_eq($$select event_type from public.email_outbox where consultation_id=(select id from public.consultations where availability_slot_id='55000000-0000-0000-0000-000000000005') and event_type='APPROVED'$$,array['APPROVED'::text],'approval enqueues email');
+select results_eq($$select count(*)::int from public.claim_email_batch(25) where id=(select id from public.email_outbox where consultation_id=(select id from public.consultations where availability_slot_id='55000000-0000-0000-0000-000000000005') and event_type='APPROVED')$$,array[1],'current approved email is claimed');
+select results_eq($$select attempts from public.email_outbox where consultation_id=(select id from public.consultations where availability_slot_id='55000000-0000-0000-0000-000000000005') and event_type='APPROVED'$$,array[1],'claim records an attempt');
+select lives_ok($$select public.mark_email_sent((select id from public.email_outbox where consultation_id=(select id from public.consultations where availability_slot_id='55000000-0000-0000-0000-000000000005') and event_type='APPROVED'))$$,'sent email can be acknowledged');
 select results_eq($$select count(*)::int from public.claim_email_batch(25)$$,array[0],'sent email is not claimed again');
 
 select * from finish();

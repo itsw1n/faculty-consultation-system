@@ -30,17 +30,18 @@ Implementation: [booking action](../../src/features/booking/actions.ts), [bookin
 
 The endpoints below use the existing signed-in session, except the public health check, email confirmation link, and secret-protected email job.
 
-| Method and route                            | Access               | Purpose                                         |
-| ------------------------------------------- | -------------------- | ----------------------------------------------- |
-| `GET /api/health`                           | Public               | Basic application health response               |
-| `GET /api/faculty/[facultyId]/availability` | Approved Student     | Read one faculty member's slots                 |
-| `GET /admin/consultations/export`           | Admin                | Download a date-range summary CSV               |
-| `GET /auth/confirm`                         | Valid email token    | Verify an email/recovery link and redirect      |
-| `GET /api/cron/email`                       | Bearer `CRON_SECRET` | Queue reminders and process consultation emails |
+| Method and route                            | Access               | Purpose                                                        |
+| ------------------------------------------- | -------------------- | -------------------------------------------------------------- |
+| `GET /api/health`                           | Public               | Basic application health response                              |
+| `GET /api/faculty/[facultyId]/availability` | Approved Student     | Read one faculty member's slots                                |
+| `GET /admin/consultations/export`           | Admin                | Download a date-range summary CSV                              |
+| `GET /faculty/consultations/export`         | Approved Faculty     | Download that faculty member's date-range consultation records |
+| `GET /auth/confirm`                         | Valid email token    | Verify an email/recovery link and redirect                     |
+| `GET /api/cron/email`                       | Bearer `CRON_SECRET` | Queue reminders and process consultation emails                |
 
 The health endpoint accepts no inputs and returns HTTP `200` with `{ "status": "ok" }`. It does not test the database or email provider. The other contracts are detailed below.
 
-Source: [health](../../src/app/api/health/route.ts), [availability](../../src/app/api/faculty/[facultyId]/availability/route.ts), [CSV export](../../src/app/admin/consultations/export/route.ts), [confirmation](../../src/app/auth/confirm/route.ts), [email job](../../src/app/api/cron/email/route.ts).
+Source: [health](../../src/app/api/health/route.ts), [availability](../../src/app/api/faculty/[facultyId]/availability/route.ts), [admin CSV export](../../src/app/admin/consultations/export/route.ts), [faculty CSV export](../../src/app/faculty/consultations/export/route.ts), [confirmation](../../src/app/auth/confirm/route.ts), [email job](../../src/app/api/cron/email/route.ts).
 
 ### Faculty availability
 
@@ -87,6 +88,15 @@ An empty result is `{ "slots": [] }`. Endpoint errors use `{ "error": "safe mess
 - **Errors:** `400` for an invalid range, `401` without authentication, `403` without Admin access, and `500` if the report cannot be prepared.
 
 Example: `/admin/consultations/export?from=2026-11-01&to=2026-11-30`.
+
+### Faculty consultation CSV
+
+- **Inputs:** required `from` and `to` dates in the query string; ranges may span up to 366 days.
+- **Success:** HTTP `200` with the signed-in faculty member's own consultation records as a CSV attachment, including all statuses.
+- **Errors:** `400` for an invalid range, `401` without authentication, `403` without approved Faculty access, and `500` if the report cannot be prepared.
+- The database export function independently enforces approved Faculty role, faculty ownership, and slot-date filtering. The CSV includes student name, category, status, schedule, mode, location, and request time. It omits consultation descriptions, outcomes, and meeting links.
+
+Example: `/faculty/consultations/export?from=2026-01-01&to=2026-10-25`.
 
 The range is inclusive and limited to 366 days. The file groups counts by these columns:
 

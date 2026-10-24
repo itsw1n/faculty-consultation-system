@@ -2,7 +2,8 @@
 
 import { useActionState, useState } from 'react'
 import { Cell, Column, Row, TableBody, TableHeader } from 'react-aria-components'
-import { MapPin, Monitor, Search } from 'lucide-react'
+import { CalendarPlus, MapPin, Monitor } from 'lucide-react'
+import { SearchInput } from '@/components/common/SearchInput'
 import { Button } from '@/components/common/button/Button'
 import { AlertDialog } from '@/components/common/AlertDialog'
 import { DataTable } from '@/components/common/table/DataTable'
@@ -49,16 +50,23 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
   const [editSlot, setEditSlot] = useState<AvailabilityItem | null>(null)
   const [detailsSlot, setDetailsSlot] = useState<AvailabilityItem | null>(null)
   const [search, setSearch] = useState('')
+  const [feedback, setFeedback] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | AvailabilityItem['status']>('ALL')
   const [state, formAction] = useActionState(async (previous: ActionState, formData: FormData) => {
     const result = await createAvailability(previous, formData)
-    if (!result.error) setAddOpen(false)
+    if (!result.error) {
+      setAddOpen(false)
+      setFeedback('Availability added.')
+    }
     return result
   }, initialActionState)
   const [editState, editAction] = useActionState(
     async (previous: ActionState, formData: FormData) => {
       const result = await updateAvailability(previous, formData)
-      if (!result.error) setEditSlot(null)
+      if (!result.error) {
+        setEditSlot(null)
+        setFeedback('Availability updated.')
+      }
       return result
     },
     initialActionState
@@ -76,29 +84,27 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
   })
 
   return (
-    <>
+    <div data-faculty-list="availability">
       <PageHeading
+        eyebrow="Faculty workspace"
         title="My Availability"
         description="Create consultation times and review their booking status."
-        action={<Button onPress={() => setAddOpen(true)}>Add Availability</Button>}
+        action={
+          <Button onPress={() => setAddOpen(true)}>
+            <CalendarPlus size={16} aria-hidden="true" className="mr-2" />
+            Add Availability
+          </Button>
+        }
       />
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_14rem]">
-        <label className="relative block">
-          <span className="sr-only">Search by student name or category</span>
-          <Search
-            size={18}
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
-          />
-          <input
-            className={`${controlClass} w-full pl-10`}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by student name or category..."
-          />
-        </label>
+      <div className="grid items-end gap-4 rounded-xl border border-border bg-surface p-4 sm:grid-cols-[minmax(0,1fr)_14rem]">
+        <SearchInput
+          label="Search availability"
+          value={search}
+          onChange={setSearch}
+          placeholder="Student, category, or location"
+        />
         <Select
-          ariaLabel="Filter by status"
+          label="Filter by status"
           options={statusOptions}
           value={statusFilter}
           onChange={(value) => setStatusFilter(value as 'ALL' | AvailabilityItem['status'])}
@@ -110,8 +116,10 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
         onOpenChange={setAddOpen}
         className="max-w-3xl"
       >
-        <p className="text-muted">Create an open time for student requests.</p>
-        <form action={formAction} className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <p className="text-muted">
+          Choose a date and time, then add the room or online meeting details.
+        </p>
+        <form action={formAction} className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <label className={fieldClass}>
             Date
             <input className={controlClass} name="date" type="date" required />
@@ -145,15 +153,28 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
           >
             {state.error}
           </p>
-          <div className="flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
+          <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-4 sm:col-span-2 lg:col-span-3">
             <Button type="button" variant="secondary" onPress={() => setAddOpen(false)}>
               Cancel
             </Button>
-            <SubmitButton pendingLabel="Adding…">Add availability</SubmitButton>
+            <SubmitButton className="w-auto" pendingLabel="Adding…">
+              Add availability
+            </SubmitButton>
           </div>
         </form>
       </Modal>
+      {feedback && (
+        <p
+          role="status"
+          className="mt-4 rounded-lg border border-success/20 bg-success/8 px-4 py-3 text-sm text-success"
+        >
+          {feedback}
+        </p>
+      )}
       <div className="mt-5">
+        <p className="mb-3 text-xs text-muted" role="status">
+          {visibleSlots.length} of {slots.length} upcoming slots
+        </p>
         <DataTable aria-label="Upcoming availability">
           <TableHeader className="border-b border-border bg-background text-xs font-semibold tracking-wide text-muted uppercase">
             <Column isRowHeader className="w-[22%] px-5 py-3">
@@ -182,7 +203,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                     {slot.start_time.slice(0, 5)}–{slot.end_time.slice(0, 5)}
                   </p>
                 </Cell>
-                <Cell className="px-5 py-4 text-sm text-muted">
+                <Cell data-label="Mode / location" className="px-5 py-4 text-sm text-muted">
                   <span className="flex items-center gap-2">
                     {slot.mode === 'IN_PERSON' ? (
                       <MapPin size={16} aria-hidden="true" />
@@ -192,10 +213,10 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                     {slot.mode === 'IN_PERSON' ? slot.location || 'Not specified' : 'Online'}
                   </span>
                 </Cell>
-                <Cell className="px-5 py-4">
+                <Cell data-label="Status" className="px-5 py-4">
                   <StatusBadge status={slot.status} />
                 </Cell>
-                <Cell className="px-5 py-4">
+                <Cell data-label="Student" className="px-5 py-4">
                   {slot.student_name ? (
                     <>
                       <p className="font-semibold text-primary">{slot.student_name}</p>
@@ -207,7 +228,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                     <span className="text-muted">—</span>
                   )}
                 </Cell>
-                <Cell className="px-5 py-4">
+                <Cell data-label="Actions" className="px-5 py-4">
                   {slot.status === 'BOOKED' || slot.status === 'RESERVED' ? (
                     <div className="flex justify-end">
                       <Button
@@ -242,6 +263,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
                         description="Students will no longer be able to request this time."
                         fields={{ slotId: slot.id }}
                         submitAction={deleteAvailability}
+                        onSuccess={() => setFeedback('Availability removed.')}
                         variant="danger"
                       />
                     </div>
@@ -266,7 +288,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
           <form
             key={editSlot.id}
             action={editAction}
-            className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+            className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
           >
             <input type="hidden" name="slotId" value={editSlot.id} />
             <label className={fieldClass}>
@@ -330,11 +352,13 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
             >
               {editState.error}
             </p>
-            <div className="flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
+            <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-4 sm:col-span-2 lg:col-span-3">
               <Button type="button" variant="secondary" onPress={() => setEditSlot(null)}>
                 Cancel
               </Button>
-              <SubmitButton pendingLabel="Saving…">Save changes</SubmitButton>
+              <SubmitButton className="w-auto" pendingLabel="Saving…">
+                Save changes
+              </SubmitButton>
             </div>
           </form>
         ) : null}
@@ -347,7 +371,7 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
         }}
       >
         {detailsSlot ? (
-          <dl className="mt-2 grid grid-cols-[7rem_1fr] [&>dd]:m-0 [&>dd]:border-b [&>dd]:border-border [&>dd]:p-2 [&>dt]:border-b [&>dt]:border-border [&>dt]:p-2 [&>dt]:font-bold">
+          <dl className="mt-2 grid grid-cols-[6rem_minmax(0,1fr)] text-sm [&>dd]:break-words [&>dd]:m-0 [&>dd]:border-b [&>dd]:border-border [&>dd]:p-2 [&>dt]:border-b [&>dt]:border-border [&>dt]:p-2 [&>dt]:font-bold">
             <dt>Date</dt>
             <dd>{formatDate(detailsSlot.date)}</dd>
             <dt>Time</dt>
@@ -394,6 +418,6 @@ export function AvailabilityManager({ slots }: { slots: AvailabilityItem[] }) {
           </dl>
         ) : null}
       </Modal>
-    </>
+    </div>
   )
 }

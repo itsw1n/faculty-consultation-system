@@ -27,9 +27,9 @@ export function Modal({ title, isOpen, onOpenChange, children, className }: Moda
           className
         )}
       >
-        <Dialog className="flex min-h-0 flex-1 flex-col outline-none">
-          <header className="flex shrink-0 items-start justify-between gap-4 px-6 pt-6">
-            <Heading slot="title" className="text-xl font-bold">
+        <Dialog className="flex min-h-0 flex-1 flex-col text-sm outline-none">
+          <header className="flex shrink-0 items-start justify-between gap-4 border-b border-border px-6 py-5">
+            <Heading slot="title" className="text-lg font-semibold text-foreground">
               {title}
             </Heading>
             <Button
@@ -40,7 +40,7 @@ export function Modal({ title, isOpen, onOpenChange, children, className }: Moda
               <X size={18} aria-hidden="true" />
             </Button>
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">{children}</div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-6">{children}</div>
         </Dialog>
       </AriaModal>
     </ModalOverlay>

@@ -33,4 +33,4 @@ Merging `dev` → `main` runs full CI; on green, the release workflow tags the n
 
 ## Release checklist
 
-Run the validation commands from [`getting-started.md`](getting-started.md), test the confirmation and recovery emails against the target origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.
+Run the validation commands from [`getting-started.md`](getting-started.md), complete the primary lifecycle pass in [`reference/manual-test-cases.md`](reference/manual-test-cases.md), test the confirmation and recovery emails against the target origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.

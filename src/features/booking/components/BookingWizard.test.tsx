@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { BookingWizard } from './BookingWizard'
 import type { SlotResult } from '../types'
@@ -118,7 +118,11 @@ describe('BookingWizard review', () => {
     fireEvent.click(screen.getByRole('button', { name: /09:00/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(screen.getByText('Dr. Ada Lovelace')).toBeInTheDocument()
+    expect(
+      within(
+        screen.getByRole('heading', { name: 'Consultation Information' }).closest('section')!
+      ).getByText('Dr. Ada Lovelace')
+    ).toBeInTheDocument()
     expect(screen.getByText('Room 101')).toBeInTheDocument()
     expect(screen.getByText('09:00–10:00')).toBeInTheDocument()
 
@@ -151,4 +155,13 @@ describe('BookingWizard month navigation', () => {
       )
     )
   })
+})
+
+it('keeps faculty context and a way back to discovery visible before selecting a slot', () => {
+  render(<BookingWizard facultyId={FACULTY_ID} initialSlots={[slot()]} />)
+  expect(screen.getByText('Dr. Ada Lovelace')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Change faculty' })).toHaveAttribute(
+    'href',
+    '/student/book'
+  )
 })

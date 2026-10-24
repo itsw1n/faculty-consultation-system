@@ -12,6 +12,7 @@ export default async function ChooseSchedule({
   return (
     <>
       <PageHeading
+        eyebrow="Student workspace"
         title="Book a Consultation"
         description="Choose an available schedule, add details, and review your request."
       />

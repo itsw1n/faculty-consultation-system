@@ -21,6 +21,8 @@ type UseInfinitePage<TItem, TCursor> = {
   setPage: Dispatch<SetStateAction<InfinitePage<TItem, TCursor>>>
   reload: (load: () => Promise<InfinitePage<TItem, TCursor>>) => void
   pending: boolean
+  error: string | null
+  retry: () => void
   markerRef: RefObject<HTMLDivElement | null>
 }
 
@@ -47,6 +49,9 @@ export function useInfinitePage<TItem, TCursor>({
 }): UseInfinitePage<TItem, TCursor> {
   const [page, setPage] = useState(initialPage)
   const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const retryRef = useRef<(() => void) | null>(null)
+  const retry = useCallback(() => retryRef.current?.(), [])
   const markerRef = useRef<HTMLDivElement>(null)
   const fetchRef = useRef(fetchPage)
   const getKeyRef = useRef(getKey)
@@ -65,19 +70,32 @@ export function useInfinitePage<TItem, TCursor>({
     initialRef.current = serialized
     generation.current += 1
     loading.current = false
+    setPending(false)
+    setError(null)
+    retryRef.current = null
     setPage((current) => {
       const key = getKeyRef.current
       return key ? mergePage(initialPage, current, key) : initialPage
     })
   }, [initialPage])
 
-  const reload = useCallback((load: () => Promise<InfinitePage<TItem, TCursor>>) => {
+  const reload = useCallback(function reloadResults(
+    load: () => Promise<InfinitePage<TItem, TCursor>>
+  ) {
     const requestGeneration = ++generation.current
     loading.current = false
     setPending(true)
-    void load()
+    setError(null)
+    retryRef.current = () => reloadResults(load)
+    void Promise.resolve()
+      .then(load)
       .then((next) => {
         if (requestGeneration === generation.current) setPage(next)
+      })
+      .catch(() => {
+        if (requestGeneration === generation.current) {
+          setError('Unable to update results. Your previous results are still shown.')
+        }
       })
       .finally(() => {
         if (requestGeneration === generation.current) setPending(false)
@@ -87,36 +105,46 @@ export function useInfinitePage<TItem, TCursor>({
   useEffect(() => {
     const node = markerRef.current
     const cursor = page.nextCursor
-    if (!node || pending || !page.hasMore || !cursor) return
+    if (!node || pending || error || !page.hasMore || !cursor) return
+    const loadNext = () => {
+      if (loading.current) return
+      loading.current = true
+      setPending(true)
+      setError(null)
+      retryRef.current = loadNext
+      const requestGeneration = generation.current
+      void Promise.resolve()
+        .then(() => fetchRef.current(cursor))
+        .then((next) => {
+          if (requestGeneration !== generation.current) return
+          setPage((current) => {
+            const key = getKeyRef.current
+            return key
+              ? mergePage(next, current, key)
+              : { ...next, items: [...current.items, ...next.items] }
+          })
+        })
+        .catch(() => {
+          if (requestGeneration === generation.current) {
+            setError('Unable to load more results. Your loaded results are still shown.')
+          }
+        })
+        .finally(() => {
+          if (requestGeneration === generation.current) {
+            loading.current = false
+            setPending(false)
+          }
+        })
+    }
     const observer = new IntersectionObserver(
       (entries) => {
-        if (!entries[0]?.isIntersecting || loading.current) return
-        loading.current = true
-        setPending(true)
-        const requestGeneration = generation.current
-        void fetchRef
-          .current(cursor)
-          .then((next) => {
-            if (requestGeneration !== generation.current) return
-            setPage((current) => {
-              const key = getKeyRef.current
-              return key
-                ? mergePage(next, current, key)
-                : { ...next, items: [...current.items, ...next.items] }
-            })
-          })
-          .finally(() => {
-            if (requestGeneration === generation.current) {
-              loading.current = false
-              setPending(false)
-            }
-          })
+        if (entries[0]?.isIntersecting) loadNext()
       },
       { rootMargin: '200px' }
     )
     observer.observe(node)
     return () => observer.disconnect()
-  }, [page, pending])
+  }, [page, pending, error])
 
-  return { page, setPage, reload, pending, markerRef }
+  return { page, setPage, reload, pending, markerRef, error, retry }
 }

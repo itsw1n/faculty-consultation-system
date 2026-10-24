@@ -21,7 +21,7 @@ export function SearchInput({
       <Label>{label}</Label>
       <div className="relative">
         <Input
-          className="min-h-11 w-full rounded-md border border-border bg-surface px-3 pr-10 outline-none focus-visible:ring-3 focus-visible:ring-focus"
+          className="min-h-11 w-full rounded-md border border-border bg-surface px-3 pr-10 text-sm font-normal outline-none focus-visible:ring-3 focus-visible:ring-focus"
           placeholder={placeholder}
         />
         {value && (

@@ -15,7 +15,7 @@ vi.mock('../queries/getNotificationPage', () => ({
 
 afterEach(() => {
   cleanup()
-  markAllNotificationsRead.mockClear()
+  markAllNotificationsRead.mockReset().mockResolvedValue(undefined)
 })
 
 const item = {
@@ -41,4 +41,25 @@ describe('NotificationList', () => {
     await waitFor(() => expect(markAllNotificationsRead).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(screen.queryByText('Mark read')).not.toBeInTheDocument())
   })
+})
+
+test('shows a safe error and retains unread items when marking all fails', async () => {
+  markAllNotificationsRead.mockRejectedValueOnce(new Error('internal database detail'))
+  render(
+    <NotificationList
+      initialPage={{ items: [item], hasMore: false, nextCursor: null }}
+      unread={1}
+    />
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }))
+  await waitFor(() =>
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Unable to mark notifications as read. Please try again.'
+    )
+  )
+  expect(screen.getByRole('button', { name: 'Mark read: Consultation approved' })).toBeEnabled()
+  expect(screen.queryByText('internal database detail')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Mark all as read' }))
+  await waitFor(() => expect(screen.queryByText('Mark read')).not.toBeInTheDocument())
+  await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument())
 })

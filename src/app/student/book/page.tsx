@@ -15,6 +15,7 @@ export default async function ChooseFaculty({
   return (
     <>
       <PageHeading
+        eyebrow="Student workspace"
         title="Book Consultation"
         description="Choose a faculty member to view available schedules."
       />

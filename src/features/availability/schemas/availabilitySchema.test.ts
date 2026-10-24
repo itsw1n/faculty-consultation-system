@@ -15,7 +15,12 @@ describe('availabilitySchema', () => {
   })
 
   test('accepts an online slot without a location', () => {
-    const { location: _omitted, ...online } = { ...valid, mode: 'ONLINE' as const }
+    const online = {
+      date: valid.date,
+      startTime: valid.startTime,
+      endTime: valid.endTime,
+      mode: 'ONLINE',
+    }
     expect(availabilitySchema.safeParse(online).success).toBe(true)
   })
 
@@ -25,7 +30,12 @@ describe('availabilitySchema', () => {
   })
 
   test('rejects an in-person slot without a location', () => {
-    const { location: _omitted, ...noLocation } = valid
+    const noLocation = {
+      date: valid.date,
+      startTime: valid.startTime,
+      endTime: valid.endTime,
+      mode: valid.mode,
+    }
     const result = availabilitySchema.safeParse(noLocation)
     expect(result.success).toBe(false)
   })

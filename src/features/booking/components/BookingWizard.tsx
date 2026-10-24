@@ -20,6 +20,7 @@ import {
   RefreshCw,
   UserRound,
 } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/common/button/Button'
 import { SubmitButton } from '@/components/common/SubmitButton'
 import { Select } from '@/components/common/select/Select'
@@ -214,7 +215,25 @@ export function BookingWizard({
   const currentStep = steps.findIndex((item) => item.value === step)
 
   return (
-    <section>
+    <section data-student-booking>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-subtle text-primary">
+            <UserRound size={17} aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-xs text-muted">Consultation with</p>
+            <p className="font-semibold text-foreground">{facultyName}</p>
+          </div>
+        </div>
+        <Link
+          href="/student/book"
+          className="inline-flex min-h-11 items-center gap-1 text-xs font-medium text-primary hover:underline"
+        >
+          <ArrowLeft size={14} aria-hidden="true" />
+          Change faculty
+        </Link>
+      </div>
       <ol className="mb-6 flex list-none items-center p-0" aria-label="Booking progress">
         {steps.map((item, index) => {
           const complete = index < currentStep
@@ -256,7 +275,7 @@ export function BookingWizard({
       </ol>
 
       {step === 'schedule' ? (
-        <div className="grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <BookingCalendar
             slots={slots}
             selectedDate={selectedDate}
@@ -266,7 +285,7 @@ export function BookingWizard({
             onToday={goToToday}
           />
 
-          <section className="flex flex-col rounded-lg border border-border bg-surface">
+          <section className="flex flex-col rounded-xl border border-border bg-surface">
             <header className="border-b border-border p-5 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -274,7 +293,9 @@ export function BookingWizard({
                     <Clock size={20} aria-hidden="true" />
                   </span>
                   <div>
-                    <h2 className="text-base font-semibold text-primary">Available Time Slots</h2>
+                    <h2 className="text-base font-semibold text-foreground">
+                      Available Time Slots
+                    </h2>
                     <p className="mt-0.5 text-sm text-muted">{formatDate(selectedDate)}</p>
                   </div>
                 </div>
@@ -345,9 +366,9 @@ export function BookingWizard({
                         'flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2.5 text-left transition-colors',
                         'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
                         open
-                          ? 'border-emerald-200 bg-emerald-50 text-success hover:bg-emerald-100'
+                          ? 'border-border bg-surface text-foreground hover:border-primary/40 hover:bg-subtle'
                           : 'cursor-not-allowed border-border bg-background text-muted',
-                        active && 'border-accent ring-3 ring-accent/30'
+                        active && 'border-primary bg-subtle ring-2 ring-primary/20'
                       )}
                     >
                       <span className="text-sm font-semibold">
@@ -360,7 +381,7 @@ export function BookingWizard({
                             aria-hidden="true"
                             className={cn(
                               'grid size-5 place-items-center rounded-full border-2',
-                              active ? 'border-accent' : 'border-emerald-300'
+                              active ? 'border-accent' : 'border-border'
                             )}
                           >
                             {active ? <span className="size-2 rounded-full bg-accent" /> : null}
@@ -390,14 +411,16 @@ export function BookingWizard({
 
       {step === 'details' ? (
         <>
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-            <section className="rounded-lg border border-border bg-surface p-5 sm:p-6">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-md bg-subtle text-accent">
                   <CalendarCheck size={20} aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className="text-base font-semibold text-primary">Consultation Information</h2>
+                  <h2 className="text-base font-semibold text-foreground">
+                    Consultation Information
+                  </h2>
                   <p className="mt-0.5 text-sm text-muted">Your selected schedule.</p>
                 </div>
               </div>
@@ -433,13 +456,13 @@ export function BookingWizard({
               </dl>
             </section>
 
-            <section className="rounded-lg border border-border bg-surface p-5 sm:p-6">
+            <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-md bg-subtle text-accent">
                   <FileText size={20} aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className="text-base font-semibold text-primary">Additional Details</h2>
+                  <h2 className="text-base font-semibold text-foreground">Additional Details</h2>
                   <p className="mt-0.5 text-sm text-muted">Help the faculty prepare.</p>
                 </div>
               </div>
@@ -469,7 +492,7 @@ export function BookingWizard({
             </section>
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-3">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <Button
               variant="secondary"
               className="flex-1 sm:flex-none"
@@ -493,14 +516,14 @@ export function BookingWizard({
 
       {step === 'review' && selected ? (
         <>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <section className="rounded-lg border border-border bg-surface p-5 sm:p-6">
+          <div className="grid gap-4 xl:grid-cols-2">
+            <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-md bg-subtle text-accent">
                   <CalendarCheck size={20} aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className="text-base font-semibold text-primary">Schedule Details</h2>
+                  <h2 className="text-base font-semibold text-foreground">Schedule Details</h2>
                   <p className="mt-0.5 text-sm text-muted">Time you are requesting.</p>
                 </div>
               </div>
@@ -524,13 +547,13 @@ export function BookingWizard({
               </dl>
             </section>
 
-            <section className="rounded-lg border border-border bg-surface p-5 sm:p-6">
+            <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-md bg-subtle text-accent">
                   <FileText size={20} aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className="text-base font-semibold text-primary">Request Details</h2>
+                  <h2 className="text-base font-semibold text-foreground">Request Details</h2>
                   <p className="mt-0.5 text-sm text-muted">What you would like to discuss.</p>
                 </div>
               </div>
@@ -547,7 +570,7 @@ export function BookingWizard({
             </section>
           </div>
 
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-accent/20 bg-subtle p-4 text-sm text-muted">
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-accent/20 bg-subtle p-4 text-sm text-muted">
             <Info size={17} aria-hidden="true" className="mt-0.5 shrink-0 text-accent" />
             <p>
               Please review your request before submitting. You can go back to make changes if
@@ -567,7 +590,7 @@ export function BookingWizard({
                 {state.error}
               </p>
             ) : null}
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <Button
                 type="button"
                 variant="secondary"

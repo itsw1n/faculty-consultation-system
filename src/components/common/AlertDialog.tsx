@@ -67,11 +67,11 @@ export function AlertDialog({
         className="fixed inset-0 z-50 grid place-items-center bg-primary/55 p-4"
         isDismissable
       >
-        <Modal className="w-full max-w-lg rounded-lg border border-border bg-surface p-6 shadow-dialog">
-          <Dialog role="alertdialog" className="outline-none">
+        <Modal className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-6 shadow-dialog">
+          <Dialog role="alertdialog" className="text-sm outline-none [overflow-wrap:anywhere]">
             {({ close }) => (
               <>
-                <Heading slot="title" className="text-xl font-semibold text-primary">
+                <Heading slot="title" className="text-lg font-semibold text-primary">
                   {title}
                 </Heading>
                 <p className="mt-2 text-muted">{description}</p>
@@ -81,10 +81,12 @@ export function AlertDialog({
                       <input key={`${name}-${value}`} type="hidden" name={name} value={value} />
                     ))
                   )}
-                  <p className="mt-3 min-h-5 text-sm font-semibold text-danger" role="alert">
-                    {state.error}
-                  </p>
-                  <div className="mt-3 flex justify-end gap-3">
+                  {state.error ? (
+                    <p className="mt-3 text-sm font-semibold text-danger" role="alert">
+                      {state.error}
+                    </p>
+                  ) : null}
+                  <div className="mt-6 grid gap-2 min-[400px]:flex min-[400px]:justify-end">
                     <Button type="button" variant="secondary" onPress={close}>
                       Go back
                     </Button>

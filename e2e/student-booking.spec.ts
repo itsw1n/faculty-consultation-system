@@ -10,6 +10,7 @@ import {
   getDepartments,
   getLatestConsultationForStudent,
   getNotifications,
+  getServiceClient,
   seedNotification,
   setProfile,
   uniqueEmail,
@@ -68,18 +69,26 @@ test.describe('Student booking journey', () => {
   }) => {
     const departments = await getDepartments()
     const { faculty, name: facultyName } = await setupFaculty('e2e-dash', departments[0]!.id)
-    const { email } = await setupStudent('e2e-dash')
+    const { student, email } = await setupStudent('e2e-dash')
     const pastDate = new Date()
     pastDate.setDate(pastDate.getDate() - 2)
     const pastSlot = await ensureSlot(faculty.id, {
       date: pastDate.toISOString().slice(0, 10),
+      status: 'BOOKED',
       start_time: '09:00',
       end_time: '10:00',
     })
     const pendingSlot = await ensureSlot(faculty.id)
     const approvedSlot = await ensureSlot(faculty.id, { start_time: '11:00', end_time: '12:00' })
-    const pastId = await bookConsultationAs(email, password, pastSlot.id, 'ACADEMIC')
-    await decideConsultationAs(faculty.email, password, pastId, true)
+    // Historical fixture: the live booking RPC intentionally rejects past slots.
+    const { error: historyError } = await getServiceClient().from('consultations').insert({
+      student_id: student.id,
+      faculty_id: faculty.id,
+      availability_slot_id: pastSlot.id,
+      category: 'ACADEMIC',
+      status: 'APPROVED',
+    })
+    if (historyError) throw historyError
     await bookConsultationAs(email, password, pendingSlot.id, 'CAPSTONE')
     const approvedId = await bookConsultationAs(email, password, approvedSlot.id, 'GRADE')
     await decideConsultationAs(faculty.email, password, approvedId, true)
@@ -151,6 +160,15 @@ test.describe('Student booking journey', () => {
     await signInAs(page, email, password)
     await page.goto(`/student/book/${faculty.id}`)
 
+    for (const width of [320, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 })
+      await expect(page.getByRole('link', { name: 'Change faculty' })).toBeVisible()
+      const dimensions = await page.evaluate(() => ({
+        viewport: innerWidth,
+        content: document.documentElement.scrollWidth,
+      }))
+      expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport)
+    }
     const continueButton = page.getByRole('button', { name: 'Continue' })
     await expect(continueButton).toBeDisabled()
     await (await findVisibleSlot(page, 'OPEN')).click()
@@ -184,7 +202,9 @@ test.describe('Student booking journey', () => {
 
     const pending = await getLatestConsultationForStudent(student.id)
     await page.goto(`/student/consultations/${pending!.id}`)
-    await expect(page.getByText('Consultation details')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Consultation details', exact: true })
+    ).toBeVisible()
     await expect(page.getByText('None provided')).toBeVisible()
   })
 

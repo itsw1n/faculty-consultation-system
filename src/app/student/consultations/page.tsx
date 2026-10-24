@@ -5,6 +5,7 @@ export default async function StudentConsultations() {
   return (
     <>
       <PageHeading
+        eyebrow="Student workspace"
         title="My Consultations"
         description="Track requests and confirmed consultations."
       />

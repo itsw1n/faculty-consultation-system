@@ -5,6 +5,7 @@ export default async function FacultyConsultations() {
   return (
     <>
       <PageHeading
+        eyebrow="Faculty workspace"
         title="My Consultations"
         description="Review confirmed and completed consultations."
       />

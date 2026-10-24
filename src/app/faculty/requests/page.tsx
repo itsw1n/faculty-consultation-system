@@ -5,6 +5,7 @@ export default async function RequestsPage() {
   return (
     <>
       <PageHeading
+        eyebrow="Faculty workspace"
         title="Consultation Requests"
         description="Approve or reject requests for your reserved time slots."
       />

@@ -39,8 +39,8 @@ export function Navigation({ role, mobile = false }: { role: UserRole; mobile?: 
 
   return (
     <nav aria-label={mobile ? 'Mobile navigation' : 'Primary navigation'} className="grid gap-1">
-      <p className="px-3 pb-2 text-[0.65rem] font-bold tracking-[0.16em] text-blue-200/70 uppercase">
-        Workspace
+      <p className="px-3 pb-2 text-[0.65rem] font-bold tracking-[0.16em] text-blue-100/60 uppercase">
+        {role.toLowerCase()} portal
       </p>
       {items[role].map(({ href, label, icon: Icon }) => {
         const active =
@@ -54,8 +54,8 @@ export function Navigation({ role, mobile = false }: { role: UserRole; mobile?: 
             className={cn(
               'group flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus',
               active
-                ? 'bg-white/14 text-white'
-                : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
+                ? 'bg-white text-primary shadow-xs'
+                : 'text-blue-100/85 hover:bg-white/10 hover:text-white'
             )}
           >
             <Icon aria-hidden="true" size={18} strokeWidth={active ? 2.3 : 1.8} />

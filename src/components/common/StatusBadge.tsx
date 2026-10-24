@@ -1,15 +1,15 @@
 import { cn } from '@/lib/cn'
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-emerald-50 text-success',
-  APPROVED: 'bg-emerald-50 text-success',
-  COMPLETED: 'bg-blue-50 text-blue-800',
-  RESERVED: 'bg-amber-50 text-warning',
-  PENDING: 'bg-amber-50 text-warning',
-  BOOKED: 'bg-blue-50 text-blue-800',
-  CLOSED: 'bg-slate-100 text-muted',
-  CANCELLED: 'bg-slate-100 text-muted',
-  REJECTED: 'bg-red-50 text-danger',
+  OPEN: 'bg-success/8 text-success',
+  APPROVED: 'bg-success/8 text-success',
+  COMPLETED: 'bg-accent/8 text-accent-hover',
+  RESERVED: 'bg-warning/8 text-warning',
+  PENDING: 'bg-warning/8 text-warning',
+  BOOKED: 'bg-accent/8 text-accent-hover',
+  CLOSED: 'bg-muted/8 text-muted',
+  CANCELLED: 'bg-muted/8 text-muted',
+  REJECTED: 'bg-danger/8 text-danger',
 }
 
 const statusLabels: Record<string, string> = {
@@ -31,7 +31,7 @@ export function StatusBadge({ status }: { status: string | null }) {
   return (
     <span
       className={cn(
-        'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold',
+        'inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs leading-4 font-medium ring-1 ring-inset ring-current/10',
         statusColors[status ?? ''] ?? 'bg-subtle text-primary'
       )}
     >

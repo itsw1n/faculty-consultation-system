@@ -73,3 +73,12 @@ describe('AvailabilityManager edit', () => {
     )
   })
 })
+
+it('shows filtered result feedback and allows clearing the search', () => {
+  render(<AvailabilityManager slots={[slot()]} />)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'no matching room' } })
+  expect(screen.getByText('0 of 1 upcoming slots')).toBeInTheDocument()
+  expect(screen.getByText('No availability matches your filters.')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Clear search' }))
+  expect(screen.getByText('Room 101')).toBeInTheDocument()
+})

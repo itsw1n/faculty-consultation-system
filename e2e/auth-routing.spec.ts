@@ -111,6 +111,8 @@ test.describe('Auth routing and gates', () => {
 
     await signInAs(page, email, password)
     await page.goto('/student')
+    // Streamed loading UI can precede the shell; do not mistake that for desktop.
+    await expect(page.locator('[data-ui="app-shell"]')).toBeVisible()
     const mobileMenu = page.getByLabel('Open navigation')
     if (await mobileMenu.isVisible()) {
       await mobileMenu.click()

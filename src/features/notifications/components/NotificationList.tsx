@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
+import { unstable_rethrow } from 'next/navigation'
 import { Button } from '@/components/common/button/Button'
 import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
 import { useInfinitePage, type InfinitePage } from '@/lib/useInfinitePage'
@@ -17,7 +19,11 @@ export function NotificationList({
   unread: number
 }) {
   const [markingAll, setMarkingAll] = useState(false)
-  const { page, setPage, pending, markerRef } = useInfinitePage<NotificationItem, Cursor>({
+  const [actionError, setActionError] = useState<string | null>(null)
+  const { page, setPage, pending, error, retry, markerRef } = useInfinitePage<
+    NotificationItem,
+    Cursor
+  >({
     initialPage,
     fetchPage: (cursor) => getNotificationPage({ cursor }),
     getKey: (item) => item.id,
@@ -25,6 +31,7 @@ export function NotificationList({
 
   async function markAll() {
     setMarkingAll(true)
+    setActionError(null)
     try {
       await markAllNotificationsRead()
       const readAt = new Date().toISOString()
@@ -32,8 +39,28 @@ export function NotificationList({
         ...current,
         items: current.items.map((item) => (item.read_at ? item : { ...item, read_at: readAt })),
       }))
+    } catch (error) {
+      unstable_rethrow(error)
+      setActionError('Unable to mark notifications as read. Please try again.')
     } finally {
       setMarkingAll(false)
+    }
+  }
+
+  async function markOne(formData: FormData) {
+    setActionError(null)
+    try {
+      await markNotificationRead(formData)
+      const id = formData.get('notificationId')
+      setPage((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.id === id ? { ...item, read_at: new Date().toISOString() } : item
+        ),
+      }))
+    } catch (error) {
+      unstable_rethrow(error)
+      setActionError('Unable to mark the notification as read. Please try again.')
     }
   }
 
@@ -45,6 +72,14 @@ export function NotificationList({
             {markingAll ? 'Marking…' : 'Mark all as read'}
           </Button>
         </form>
+      ) : null}
+      {actionError ? (
+        <p
+          role="alert"
+          className="mb-3 rounded-lg border border-danger/20 bg-surface p-4 text-sm text-danger"
+        >
+          {actionError}
+        </p>
       ) : null}
       <section className="overflow-hidden rounded-lg border border-border bg-surface">
         {page.items.length === 0 ? (
@@ -58,15 +93,9 @@ export function NotificationList({
               {item.read_at ? (
                 <NotificationContent item={item} />
               ) : (
-                <form action={markNotificationRead}>
+                <form action={markOne}>
                   <input type="hidden" name="notificationId" value={item.id} />
-                  <button
-                    type="submit"
-                    aria-label={`Mark read: ${item.title}`}
-                    className="block w-full cursor-pointer text-left hover:bg-accent/10 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus"
-                  >
-                    <NotificationContent item={item} />
-                  </button>
+                  <NotificationReadButton item={item} />
                 </form>
               )}
             </article>
@@ -75,6 +104,8 @@ export function NotificationList({
       </section>
       <InfiniteListMarker
         markerRef={markerRef}
+        error={error}
+        onRetry={retry}
         pending={pending}
         hasMore={page.hasMore}
         pendingLabel="Loading notifications…"
@@ -83,7 +114,27 @@ export function NotificationList({
   )
 }
 
-function NotificationContent({ item }: { item: NotificationItem }) {
+function NotificationReadButton({ item }: { item: NotificationItem }) {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-label={`Mark read: ${item.title}`}
+      className="block w-full cursor-pointer text-left hover:bg-accent/10 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-focus disabled:cursor-wait disabled:opacity-60"
+    >
+      <NotificationContent item={item} pending={pending} />
+    </button>
+  )
+}
+
+function NotificationContent({
+  item,
+  pending = false,
+}: {
+  item: NotificationItem
+  pending?: boolean
+}) {
   return (
     <div className="flex flex-col justify-between gap-3 p-4 sm:flex-row">
       <div className="relative pl-4">
@@ -105,7 +156,7 @@ function NotificationContent({ item }: { item: NotificationItem }) {
       </div>
       {!item.read_at && (
         <span className="self-start whitespace-nowrap text-sm font-semibold text-primary">
-          Mark read
+          {pending ? 'Marking…' : 'Mark read'}
         </span>
       )}
     </div>

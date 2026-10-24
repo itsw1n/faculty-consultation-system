@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { Bell, Menu } from 'lucide-react'
+import { Bell, Menu, ChevronsUpDown } from 'lucide-react'
 import logo from '@/assets/acd-logo.png'
 import { signOut } from '@/features/auth/actions'
 import type { AuthProfile } from '@/features/auth/types'
@@ -15,6 +15,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { Container } from './Container'
 import { Section } from './Section'
 import { Navigation } from './Navigation'
+import { ShellDisclosure } from './ShellDisclosure'
 
 export async function AppShell({
   children,
@@ -31,9 +32,15 @@ export async function AppShell({
 
   return (
     <div data-ui="app-shell" className="min-h-screen md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col bg-primary px-4 py-5 text-white md:flex">
+      <a
+        href="#main-content"
+        className="sr-only fixed top-2 left-2 z-50 rounded-md bg-surface p-3 text-primary focus:not-sr-only"
+      >
+        Skip to content
+      </a>
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-primary-hover bg-primary px-4 py-6 text-white md:flex">
         <Link
-          className="mb-8 flex items-center gap-3 rounded-md px-2 text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="mb-10 flex items-center gap-3 rounded-md px-2 text-white focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
           href={`/${role.toLowerCase()}`}
         >
           <Image
@@ -48,17 +55,22 @@ export async function AppShell({
           <strong className="text-sm leading-tight">Assumption College of Davao</strong>
         </Link>
         <Navigation role={role} />
-        <details className="group relative mt-auto">
+        <ShellDisclosure className="group relative mt-auto border-t border-white/15 pt-5">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus">
-            <span className="grid size-10 place-items-center rounded-full bg-white font-extrabold text-primary">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-sm font-semibold text-white ring-1 ring-white/20">
               {profile.fullName.slice(0, 1).toUpperCase()}
             </span>
             <span className="grid min-w-0">
-              <strong className="truncate">{profile.fullName}</strong>
+              <strong className="truncate text-sm font-medium">{profile.fullName}</strong>
               <small className="capitalize opacity-70">{role.toLowerCase()}</small>
             </span>
+            <ChevronsUpDown
+              size={14}
+              aria-hidden="true"
+              className="ml-auto shrink-0 text-blue-100/60"
+            />
           </summary>
-          <div className="absolute bottom-14 left-0 w-full rounded-lg bg-white/10 p-3 backdrop-blur-sm">
+          <div className="absolute bottom-14 left-0 w-full rounded-lg border border-primary-hover bg-primary p-4 shadow-dialog">
             <dl className="mb-3">
               <dt className="text-xs uppercase opacity-70">Email</dt>
               <dd className="mb-2 text-sm [overflow-wrap:anywhere]">{profile.email}</dd>
@@ -79,22 +91,22 @@ export async function AppShell({
               </Button>
             </form>
           </div>
-        </details>
+        </ShellDisclosure>
       </aside>
 
       <div className="min-w-0">
         <header
           data-ui="topbar"
-          className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-surface/95 px-4 backdrop-blur-sm sm:px-6 lg:px-8"
+          className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-surface px-4 sm:px-6 lg:px-8"
         >
-          <details className="relative md:hidden">
+          <ShellDisclosure className="relative md:hidden">
             <summary
               aria-label="Open navigation"
-              className="grid min-h-11 cursor-pointer list-none place-items-center rounded-lg focus-visible:outline-3 focus-visible:outline-focus"
+              className="grid size-11 shrink-0 cursor-pointer list-none place-items-center rounded-lg focus-visible:outline-3 focus-visible:outline-focus"
             >
               <Menu aria-hidden="true" />
             </summary>
-            <div className="absolute top-12 left-0 z-20 w-64 rounded-xl bg-primary p-3 text-white shadow-card">
+            <div className="absolute top-12 left-0 z-20 max-h-[calc(100dvh-6rem)] w-64 overflow-y-auto rounded-xl bg-primary p-3 text-white shadow-card">
               <Navigation role={role} mobile />
               <div className="mt-3 border-t border-white/15 pt-3">
                 <p className="truncate px-3 text-sm font-semibold">{profile.fullName}</p>
@@ -111,12 +123,12 @@ export async function AppShell({
                 </form>
               </div>
             </div>
-          </details>
-          <Breadcrumbs />
-          <details className="relative ml-auto">
+          </ShellDisclosure>
+          <Breadcrumbs role={role} />
+          <ShellDisclosure className="relative ml-auto">
             <summary
               aria-label={`${unread} unread notifications`}
-              className="relative grid min-h-11 cursor-pointer list-none place-items-center rounded-lg px-2 focus-visible:outline-3 focus-visible:outline-focus"
+              className="relative grid size-11 shrink-0 cursor-pointer list-none place-items-center rounded-lg px-2 focus-visible:outline-3 focus-visible:outline-focus"
             >
               <Bell aria-hidden="true" />
               {unread > 0 && (
@@ -125,7 +137,7 @@ export async function AppShell({
                 </span>
               )}
             </summary>
-            <div className="absolute top-12 right-0 z-20 w-[min(22rem,80vw)] overflow-hidden rounded-xl border border-border bg-surface shadow-card">
+            <div className="absolute top-12 right-0 z-20 max-h-[calc(100dvh-6rem)] w-[min(22rem,80vw)] overflow-y-auto rounded-xl border border-border bg-surface shadow-card">
               {notifications.length === 0 ? (
                 <p className="p-4 text-sm text-muted">No notifications yet.</p>
               ) : (
@@ -146,9 +158,9 @@ export async function AppShell({
                 View all notifications
               </Link>
             </div>
-          </details>
+          </ShellDisclosure>
         </header>
-        <main>
+        <main id="main-content" tabIndex={-1} className="outline-none">
           <Section>
             <Container>{children}</Container>
           </Section>

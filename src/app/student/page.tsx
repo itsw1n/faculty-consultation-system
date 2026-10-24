@@ -85,7 +85,7 @@ function NextConsultation({ summary }: { summary: StudentDashboardSummary }) {
   return (
     <section
       aria-labelledby="next-consultation-heading"
-      className="rounded-lg border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
+      className="rounded-xl border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -101,10 +101,10 @@ function NextConsultation({ summary }: { summary: StudentDashboardSummary }) {
         </div>
         <StatusBadge status="APPROVED" />
       </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-[7rem_minmax(0,1fr)]">
+      <div className="mt-5 grid items-start gap-4 sm:grid-cols-[7rem_minmax(0,1fr)]">
         <time
           dateTime={summary.next_slot_date}
-          className="grid place-content-center rounded-lg border border-border bg-subtle px-3 py-4 text-center"
+          className="flex items-center justify-center gap-2 rounded-lg border border-border bg-subtle px-3 py-3 text-center sm:grid sm:py-4"
         >
           <span className="text-xs font-semibold tracking-wide text-muted uppercase">
             {monthDayFormatter.format(slotDate(summary.next_slot_date))}
@@ -167,10 +167,10 @@ function PendingRequests({ items, count }: { items: ConsultationItem[]; count: n
   return (
     <section
       aria-labelledby="pending-heading"
-      className="rounded-lg border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
+      className="rounded-xl border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
     >
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="pending-heading" className="text-lg font-semibold text-primary">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="pending-heading" className="text-base font-semibold text-foreground">
           Pending requests
           <span className="ml-2 text-sm font-normal text-muted">{count}</span>
         </h2>
@@ -228,10 +228,10 @@ function NoNextConsultation() {
   return (
     <section
       aria-labelledby="no-next-heading"
-      className="rounded-lg border border-dashed border-border bg-surface p-6 lg:col-start-1"
+      className="rounded-xl border border-dashed border-border bg-surface p-6 lg:col-start-1"
     >
       <CalendarDays className="size-6 text-muted" aria-hidden="true" />
-      <h2 id="no-next-heading" className="mt-3 text-lg font-semibold text-primary">
+      <h2 id="no-next-heading" className="mt-3 text-base font-semibold text-foreground">
         No confirmed consultation
       </h2>
       <p className="mt-1 text-sm leading-relaxed text-muted">
@@ -251,10 +251,10 @@ function RecentConsultations({ items }: { items: ConsultationItem[] }) {
   return (
     <section
       aria-labelledby="recent-heading"
-      className="rounded-lg border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
+      className="rounded-xl border border-border bg-surface p-5 sm:p-6 lg:col-start-1"
     >
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="recent-heading" className="text-lg font-semibold text-primary">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="recent-heading" className="text-base font-semibold text-foreground">
           Recent consultations
         </h2>
         <Link
@@ -304,10 +304,10 @@ function SideRail({ summary }: { summary: StudentDashboardSummary }) {
     { label: 'Completed', value: summary.completed },
   ]
   return (
-    <aside className="grid gap-5 lg:col-start-2 lg:row-span-4">
+    <aside className="grid gap-5 lg:col-start-2 lg:row-start-1 lg:row-span-3">
       <section
         aria-labelledby="student-stats-heading"
-        className="rounded-lg border border-border bg-surface p-5"
+        className="rounded-xl border border-border bg-surface p-5"
       >
         <h2 id="student-stats-heading" className="text-base font-semibold text-primary">
           At a glance
@@ -316,14 +316,14 @@ function SideRail({ summary }: { summary: StudentDashboardSummary }) {
           {stats.map((stat) => (
             <div className="flex items-center justify-between gap-3 py-3" key={stat.label}>
               <dt className="text-sm text-muted">{stat.label}</dt>
-              <dd className="text-lg font-semibold text-primary">{stat.value}</dd>
+              <dd className="text-base font-semibold text-foreground">{stat.value}</dd>
             </div>
           ))}
         </dl>
       </section>
       <section
         aria-labelledby="student-actions-heading"
-        className="rounded-lg border border-border bg-surface p-5"
+        className="rounded-xl border border-border bg-surface p-5"
       >
         <h2 id="student-actions-heading" className="text-base font-semibold text-primary">
           Quick actions

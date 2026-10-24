@@ -40,7 +40,7 @@ export function PasswordField({
           type="button"
           onClick={() => setShowPassword((value) => !value)}
           aria-label={`${showPassword ? 'Hide' : 'Show'} ${label.toLowerCase()}`}
-          className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-muted transition hover:text-foreground focus-visible:ring-3 focus-visible:ring-focus"
+          className="absolute top-1/2 right-0.5 grid size-11 -translate-y-1/2 place-items-center rounded-md text-muted transition hover:text-foreground focus-visible:ring-3 focus-visible:ring-focus"
         >
           {showPassword ? (
             <EyeOff size={18} aria-hidden="true" />

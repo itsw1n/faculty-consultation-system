@@ -44,3 +44,30 @@ describe('ConsultationDetailView', () => {
     expect(screen.queryByRole('link', { name: 'Join online consultation' })).not.toBeInTheDocument()
   })
 })
+
+test('faculty details keep one page landmark and provide an outcome submission for approved records', () => {
+  render(<ConsultationDetailView detail={detail} viewer="FACULTY" />)
+  expect(document.querySelector('main')).toBeNull()
+  expect(screen.getByLabelText('Outcome note (optional)')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Mark completed' })).toBeInTheDocument()
+})
+test('completed faculty details show the outcome without completion controls', () => {
+  render(
+    <ConsultationDetailView
+      detail={{ ...detail, consultation_status: 'COMPLETED', outcome: 'Reviewed the study plan.' }}
+      viewer="FACULTY"
+    />
+  )
+  expect(screen.getByText('Reviewed the study plan.')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Mark completed' })).not.toBeInTheDocument()
+})
+
+test('student details preserve the workspace landmark and remain read-only', () => {
+  render(<ConsultationDetailView detail={detail} viewer="STUDENT" />)
+  expect(document.querySelector('main')).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Mark completed' })).not.toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Back to consultations' })).toHaveAttribute(
+    'href',
+    '/student/consultations'
+  )
+})

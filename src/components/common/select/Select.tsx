@@ -61,7 +61,7 @@ export function Select({
       >
         {({ isOpen }) => (
           <>
-            <Button className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 text-left transition-colors outline-none hover:bg-subtle focus-visible:ring-3 focus-visible:ring-focus data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+            <Button className="flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 text-left text-sm font-normal transition-colors outline-none hover:bg-subtle focus-visible:ring-3 focus-visible:ring-focus data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
               <SelectValue className="flex-1 truncate data-[placeholder]:text-muted" />
               {isOpen ? (
                 <ChevronUp size={18} aria-hidden="true" className="shrink-0 text-muted" />
@@ -70,7 +70,7 @@ export function Select({
               )}
             </Button>
             <Popover className="z-[60] w-[var(--trigger-width)] overflow-hidden rounded-lg border border-border bg-surface shadow-dialog">
-              <ListBox className="max-h-64 overflow-y-auto p-1 font-normal outline-none">
+              <ListBox className="max-h-64 overflow-y-auto p-1 text-sm font-normal outline-none">
                 {options.map((option) => (
                   <ListBoxItem
                     key={option.id}

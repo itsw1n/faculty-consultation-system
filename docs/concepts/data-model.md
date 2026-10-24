@@ -1,6 +1,47 @@
-# Data Model
+# Database model
 
-PostgreSQL hosted through Supabase. The executable schema lives in `supabase/migrations/` and database tests in `supabase/tests/`. Exact behavior is in [`rules.md`](rules.md).
+[Documentation guide](../README.md) · Previous: [Architecture](architecture.md) · Next: [API reference](../reference/api.md)
+
+PostgreSQL, hosted through Supabase, stores the application records. Start with the table purposes and relationship diagram below; the field definitions, access rules, and function catalog provide the technical detail.
+
+The executable schema lives in [migrations](../../supabase/migrations/) and its tests in [database tests](../../supabase/tests/). Business conditions are defined in [Business rules](rules.md). RPC, RLS, and atomic transactions are explained in the [architecture glossary](architecture.md#technical-terms).
+
+## What is stored
+
+| Table                    | Purpose                                                                                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `auth.users`             | Supabase-managed identity and password hash; separate from public application profiles                    |
+| `profiles`               | School-facing name, email, approved role, department, and faculty position                                |
+| `departments`            | Official department codes and names                                                                       |
+| `availability_slots`     | Times a Faculty member offers, including mode and slot status                                             |
+| `consultations`          | A Student request linked to a Faculty member and slot, including its lifecycle and participant-only notes |
+| `notifications`          | Messages addressed to a particular account and whether they have been read                                |
+| `approved_email_domains` | Email domains accepted for accounts                                                                       |
+| `email_outbox`           | Consultation email tasks and their delivery/retry state                                                   |
+
+An account's department can be unassigned. Faculty identity fields live in `profiles`; there is no separate `faculty_profiles` table in the current schema.
+
+## Relationships
+
+```mermaid
+erDiagram
+    auth_users ||--o| profiles : has
+    departments |o--o{ profiles : groups
+    profiles ||--o{ availability_slots : publishes
+    profiles ||--o{ consultations : requests_as_student
+    profiles ||--o{ consultations : receives_as_faculty
+    availability_slots ||--o{ consultations : preserves_history
+    profiles ||--o{ notifications : receives
+    profiles ||--o{ email_outbox : receives_email
+    consultations ||--o{ email_outbox : generates
+    approved_email_domains {
+        text domain PK
+    }
+```
+
+`auth_users` in the diagram represents Supabase's `auth.users` table. A line ending in a crow's foot represents many records. A slot can have several historical consultations, but at most one active (`PENDING` or `APPROVED`) consultation. The same `profiles` table supplies both the Student and Faculty foreign keys; those links refer to two different participants.
+
+A primary key (PK) identifies one row. A foreign key links a row to a referenced table. `uuid` is the identifier type; `date` and `time` describe the scheduled slot, while `timestamptz` stores an event timestamp with time-zone handling.
 
 ## Enums
 
@@ -116,18 +157,6 @@ sent_at          timestamptz nullable
 created_at       timestamptz
 ```
 
-## Relationships
-
-```text
-departments 1 ---- * profiles
-profiles    1 ---- * availability_slots      (faculty)
-profiles    1 ---- * consultations           (student)
-profiles    1 ---- * consultations           (faculty)
-profiles    1 ---- * notifications
-availability_slots 1 ---- * consultations    (history)
-consultations 1 ---- * email_outbox
-```
-
 ## Indexes
 
 ```text
@@ -144,7 +173,7 @@ email_outbox(created_at) WHERE sent_at IS NULL
 
 ## RLS and grants
 
-RLS is enabled on every user-facing table.
+Row-level security (RLS) is enabled on every user-facing table. Grants determine which operations can be attempted; RLS policies constrain the rows. Protected RPCs apply their own caller and state checks as well.
 
 - `departments`: authenticated read; admin write.
 - `profiles`: users read their own row; admins manage all.

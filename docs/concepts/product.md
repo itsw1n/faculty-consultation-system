@@ -1,61 +1,59 @@
-# Product
+# Product overview
 
-A web-based faculty consultation and scheduling system for Assumption College of Davao. Students request consultations, faculty manage availability and requests, and administrators manage accounts, departments, and records.
+[Documentation guide](../README.md) · Next: [System walkthrough](../walkthrough.md)
 
-Next.js 16 · Supabase Auth + PostgreSQL · TypeScript · React Aria · Tailwind CSS.
+The Faculty Consultation and Scheduling System is a web application for Assumption College of Davao. It gives Students a way to request faculty consultations, gives Faculty control over their availability and decisions, and gives administrators an organized view of accounts and consultation activity.
 
-## Goals
+## The problem it addresses
 
-- Let approved students discover faculty availability and request consultations.
-- Let faculty publish availability and decide requests safely.
-- Let administrators manage accounts, departments, and school records.
-- Keep booking, status transitions, and access control authoritative in PostgreSQL.
+A consultation needs a clear available time, an identified Student and Faculty member, a decision, and a record of what happened. The system brings these steps into one workflow so participants can check the same request status and schedule. It also prevents two active consultations from holding the same slot.
 
-## Roles
+## Users and responsibilities
 
-### Student
+| Role    | Main responsibility                                                            | Portal     |
+| ------- | ------------------------------------------------------------------------------ | ---------- |
+| Student | Discover faculty, request consultations, and follow up on their own records    | `/student` |
+| Faculty | Publish available times, decide requests, and record consultation outcomes     | `/faculty` |
+| Admin   | Manage accounts and departments and review consultation metadata and summaries | `/admin`   |
 
-An approved school account that discovers faculty, requests consultations, views its own consultation records, and cancels eligible requests.
-
-### Faculty
-
-An existing verified student account promoted by an administrator. Faculty publish availability, decide requests, complete consultations, and record outcomes.
-
-### Admin
-
-A privileged account that manages departments, promotes faculty, corrects approved accounts, and reads consultation metadata.
-
-How each role becomes an account is defined in [`rules.md`](rules.md#account-and-role-rules).
+An eligible new account becomes a Student after registration, with email verification required before sign-in. An Admin promotes an existing verified Student account to Faculty. First-admin setup is restricted to a designated school account. Exact eligibility and correction rules are in [Business rules](rules.md#account-and-role-rules).
 
 ## What each role can do
 
-| Role    | Screens                                                             |
-| ------- | ------------------------------------------------------------------- |
-| Student | Dashboard, Book Consultation, My Consultations                      |
-| Faculty | Dashboard, My Availability, Consultation Requests, My Consultations |
-| Admin   | Dashboard, Manage Users, Departments, Consultation Records          |
+“Own” means records belonging to that Student; “assigned” means consultations with that Faculty member.
 
-Common capabilities:
+| Capability                                    | Student               | Faculty                         | Admin                                |
+| --------------------------------------------- | --------------------- | ------------------------------- | ------------------------------------ |
+| Browse faculty and request an open slot       | Yes                   | No                              | No                                   |
+| Create and manage availability                | No                    | Own eligible slots              | No                                   |
+| Approve or reject requests                    | No                    | Assigned pending requests       | No                                   |
+| Cancel consultations                          | Own eligible requests | No                              | No                                   |
+| Record an outcome and complete a consultation | No                    | Assigned approved consultations | No                                   |
+| Read private descriptions and outcomes        | Own consultations     | Assigned consultations          | No                                   |
+| Review consultation metadata and categories   | Own consultations     | Assigned consultations          | Institution-wide                     |
+| Manage accounts and departments               | No                    | No                              | Yes, within account-correction rules |
+| Export aggregate consultation summaries       | No                    | No                              | Yes                                  |
+| Read and mark in-app notifications            | Own inbox             | Own inbox                       | Own inbox                            |
 
-- **Booking** — a three-step wizard: choose faculty, choose an open slot, add a category and optional description, then review and confirm.
-- **Consultations** — cursor paginated lists with search and status filters, participant-only detail pages, and outcome notes.
-- **Notifications** — an in-app bell with unread count and a full notifications page.
-- **Email** — generic status emails and next-day reminders, secondary to in-app notifications.
-- **Accounts** — role-specific navigation; approved role and department are not user-editable.
+Role permissions are checked on the server and in database functions; hiding an interface control is not the permission check. See [Architecture](architecture.md#authorization).
 
-## Consultation categories
+## Main capabilities
 
-`GRADE`, `CAPSTONE`, `ACADEMIC`, `PERSONAL`, `OTHER`. The category and the optional description are visible only to the student and the assigned faculty.
+- Faculty discovery with search and department filters.
+- A three-step booking wizard: **Schedule → Details → Review**.
+- In-person and online consultations.
+- Request decisions, eligible cancellation, completion, and saved outcomes.
+- Searchable consultation lists with status filters and additional pages loaded as needed.
+- In-app notifications, with optional consultation email delivery.
+- Administrative account correction, department management, and summary CSV export.
+- Shared desktop and mobile navigation and components.
 
-## Scope
+The consultation categories are grade, capstone, academic, personal, and other concerns. Categories are visible in administrative records and summaries; private descriptions and outcomes are restricted to participants.
 
-Explicitly out of scope for v1:
+## Scope and limitations
 
-- Payments and native mobile applications.
-- Dark mode.
-- Direct SIS integration until ICTC approves access, data use, and security controls.
-- User-editable approved role or department.
-- Administrative deletion of consultation history.
-- Bulk approve/reject in the current Manage Users UI.
+The current version does not include payments, native mobile applications, dark mode, user-editable approved roles or departments, bulk account approval in Manage Users, or administrative deletion of consultation history.
 
-Exact behavior — statuses, transitions, constraints, and limits — lives in [`rules.md`](rules.md). How the system is built lives in [`architecture.md`](architecture.md).
+There is no direct integration with the school's Student Information System (SIS). That would require separate institutional approval. Exact institutional record fields and a retention period still need confirmation before the system could replace paper records.
+
+Completed features and environment-specific deployment work are tracked in [Implementation status](../../PROGRESS.md). The [walkthrough](../walkthrough.md) shows the current screens; [Business rules](rules.md) defines their exact behavior.

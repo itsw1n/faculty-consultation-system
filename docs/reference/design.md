@@ -1,12 +1,10 @@
-# Design Reference
+# Design reference
 
-Design tokens and UI conventions. The token values live in `src/app/globals.css`; use the resulting Tailwind utilities, never raw hex.
+[Documentation guide](../README.md) · [System walkthrough](../walkthrough.md)
 
-## Direction
+The application uses a light, navy-led visual language appropriate to an academic institution. Shared typography, surfaces, controls, and navigation keep Student, Faculty, Admin, and account screens cohesive. Each portal organizes its actual tasks rather than adding decorative charts or filler content.
 
-- Clean academic/admin application; light theme only in v1.
-- Navy primary with a blue accent; high readability; minimal noise.
-- Consistent across Student, Faculty, and Admin; mobile-first.
+The token definitions in [globals.css](../../src/app/globals.css) are the implementation source. Use their Tailwind utilities in components rather than introducing unrelated colors.
 
 ## Tokens
 
@@ -32,104 +30,74 @@ Design tokens and UI conventions. The token values live in `src/app/globals.css`
 
 The `:root` block sets `color-scheme: light` and a native system sans-serif stack, with antialiased rendering. No external font requests are required.
 
+## Typography and proportions
+
+| Element              | Size and weight |
+| -------------------- | --------------- |
+| Workspace page title | 24px, semibold  |
+| Dialog/header title  | 18px, semibold  |
+| Section title        | 16px, semibold  |
+| Body and input text  | 14px, regular   |
+| Labels               | 12px, semibold  |
+| Metadata             | 12px, regular   |
+
+Inputs and select popovers keep these proportions when rendered through portals outside the workspace shell. Account forms use the same control language. The sign-in page has a larger institutional introduction on desktop and a compact introduction on mobile so the form remains reachable.
+
+Use the standard spacing scale, consistent small control radii, and bordered section surfaces. Panels use rounded corners and divided rows; strong shadows are reserved for dialogs and overlays.
+
+## Navigation and shared components
+
+- **Application shell:** a persistent navy sidebar on desktop, a white context header, and a mobile navigation disclosure. A skip link leads to the main workspace.
+- **Headers:** compact titles, a short description where useful, and a recognizable primary action.
+- **Search and filters:** labelled controls inline when space permits, stacked on narrow screens, without a separate filter drawer.
+- **Controls:** shared Button, Select, SearchInput, StatusBadge, DataTable, and Modal components provide consistent states.
+- **Account screens:** the shared AccountPanel combines institution identity, a concise explanation, and the current form or account status.
+
+Header icon controls have 44px touch targets. Navigation and notification disclosures are height-bounded, scroll on short screens, and dismiss on outside interaction, navigation, or Escape. Escape restores trigger focus. Native menus opened before hydration remain open when JavaScript arrives.
+
 ## Status presentation
 
-Statuses use text plus a tinted surface through the shared `StatusBadge` and semantic tokens.
+Text labels accompany every semantic status; color alone does not carry meaning.
 
-```text
-Approved / Open               text-success with a subtle surface
-Completed                     text-accent-hover with a subtle surface
-Pending / Reserved            text-warning with a subtle surface
-Booked                        enabled darker accent surface, distinct from Open
-Rejected                      text-danger with a subtle surface
-Cancelled                     text-muted with a muted surface
-Closed / Disabled             text-muted with a muted background
-```
+| Status             | Treatment                               |
+| ------------------ | --------------------------------------- |
+| Approved / Open    | Success text and a tinted surface       |
+| Completed / Booked | Darker accent text and a tinted surface |
+| Pending / Reserved | Warning text and a tinted surface       |
+| Rejected           | Danger text and a tinted surface        |
+| Cancelled / Closed | Muted text and a quiet surface          |
 
-## Typography
+The booking slot list enables only requestable open times. Reserved and booked slots remain visible but disabled; closed slots use a muted disabled treatment. The calendar includes a status legend. The exact lifecycle is defined in [Business rules](../concepts/rules.md#booking-transitions).
 
-System sans-serif, with a consistent hierarchy:
+## Layout by responsibility
 
-```text
-Page title       24px / Semibold
-Header title     18px / Semibold
-Card title       16px / Semibold
-Body             14px / Regular
-Label            12px / Semibold
-Meta             12px / Regular
-```
+| Experience | Composition                                                                                                                                                                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Student    | The next confirmed appointment and pending requests lead; summary and quick actions sit in a desktop side rail, with recent records below. Faculty discovery uses identity cards and booking keeps the chosen faculty visible through Schedule, Details, and Review. |
+| Faculty    | Open availability, requests needing a decision, and confirmed appointments lead the dashboard. Availability and consultation screens use labelled filters and compact records. Detail views separate schedule information from the outcome form.                     |
+| Admin      | Account/capacity totals, management shortcuts, recent consultation metadata, and follow-up counts support institution-wide management. User and department controls prioritize editing and feedback; the export section explains its independent date range.         |
 
-Use responsive/rem-based Tailwind values while preserving this hierarchy.
+All summaries use application data. Consultation descriptions and outcomes remain absent from Admin presentation. User management keeps faculty promotion visible; department forms retain failed edits and display pending, error, and success feedback.
 
-## Spacing and radius
+## Responsive behavior
 
-Use the standard Tailwind spacing scale; avoid one-off values. Keep radii consistent: small controls rounded, cards slightly larger, status badges softly rounded, avatar circular.
+Workspace lists keep a single React Aria table with column labels, row headers, and keyboard interaction. Below 1024px, Student and Faculty rows become labelled two-column records with full-width actions. Admin lists switch below 1280px to accommodate denser columns and the desktop sidebar. The content and actions remain available.
 
-## Layout
+The booking calendar and time slots split into adjacent panels at the xl breakpoint and stack below it. Calendar cells fit the available width. Mobile dashboards preserve workflow priority; whitespace and density adapt to the actual content.
 
-- **Sidebar** — dark navy (`bg-primary`); active item uses a white surface with navy text; profile details pinned to the bottom on desktop.
-- **Header** — white surface; breadcrumb/page context left, notification bell right.
-- **Content surfaces** — prefer divided rows, summary strips, and border-separated sections. Use standalone cards only when the content is a distinct object or task.
-- **Shadows** — reserve the stronger dialog shadow for overlays. Ordinary page content uses borders and spacing instead of stacked shadows.
-- **Search and filters** — consistent control height and radius; search is the primary wide field; filters sit inline on desktop and stack below on mobile. There is no separate filter drawer.
+## Dialogs and feedback
 
-The student dashboard is action-first: the next confirmed consultation and pending requests lead the page, status counts and quick actions sit in a side rail, and up to three deduplicated recent rows close the page. On mobile the side rail follows pending requests and precedes recent activity. Without a confirmed appointment, pending requests and a discovery card take its place; students with no consultation history see the discovery empty state alongside the side rail.
+Dialogs bound their height to the viewport and allow content to scroll. Shared form dialogs retain a visible heading and close control. Consultation details use readable definition rows; confirmations stack long action labels on narrow screens. Date/time presentation includes the year and uses Philippine time.
 
-## Calendar status
+Loading states use restrained, reduced-motion-aware indicators. Empty states explain what is missing and offer a relevant next action where appropriate. Paginated list failures keep loaded results, announce safe feedback, pause automatic fetching, and offer an explicit retry. Notification read actions show pending and recoverable failure feedback.
 
-```text
-OPEN       visible + enabled
-RESERVED   visible + disabled
-BOOKED     visible + disabled
-CLOSED     muted + disabled
-```
+## Accessibility conventions
 
-The faculty availability view uses the same color language. Include a legend when several statuses are visible.
+- Preserve semantic labels, headings, table relationships, and a single workspace main landmark.
+- Provide visible keyboard focus; dialogs trap and restore focus.
+- Use native disabled behavior rather than muted styling alone.
+- Pair status color with text, and announce actionable feedback.
+- Keep normal text readable on white, workspace, and subtle surfaces; the muted/accent text token pairings meet at least 4.5:1 contrast on those surfaces.
+- Respect reduced-motion preferences and retain access to controls at narrow widths and short viewport heights.
 
-## Responsive
-
-- **Desktop** — persistent sidebar; booking shows a monthly calendar beside its slot list.
-- **Mobile** — hamburger navigation drawer; the booking calendar stacks above a vertical slot list; card lists replace wide rows.
-
-Wide data lists use the shared React Aria `DataTable` wrapper, with labelled columns, row headers, keyboard navigation, and horizontal scrolling when the viewport is narrow. Primary actions remain visible without turning every row into a separate card.
-
-## Accessibility
-
-- Maintain contrast; never rely on color alone for status.
-- Visible focus styles are required; dialogs trap and restore focus.
-- Interactive controls must be keyboard accessible.
-- Disabled slots use native disabled behavior, not only muted styling.
-
-## Reference image
-
-[`ui-inspo.png`](ui-inspo.png) is the original visual reference. Labels pictured there do not override product behavior.
-
-## Shared foundation and faculty benchmark
-
-Workspace body and input text use 14px; labels and metadata use 12px. Page headings pair a quiet eyebrow with a compact title and one primary action. Buttons use subtle edge definition; status badges use semantic tinted surfaces. Panels use 12px corners and borders, with divided rows rather than stacked shadows.
-
-The faculty dashboard pairs an availability strip with decision and appointment panels. Pending counts come from the existing summary, and all list content remains backed by the existing repositories. Mobile stacks the same content without removing actions. Shared shell disclosures close on navigation, outside pointer interaction, and Escape; Escape restores trigger focus. A skip link leads to the main workspace.
-
-## Faculty workspace lists and details
-
-Availability and consultation lists use labelled filters inside a bordered toolbar, followed by a result count and a divided table. Below 1024px, the same table rows form compact two-column records with visible field labels and a full-width action area. No action or data field is hidden; React Aria table semantics remain intact.
-
-Availability forms keep schedule and meeting fields together, with a separated footer and intrinsic-width submit control. Faculty consultation details use a bounded surface, readable definition rows, and a separate outcome form. Faculty details dialogs keep their heading and action footer visible while scrolling. The faculty route has a reduced-motion-aware loading placeholder; the dashboard retains the approved benchmark composition.
-
-## Student workspace
-
-The next appointment leads the dashboard; the desktop side rail aligns with its first row while mobile retains pending requests before summary and quick actions. Faculty discovery uses bounded identity cards, a wider search field, department filter, and a clear-filter empty state. Booking keeps the chosen faculty visible through all three steps and provides a change-faculty link. Calendar cells flex to the available width; calendar and slots split only at the xl breakpoint. Selected slots use navy emphasis, with semantic status badges retained. Student consultation lists share the responsive record layout and labelled actions from the faculty workspace. Details use the same bounded reading surface without a nested main landmark.
-
-## Administration workspace
-
-The admin dashboard leads with account and capacity totals, compact management shortcuts, recent consultation metadata, and a follow-up/status rail on wide screens. It uses existing live counts, with no decorative charts. User management uses a responsive search/role/department toolbar; the primary faculty promotion action remains visible at all widths. Admin lists use the same accessible table-to-record treatment as the other portals, switching below 1280px to account for the sidebar and denser management columns.
-
-Consultation records display student, faculty, schedule, category, and status; no empty action column or private descriptions/outcomes are shown. The separate summary export surface states that its dates affect only the CSV, with the default end date based on Philippine time. Export routes and permissions are unchanged. Department forms call the existing authorized server actions and provide pending, safe inline error, and success feedback. Controlled inputs retain failed edits; successful creation clears its fields.
-
-## Final consistency and recovery
-
-Inputs and select popovers retain the same text proportions when rendered through dialog portals outside the workspace shell. Account creation, recovery, application gates, and initial administrator access share the compact `AccountPanel` surface and institution identity. Mobile sign-in keeps the introduction brief so the form is immediately reachable; the desktop reference composition is retained. Muted text and accent tokens are dark enough for normal text on the white, workspace, and subtle surfaces (minimum 4.5:1 for these pairings).
-
-Header icon controls have 44px touch targets. Native disclosures preserve menus opened before hydration and dismiss on actual route changes. Mobile navigation and notification popovers are height-bounded and scroll on short screens. Confirmation dialogs share the 14px body / 18px heading hierarchy, bound their height, and stack long action labels on narrow screens. Consultation detail pages and dialogs share Philippine date/time presentation, including the year.
-
-Paginated directories preserve loaded results on request failure, announce a safe error, stop automatic retries, and offer an explicit retry. Notification read actions show pending and recoverable error feedback without exposing server details. These are presentation and request-state changes; authorization, mutation actions, privacy, and lifecycle rules remain unchanged.
+These conventions describe the implemented design; they are not a claim of exhaustive accessibility certification. Current test commands and prerequisites are in [Getting started](../getting-started.md#validate).

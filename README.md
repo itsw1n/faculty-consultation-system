@@ -53,7 +53,7 @@ npm run supabase:test
 npm run test:e2e
 ```
 
-The [testing guide](docs/getting-started.md#validate) explains what these commands check and when database-backed browser tests run. [Technical evidence](docs/evidence/README.md) contains earlier local verification captures. Team members can place their AI-use evidence in their own folders under [ai-evidence](ai-evidence/README.md).
+The [testing guide](docs/getting-started.md#validate) explains what these commands check and when database-backed browser tests run. The [manual test cases](docs/reference/manual-test-cases.md) cover the primary consultation workflow end to end. [Technical evidence](docs/evidence/README.md) contains earlier local verification captures. Team members can place their AI-use evidence in their own folders under [ai-evidence](ai-evidence/README.md).
 
 ## Development and deployment
 

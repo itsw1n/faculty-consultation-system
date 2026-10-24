@@ -1,6 +1,8 @@
 import { categoryLabel } from '../categories'
+import { formatConsultationDay, formatConsultationTime } from '../formatSchedule'
 import type { ConsultationDetail } from '../repositories/consultationDetailRepository'
-import { Button } from '@/components/common/button/Button'
+import { SubmitButton } from '@/components/common/SubmitButton'
+import { ArrowLeft } from 'lucide-react'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { completeConsultation } from '../actions'
 import Link from 'next/link'
@@ -18,13 +20,18 @@ export function ConsultationDetailView({
     detail.meeting_link && ['APPROVED', 'COMPLETED'].includes(detail.consultation_status)
       ? safeHttpUrl(detail.meeting_link)
       : null
+  const Root = 'section'
   return (
-    <main className="mx-auto max-w-2xl space-y-6">
-      <Link href={back} className="font-semibold text-primary underline">
+    <Root className="mx-auto max-w-4xl space-y-6">
+      <Link
+        href={back}
+        className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted hover:text-primary"
+      >
+        <ArrowLeft size={16} aria-hidden="true" />
         Back to consultations
       </Link>
       <h1 className="text-2xl font-semibold text-primary">Consultation details</h1>
-      <dl className="divide-y divide-border border-y border-border [&>div]:grid [&>div]:gap-1 [&>div]:py-3 sm:[&>div]:grid-cols-[10rem_1fr]">
+      <dl className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface px-5 text-sm [&>div]:grid [&>div]:gap-2 [&>div]:py-4 [&_dd]:break-words sm:[&>div]:grid-cols-[10rem_minmax(0,1fr)]">
         <div>
           <dt className="font-semibold">Student</dt>
           <dd>{detail.student_name}</dd>
@@ -36,12 +43,13 @@ export function ConsultationDetailView({
         <div>
           <dt className="font-semibold">Date and time</dt>
           <dd>
-            {detail.slot_date}, {detail.start_time.slice(0, 5)}–{detail.end_time.slice(0, 5)}
+            {formatConsultationDay(detail.slot_date)} ·{' '}
+            {formatConsultationTime(detail.start_time, detail.end_time)}
           </dd>
         </div>
         <div>
           <dt className="font-semibold">Mode</dt>
-          <dd>{detail.mode === 'IN_PERSON' ? detail.location : 'Online'}</dd>
+          <dd>{detail.mode === 'IN_PERSON' ? detail.location || 'Not specified' : 'Online'}</dd>
         </div>
         {meetingLink ? (
           <div>
@@ -80,7 +88,13 @@ export function ConsultationDetailView({
         )}
       </dl>
       {viewer === 'FACULTY' && detail.consultation_status === 'APPROVED' && (
-        <form action={completeConsultation} className="grid gap-3">
+        <form
+          action={completeConsultation}
+          className="grid gap-3 rounded-xl border border-border bg-surface p-5"
+        >
+          <p className="text-sm text-muted">
+            Record the consultation outcome before marking it completed.
+          </p>
           <input type="hidden" name="consultationId" value={detail.id} />
           <label htmlFor="outcome" className="font-semibold">
             Outcome note (optional)
@@ -92,9 +106,13 @@ export function ConsultationDetailView({
             rows={5}
             className="rounded-md border border-border bg-surface p-3 outline-none focus-visible:ring-3 focus-visible:ring-focus"
           />
-          <Button type="submit">Mark completed</Button>
+          <div className="flex justify-end border-t border-border pt-4">
+            <SubmitButton className="w-auto" pendingLabel="Completing…">
+              Mark completed
+            </SubmitButton>
+          </div>
         </form>
       )}
-    </main>
+    </Root>
   )
 }

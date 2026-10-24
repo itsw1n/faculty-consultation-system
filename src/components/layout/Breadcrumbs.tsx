@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import type { UserRole } from '@/features/auth/types'
 
 const labels: Record<string, string> = {
   book: 'Book Consultation',
@@ -12,42 +14,34 @@ const labels: Record<string, string> = {
   departments: 'Departments',
   notifications: 'Notifications',
 }
-
-export function Breadcrumbs() {
-  const segments = usePathname()
-    .split('/')
-    .filter(Boolean)
-    .filter((segment) => !/^[-0-9a-f]{36}$/i.test(segment))
-  if (segments.length <= 1)
-    return (
-      <div className="mr-auto">
-        <strong>Dashboard</strong>
-        <small className="block text-muted">Assumption College of Davao</small>
-      </div>
-    )
-
+export function Breadcrumbs({ role }: { role: UserRole }) {
+  const segments = usePathname().split('/').filter(Boolean)
+  const root = `/${role.toLowerCase()}`
+  const current = segments.at(-1) ?? ''
+  const isDetail = /^[-0-9a-f]{36}$/i.test(current)
+  const label = isDetail
+    ? segments.includes('book')
+      ? 'Choose schedule'
+      : 'Consultation details'
+    : current === 'consultations' && role === 'ADMIN'
+      ? 'Consultation Records'
+      : (labels[current] ?? 'Dashboard')
   return (
-    <nav className="mr-auto flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-      {segments.slice(1).map((segment, index) => {
-        const href = '/' + segments.slice(0, index + 2).join('/')
-        const label = labels[segment] ?? segment.replaceAll('-', ' ')
-        return (
-          <span className="flex items-center gap-2" key={href}>
-            {index > 0 && (
-              <i className="not-italic text-muted" aria-hidden="true">
-                /
-              </i>
-            )}
-            {index === segments.length - 2 ? (
-              <strong>{label}</strong>
-            ) : (
-              <Link className="text-muted hover:text-foreground" href={href}>
-                {label}
-              </Link>
-            )}
-          </span>
-        )
-      })}
+    <nav aria-label="Breadcrumb" className="mr-auto flex min-w-0 items-center gap-2 text-sm">
+      <Link
+        href={root}
+        className="hidden shrink-0 text-muted hover:text-primary focus-visible:outline-3 focus-visible:outline-focus sm:inline"
+      >
+        {role.charAt(0) + role.slice(1).toLowerCase()} portal
+      </Link>
+      <ChevronRight
+        size={14}
+        aria-hidden="true"
+        className="hidden shrink-0 text-muted/60 sm:block"
+      />
+      <span aria-current="page" className="truncate font-medium text-foreground">
+        {label}
+      </span>
     </nav>
   )
 }

@@ -17,6 +17,10 @@ This guide explains the Faculty Consultation and Scheduling System for Assumptio
 
 For a quick review, read the product overview and walkthrough first. Technical terms are explained in the [architecture glossary](concepts/architecture.md#technical-terms).
 
+## Test the application
+
+Use the [core test cases](reference/manual-test-cases.md) to test the main workflows. The 12 numbered cases have expected result, actual result, and pass/fail columns, followed by a bug log. Automated commands are in [Getting started](getting-started.md#validate).
+
 ## Reference and maintenance
 
 | Document                                            | Use it for                                                              |

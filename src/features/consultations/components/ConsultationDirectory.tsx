@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Cell, Column, Row, TableBody, TableHeader } from 'react-aria-components'
 import { SearchInput } from '@/components/common/SearchInput'
 import { AlertDialog } from '@/components/common/AlertDialog'
@@ -18,6 +18,16 @@ import { ConsultationDetailsDialog } from './ConsultationDetailsDialog'
 type Status = ConsultationItem['consultation_status']
 type Cursor = { createdAt: string; id: string }
 
+const STATUS_VALUES = ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'] as const
+
+function statusFromSearchParams(values: string[]): Status | '' {
+  if (values.length !== 1) return 'PENDING'
+  const value = values[0]
+  if (value === 'all') return ''
+  if ((STATUS_VALUES as readonly string[]).includes(value)) return value as Status
+  return 'PENDING'
+}
+
 const dateFormatter = new Intl.DateTimeFormat('en-PH', {
   month: 'short',
   day: '2-digit',
@@ -32,17 +42,24 @@ function formatDate(date: string) {
 export function ConsultationDirectory({
   initialPage,
   viewer,
-  fixedStatus,
+  initialStatus,
+  statusInUrl = false,
   allowDecisions = false,
 }: {
   initialPage: InfinitePage<ConsultationItem, Cursor>
   viewer: 'STUDENT' | 'FACULTY' | 'ADMIN'
-  fixedStatus?: Status
+  initialStatus?: Status
+  statusInUrl?: boolean
   allowDecisions?: boolean
 }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
-  const [status, setStatus] = useState<Status | ''>(fixedStatus ?? '')
+  const [localStatus, setLocalStatus] = useState<Status | ''>(initialStatus ?? '')
+  const status = statusInUrl ? statusFromSearchParams(searchParams.getAll('status')) : localStatus
+  const pendingRequestView = allowDecisions && status === 'PENDING'
+  const initialStatusValue = useRef<Status | ''>(initialStatus ?? '')
   const isFirstRender = useRef(true)
   const { page, setPage, pending, error, retry, markerRef, reload } = useInfinitePage<
     ConsultationItem,
@@ -54,14 +71,24 @@ export function ConsultationDirectory({
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
-      return
+      if (!statusInUrl || initialStatusValue.current === status) return
     }
     const timeout = setTimeout(
       () => reload(() => getConsultationPage({ search, status: status || null, cursor: null })),
       300
     )
     return () => clearTimeout(timeout)
-  }, [search, status, reload])
+  }, [search, status, reload, statusInUrl])
+  const changeStatus = (value: string) => {
+    const next = value === 'all' ? '' : (value as Status | '')
+    if (statusInUrl) {
+      const params = new URLSearchParams(window.location.search)
+      params.set('status', next || 'all')
+      window.history.replaceState(null, '', `${pathname}?${params}${window.location.hash}`)
+      return
+    }
+    setLocalStatus(next)
+  }
   const handleCompleted = (id: string, outcome: string | null) => {
     setPage((current) => ({
       ...current,
@@ -92,26 +119,24 @@ export function ConsultationDirectory({
               : 'Search student name or category...'
           }
         />
-        {!fixedStatus && (
-          <Select
-            label="Status"
-            options={[
-              { id: 'all', label: 'All statuses' },
-              ...['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'COMPLETED'].map((value) => ({
-                id: value,
-                label: value.charAt(0) + value.slice(1).toLowerCase(),
-              })),
-            ]}
-            value={status || 'all'}
-            onChange={(value) => setStatus(value === 'all' ? '' : (value as Status | ''))}
-          />
-        )}
+        <Select
+          label="Status"
+          options={[
+            { id: 'all', label: 'All statuses' },
+            ...STATUS_VALUES.map((value) => ({
+              id: value,
+              label: value.charAt(0) + value.slice(1).toLowerCase(),
+            })),
+          ]}
+          value={status || 'all'}
+          onChange={changeStatus}
+        />
       </div>
       <div className="mt-5" aria-busy={pending}>
         <p className="mb-3 text-xs text-muted" role="status">
           {pending
             ? 'Updating consultations…'
-            : `${page.items.length}${page.hasMore ? '+' : ''} consultation${page.items.length === 1 ? '' : 's'}${fixedStatus ? ' awaiting your decision' : ''}`}
+            : `${page.items.length}${page.hasMore ? '+' : ''} consultation${page.items.length === 1 ? '' : 's'}${pendingRequestView ? ' awaiting your decision' : ''}`}
         </p>
         <DataTable aria-label="Consultations">
           <TableHeader className="border-b border-border bg-background text-xs font-semibold tracking-wide text-muted uppercase">
@@ -133,9 +158,9 @@ export function ConsultationDirectory({
                 <div className="px-5 py-8 text-center">
                   <p className="font-medium text-foreground">No consultations found.</p>
                   <p className="mt-1 text-sm text-muted">
-                    {search || (!fixedStatus && status)
+                    {search || (status && !pendingRequestView)
                       ? 'Try another search or status.'
-                      : fixedStatus
+                      : allowDecisions
                         ? 'New requests will appear here when students book your availability.'
                         : viewer === 'STUDENT'
                           ? 'Book a consultation to start your consultation history.'

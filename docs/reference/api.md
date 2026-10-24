@@ -202,4 +202,6 @@ These are navigable screens, not additional REST endpoints.
 | `/admin`, `/admin/users`, `/admin/departments`, `/admin/consultations`                                            | Administrative workflows                                           |
 | `/notifications`                                                                                                  | The signed-in approved account's notification inbox                |
 
+`/faculty/requests` accepts an optional `status` query parameter (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `COMPLETED`, or `all`); it defaults to `PENDING`.
+
 For the visible experience, return to the [system walkthrough](../walkthrough.md). For authorization boundaries, read [Architecture](../concepts/architecture.md#authorization).

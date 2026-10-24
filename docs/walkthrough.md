@@ -32,6 +32,8 @@ Faculty use **My Availability** to add a future date, start and end times, and m
 
 In **Consultation Requests**, faculty open a request and choose **Approve** or **Reject**, then confirm the decision. Approval books the reserved slot. Rejection releases it for another request. The Student sees the updated status and receives an in-app notification.
 
+The **Status** filter defaults to **Pending** on **Consultation Requests**; choose another status to review past decisions from the same page.
+
 ## 4. Participants: review, cancel, or complete
 
 **My Consultations** lets Students and Faculty search their own records, filter by status, and open details. Descriptions and outcome notes are participant-only. An online meeting link is shown to participants after approval and remains available for completed consultations.

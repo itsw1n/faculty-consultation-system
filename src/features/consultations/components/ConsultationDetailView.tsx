@@ -5,6 +5,7 @@ import { SubmitButton } from '@/components/common/SubmitButton'
 import { ArrowLeft } from 'lucide-react'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { completeConsultation } from '../actions'
+import { consultationIcs } from '../services/consultationIcs'
 import Link from 'next/link'
 import { safeHttpUrl } from '@/lib/safeNavigation'
 
@@ -87,6 +88,28 @@ export function ConsultationDetailView({
           </div>
         )}
       </dl>
+      {detail.consultation_status === 'APPROVED' && (
+        <a
+          href={`data:text/calendar;charset=utf-8,${encodeURIComponent(
+            consultationIcs({
+              id: detail.id,
+              title: `Consultation with ${viewer === 'STUDENT' ? detail.faculty_name : detail.student_name}`,
+              purpose: categoryLabel(detail.category),
+              slot_date: detail.slot_date,
+              start_time: detail.start_time,
+              end_time: detail.end_time,
+              location:
+                detail.mode === 'IN_PERSON'
+                  ? detail.location || 'Not specified'
+                  : (meetingLink ?? 'Online'),
+            })
+          )}`}
+          download={`consultation-${detail.slot_date}.ics`}
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-surface px-4 py-2 text-sm font-bold text-primary ring-1 ring-border transition-colors hover:bg-subtle focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        >
+          Add to calendar
+        </a>
+      )}
       {viewer === 'FACULTY' && detail.consultation_status === 'APPROVED' && (
         <form
           action={completeConsultation}

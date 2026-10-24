@@ -14,7 +14,7 @@ describe('accountCorrectionSchema', () => {
   })
 
   test('accepts a student correction without a position title', () => {
-    const { positionTitle: _omitted, ...student } = { ...valid, role: 'STUDENT' as const }
+    const student = { userId: valid.userId, departmentId: valid.departmentId, role: 'STUDENT' }
     expect(accountCorrectionSchema.safeParse(student).success).toBe(true)
   })
 
@@ -23,7 +23,7 @@ describe('accountCorrectionSchema', () => {
   })
 
   test('accepts a faculty correction without a position title (server keeps the current one)', () => {
-    const { positionTitle: _omitted, ...noPosition } = valid
+    const noPosition = { userId: valid.userId, departmentId: valid.departmentId, role: valid.role }
     expect(accountCorrectionSchema.safeParse(noPosition).success).toBe(true)
   })
 

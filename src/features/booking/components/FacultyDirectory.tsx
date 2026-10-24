@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowUpRight, GraduationCap } from 'lucide-react'
+import { EmptyState } from '@/components/common/EmptyState'
 import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { InfiniteListMarker } from '@/components/common/InfiniteListMarker'
@@ -24,7 +26,7 @@ export function FacultyDirectory({
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-  const { page, pending, markerRef } = useInfinitePage<FacultyResult, Cursor>({
+  const { page, pending, error, retry, markerRef } = useInfinitePage<FacultyResult, Cursor>({
     initialPage,
     fetchPage: (cursor) => getFacultyPage({ search, departmentId: department, cursor }),
   })
@@ -48,7 +50,7 @@ export function FacultyDirectory({
 
   return (
     <>
-      <div className="grid items-end gap-3 border-y border-border py-4 sm:flex">
+      <div className="grid items-end gap-4 rounded-xl border border-border bg-surface p-4 sm:grid-cols-[minmax(0,1fr)_16rem]">
         <SearchInput
           label="Faculty name"
           value={search}
@@ -65,32 +67,57 @@ export function FacultyDirectory({
           onChange={(value) => changeDepartment(value === 'all' ? '' : value)}
         />
       </div>
-      <div className="mt-5 divide-y divide-border border-y border-border bg-surface">
+      <p className="mt-5 mb-3 text-xs text-muted" role="status">
+        {pending
+          ? 'Loading faculty…'
+          : `${page.items.length}${page.hasMore ? '+' : ''} faculty members`}
+      </p>
+      {page.items.length === 0 && (
+        <EmptyState
+          title="No faculty found"
+          description="Try another name or choose a different department."
+          action={
+            <Link
+              href="/student/book"
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-primary hover:bg-subtle"
+            >
+              Clear filters
+            </Link>
+          }
+        />
+      )}
+      <div className="grid gap-4 xl:grid-cols-2">
         {page.items.map((member) => (
           <article
-            className="grid gap-4 px-1 py-5 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:px-4"
+            className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-xl border border-border bg-surface p-5"
             key={member.id}
           >
-            <div className="grid size-10 place-items-center rounded-full bg-subtle font-semibold text-primary">
+            <div className="grid size-11 place-items-center rounded-full bg-subtle font-semibold text-primary">
               {member.full_name[0]}
             </div>
             <div>
-              <h2 className="font-semibold text-primary">{member.full_name}</h2>
+              <h2 className="text-base font-semibold text-foreground">{member.full_name}</h2>
               <p className="mt-1 text-sm text-muted">
-                {member.position_title} · {member.department_name}
+                {member.position_title}
+                <span className="mt-3 flex items-center gap-1.5 text-xs">
+                  <GraduationCap size={15} aria-hidden="true" />
+                  {member.department_name}
+                </span>
               </p>
             </div>
             <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-semibold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-focus"
+              className="col-span-2 mt-2 inline-flex min-h-11 items-center justify-between border-t border-border pt-4 text-sm font-semibold text-primary hover:bg-subtle focus-visible:outline-3 focus-visible:outline-focus"
               href={`/student/book/${member.id}`}
             >
-              View schedule
+              View schedule <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           </article>
         ))}
       </div>
       <InfiniteListMarker
         markerRef={markerRef}
+        error={error}
+        onRetry={retry}
         pending={pending}
         hasMore={page.hasMore}
         pendingLabel="Loading more faculty…"

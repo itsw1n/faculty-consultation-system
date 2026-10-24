@@ -91,6 +91,8 @@ The existing student account becomes faculty immediately. No invitation or pendi
 
 ## Validate
 
+For hands-on testing, use the [core test cases and bug log](reference/manual-test-cases.md). The commands below run the automated checks.
+
 ```bash
 npm run check
 npm run build

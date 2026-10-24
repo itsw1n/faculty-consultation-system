@@ -1,59 +1,60 @@
 # Faculty Consultation and Scheduling System
 
-Web app for Assumption College of Davao: students request consultations, faculty manage availability and requests, admins manage accounts. Next.js 16 · Supabase Auth + PostgreSQL · TypeScript · React Aria · Tailwind CSS.
+A web application for **Assumption College of Davao** that brings consultation scheduling, faculty decisions, and consultation records into one place.
 
-## Start here
+Students find an available faculty member and request a consultation. Faculty publish schedules, approve or reject requests, and record outcomes. Administrators manage school accounts, departments, and consultation summaries.
 
-| I want to…                          | Go to                                                            |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| Run it locally                      | [`docs/getting-started.md`](docs/getting-started.md)             |
-| Understand the system               | [`docs/concepts/product.md`](docs/concepts/product.md)           |
-| Look up routes or actions           | [`docs/reference/api.md`](docs/reference/api.md)                 |
-| Configure env (local vs prod)       | [`docs/reference/environment.md`](docs/reference/environment.md) |
-| Know the exact rules                | [`docs/concepts/rules.md`](docs/concepts/rules.md)               |
-| Deploy it                           | [`docs/operations.md`](docs/operations.md)                       |
-| Check what is built / left          | [`PROGRESS.md`](PROGRESS.md)                                     |
-| Contribute (branches, commits, PRs) | [`docs/contributing.md`](docs/contributing.md)                   |
+## Reviewing the project
 
-Full documentation map: [`docs/README.md`](docs/README.md).
+Start with the [system walkthrough](docs/walkthrough.md). It explains a complete consultation step by step, followed by the Faculty and Admin responsibilities. You do not need to install the app to read it.
+
+| To understand…                                         | Read                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------ |
+| The users, purpose, and scope                          | [Product overview](docs/concepts/product.md)                 |
+| The workflows and screens                              | [System walkthrough](docs/walkthrough.md)                    |
+| Booking rules, statuses, and privacy                   | [Business rules](docs/concepts/rules.md)                     |
+| How the application components communicate             | [Architecture](docs/concepts/architecture.md)                |
+| Tables and their relationships                         | [Database model and ER diagram](docs/concepts/data-model.md) |
+| HTTP endpoints, server actions, and database functions | [API reference](docs/reference/api.md)                       |
+| How to run and test the project                        | [Getting started](docs/getting-started.md)                   |
+
+The [documentation index](docs/README.md) provides the recommended reading order and the remaining technical references. [Implementation status](PROGRESS.md) distinguishes completed features from deployment work still required.
+
+## Technology
+
+| Part                  | Technology                    | Responsibility                                                 |
+| --------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Application           | Next.js 16, React, TypeScript | Pages, interactive forms, and server-side request handling     |
+| Identity and database | Supabase Auth, PostgreSQL     | Sign-in, stored records, permissions, and atomic booking rules |
+| Interface             | React Aria, Tailwind CSS      | Accessible controls and a shared responsive design             |
+| Consultation email    | Resend                        | Optional status messages and reminders                         |
+
+Private consultation descriptions and outcomes are shown only to the student and assigned faculty. Admin screens show consultation metadata, categories, and aggregate summaries.
 
 ## Run locally
 
+Follow [Getting started](docs/getting-started.md) for prerequisites, environment configuration, and the local Supabase keys before running:
+
 ```bash
-cp .env.example .env.local
-npm install
+npm ci
 npm run supabase:start
 npm run supabase:reset
 npm run dev
 ```
 
-Full steps (email verification, seed data, first-admin claim, faculty promotion): [`docs/getting-started.md`](docs/getting-started.md).
+`supabase:reset` rebuilds the local database and loads demo data; it clears existing local development data. The setup guide includes [demo accounts](docs/getting-started.md#demo-accounts) and local email verification instructions.
 
-## Work on it
-
-- Branch off `dev`, never `main`, and open PRs against `dev`: [`docs/contributing.md`](docs/contributing.md).
-- Commits follow `type(scope): description`: [`docs/contributing.md`](docs/contributing.md#commit-rules).
-
-## Validate
+## Verification
 
 ```bash
-npm run check    # format + lint + typecheck + tests
+npm run check
 npm run build
 npm run supabase:test
 npm run test:e2e
 ```
 
-## Documentation map
+The [testing guide](docs/getting-started.md#validate) explains what these commands check and when database-backed browser tests run. [Technical evidence](docs/evidence/README.md) contains earlier local verification captures. Team members can place their AI-use evidence in their own folders under [ai-evidence](ai-evidence/README.md).
 
-- Index and reading paths: [`docs/README.md`](docs/README.md)
-- Product intent: [`CONTEXT.md`](CONTEXT.md)
-- Concepts (product, rules, architecture, data model): [`docs/concepts/`](docs/concepts/)
-- Reference (API, environment, design): [`docs/reference/`](docs/reference/)
-- Setup: [`docs/getting-started.md`](docs/getting-started.md)
-- Operations: [`docs/operations.md`](docs/operations.md)
-- Contributing: [`docs/contributing.md`](docs/contributing.md)
-- Completion status: [`PROGRESS.md`](PROGRESS.md)
+## Development and deployment
 
-## Releases
-
-Merging `dev` → `main` runs full CI; on green, the release workflow tags the next semantic version from Conventional Commits (`feat` → minor, `fix` → patch) and publishes generated notes. Production database pushes and hosting deploys are separate, explicitly approved steps.
+Branch, commit, and pull request conventions are in [Contributing](docs/contributing.md). Configuration and deployment instructions are in [Environment reference](docs/reference/environment.md) and [Operations](docs/operations.md).

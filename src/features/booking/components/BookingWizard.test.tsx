@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { BookingWizard } from './BookingWizard'
 import type { SlotResult } from '../types'
@@ -18,6 +18,10 @@ function futureKey(): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
     date.getDate()
   ).padStart(2, '0')}`
+}
+
+function todayKey(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date())
 }
 
 const slot = (overrides: Partial<SlotResult> = {}): SlotResult => ({
@@ -49,6 +53,22 @@ describe('BookingWizard details', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByText('Select a concern')).toBeInTheDocument()
+  })
+})
+
+describe('BookingWizard past slots', () => {
+  it('keeps slots that have already started unselectable', () => {
+    render(
+      <BookingWizard
+        facultyId={FACULTY_ID}
+        initialSlots={[
+          slot({ slot_date: todayKey(), start_time: '00:00:00', end_time: '01:00:00' }),
+        ]}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: /00:00/ })).toBeDisabled()
+    expect(screen.getByText('0 open slots')).toBeInTheDocument()
   })
 })
 
@@ -98,7 +118,11 @@ describe('BookingWizard review', () => {
     fireEvent.click(screen.getByRole('button', { name: /09:00/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(screen.getByText('Dr. Ada Lovelace')).toBeInTheDocument()
+    expect(
+      within(
+        screen.getByRole('heading', { name: 'Consultation Information' }).closest('section')!
+      ).getByText('Dr. Ada Lovelace')
+    ).toBeInTheDocument()
     expect(screen.getByText('Room 101')).toBeInTheDocument()
     expect(screen.getByText('09:00–10:00')).toBeInTheDocument()
 
@@ -131,4 +155,13 @@ describe('BookingWizard month navigation', () => {
       )
     )
   })
+})
+
+it('keeps faculty context and a way back to discovery visible before selecting a slot', () => {
+  render(<BookingWizard facultyId={FACULTY_ID} initialSlots={[slot()]} />)
+  expect(screen.getByText('Dr. Ada Lovelace')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Change faculty' })).toHaveAttribute(
+    'href',
+    '/student/book'
+  )
 })

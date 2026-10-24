@@ -76,12 +76,12 @@ export function AddFacultyButton({ departments }: { departments: Department[] })
 
   return (
     <>
-      <Button onPress={() => setOpen(true)}>
+      <Button className="whitespace-nowrap" onPress={() => setOpen(true)}>
         <Plus size={18} aria-hidden="true" className="mr-2" />
         Add Faculty
       </Button>
       {message ? (
-        <p className="text-sm font-semibold text-success" role="status">
+        <p className="text-sm text-success" role="status">
           {message}
         </p>
       ) : null}

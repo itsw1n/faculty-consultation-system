@@ -1,5 +1,9 @@
 import { z } from 'zod'
 
+const meetingLink = z
+  .url()
+  .refine((value) => /^https?:\/\//i.test(value), { message: 'Use an http or https link.' })
+
 export const availabilitySchema = z
   .object({
     date: z.iso.date(),
@@ -7,7 +11,7 @@ export const availabilitySchema = z
     endTime: z.iso.time(),
     mode: z.enum(['IN_PERSON', 'ONLINE']),
     location: z.string().trim().max(160).optional(),
-    meetingLink: z.union([z.url(), z.literal('')]).optional(),
+    meetingLink: z.union([meetingLink, z.literal('')]).optional(),
   })
   .superRefine((value, context) => {
     if (value.endTime <= value.startTime)

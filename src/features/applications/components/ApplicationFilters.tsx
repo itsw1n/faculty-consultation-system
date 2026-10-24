@@ -43,7 +43,7 @@ export function ApplicationFilters({
     ...departments.map((item) => ({ id: item.id, label: item.code })),
   ]
   return (
-    <div className="grid items-end gap-3 border-y border-border py-4 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1.4fr)_minmax(10rem,1fr)_minmax(12rem,1fr)_auto]">
+    <div className="grid items-end gap-4 rounded-xl border border-border bg-surface p-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,1fr)_auto]">
       <SearchInput
         label="Search"
         value={search}
@@ -62,7 +62,7 @@ export function ApplicationFilters({
         value={current.get('department') ?? 'all'}
         onChange={(value) => update('department', value === 'all' ? '' : value)}
       />
-      <div className="flex items-end sm:col-span-2 lg:col-auto lg:justify-self-end">{action}</div>
+      <div className="flex items-end sm:justify-self-start xl:justify-self-end">{action}</div>
     </div>
   )
 }

@@ -32,3 +32,11 @@ export async function markEmailSent(id: string) {
   const { error } = await adminClient().rpc('mark_email_sent', { target_id: id })
   if (error) throw new Error('Unable to record email delivery')
 }
+
+export async function markEmailFailed(id: string, reason: string) {
+  const { error } = await adminClient().rpc('mark_email_failed', {
+    target_id: id,
+    error_message: reason,
+  })
+  if (error) throw new Error('Unable to record email failure')
+}

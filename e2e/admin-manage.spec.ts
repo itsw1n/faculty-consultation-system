@@ -113,6 +113,12 @@ test.describe('Admin management', () => {
       })
       .toBe(true)
     expect((await getDepartmentByCode(code))?.name).toBe(name)
+    await expect(addForm.getByRole('status')).toHaveText('Department added.')
+    await addForm.locator('input[name="code"]').fill(code)
+    await addForm.locator('input[name="name"]').fill(name)
+    await addForm.getByRole('button', { name: 'Add department' }).click()
+    await expect(addForm.getByRole('alert')).toContainText('use a unique code and name')
+    await expect(addForm.locator('input[name="name"]')).toHaveValue(name)
     let cardIndex = -1
     await expect
       .poll(
@@ -130,6 +136,7 @@ test.describe('Admin management', () => {
     await row.locator('input[name="name"]').fill(renamed)
     await row.getByRole('button', { name: 'Save changes' }).click()
     await expect.poll(() => getDepartmentByCode(code).then((row) => row?.name)).toBe(renamed)
+    await expect(row.getByRole('status')).toHaveText('Changes saved.')
   })
 
   test('consultation records export a CSV covering the range', async ({ page }) => {
@@ -144,10 +151,19 @@ test.describe('Admin management', () => {
     await setProfile(student.id, { role: 'STUDENT', account_status: 'APPROVED' })
     await setDepartment(student.id, departments[0]!.id)
     const slot = await ensureSlot(faculty.id)
-    await bookConsultationAs(studentEmail, password, slot.id)
+    await bookConsultationAs(
+      studentEmail,
+      password,
+      slot.id,
+      'ACADEMIC',
+      'Private export test note'
+    )
 
     await signInAs(page, email, password)
     await page.goto('/admin/consultations')
+    await expect(page.getByRole('columnheader', { name: 'Faculty' })).toBeVisible()
+    await expect(page.getByRole('columnheader', { name: 'Action' })).toHaveCount(0)
+    await expect(page.getByText('Private export test note')).toHaveCount(0)
     const today = new Date().toISOString().slice(0, 10)
     const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
     const exportForm = page.locator('form', { hasText: 'Download summary CSV' })
@@ -162,5 +178,28 @@ test.describe('Admin management', () => {
     const csv = readFileSync(path!, 'utf8')
     expect(csv).toContain('Date,Department,Category,Status,Count')
     expect(csv).toContain('PENDING')
+    expect(csv).not.toContain('Private export test note')
+  })
+  test('management pages keep filters and records within narrow and tablet viewports', async ({
+    page,
+  }) => {
+    const { email } = await setupAdmin('e2e-adminresponsive')
+    await signInAs(page, email, password)
+    for (const route of ['/admin', '/admin/users', '/admin/departments', '/admin/consultations']) {
+      await page.goto(route)
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      for (const width of [320, 768, 1024, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        const dimensions = await page.evaluate(() => ({
+          viewport: innerWidth,
+          content: document.documentElement.scrollWidth,
+        }))
+        expect(dimensions.content, `${route} at ${width}px`).toBeLessThanOrEqual(
+          dimensions.viewport
+        )
+        if (route === '/admin/users')
+          await expect(page.getByRole('button', { name: 'Add Faculty', exact: true })).toBeVisible()
+      }
+    }
   })
 })

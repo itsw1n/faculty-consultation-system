@@ -16,7 +16,7 @@ update public.profiles set role='ADMIN',account_status='APPROVED' where id='7700
 insert into public.availability_slots (id,faculty_id,date,start_time,end_time,status,mode,location)
 values
 ('88000000-0000-0000-0000-000000000001','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date - 1,'09:00','10:00','OPEN','IN_PERSON','Past room'),
-('88000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date,'13:00','14:00','OPEN','IN_PERSON','Today room'),
+('88000000-0000-0000-0000-000000000002','77000000-0000-0000-0000-000000000001','2027-06-01','13:00','14:00','OPEN','IN_PERSON','Future room'),
 ('88000000-0000-0000-0000-000000000003','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date + 1,'09:00','10:00','RESERVED','IN_PERSON','Pending room'),
 ('88000000-0000-0000-0000-000000000004','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date + 1,'11:00','12:00','BOOKED','IN_PERSON','Approved room'),
 ('88000000-0000-0000-0000-000000000005','77000000-0000-0000-0000-000000000001',(now() at time zone 'Asia/Manila')::date + 2,'09:00','10:00','BOOKED','ONLINE',null),
@@ -48,7 +48,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"77000000-0000-0000-0000-000000000001","role":"authenticated"}',true);
 select results_eq(
   $$select pending, open_slots, next_open_date, next_open_start_time, next_open_end_time from public.faculty_dashboard_summary()$$,
-  $$values (1::bigint, 2::bigint, (now() at time zone 'Asia/Manila')::date, '13:00'::time, '14:00'::time)$$,
+  $$values (1::bigint, 2::bigint, (now() at time zone 'Asia/Manila')::date + 3, '10:00'::time, '11:00'::time)$$,
   'summary returns caller counts and the next open slot'
 );
 select results_eq(

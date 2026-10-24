@@ -43,15 +43,18 @@ delete from public.approved_email_domains where domain = '*';
 
 ## Demo accounts
 
-`supabase db reset` loads five local demo accounts (one admin, three faculty, and one student), twenty availability slots, twelve consultations covering every lifecycle state, sample notifications, and email outbox history:
+`supabase db reset` loads six local demo accounts (one admin, three faculty, and two students), seventeen availability slots, twelve consultations covering every lifecycle state, twelve notifications, and twelve email outbox records:
 
 | Role    | Name                       | Email                                | Password       |
 | ------- | -------------------------- | ------------------------------------ | -------------- |
-| Admin   | Demo Admin                 | `admin.demo@acdeducation.com`        | `Password123!` |
-| Faculty | Maria Cristina D. Reyes    | `faculty.demo@acdeducation.com`      | `Password123!` |
+| Admin   | Erwin Curato               | `erwin@acdeducation.com`             | `Password123!` |
+| Faculty | Alexandra Mendoza          | `mendoza@acdeducation.com`           | `Password123!` |
 | Faculty | Jose Miguel A. Santos      | `jose.santos@acdeducation.com`       | `Password123!` |
 | Faculty | Angela Marie L. Villanueva | `angela.villanueva@acdeducation.com` | `Password123!` |
-| Student | Erwin James P. Dela Cruz   | `student.demo@acdeducation.com`      | `Password123!` |
+| Student | John Frence Cuevas Bitas   | `bitas@acdeducation.com`             | `Password123!` |
+| Student | Bien Panzo                 | `panzo@acdeducation.com`             | `Password123!` |
+
+Jose and Angela are supporting faculty for department filtering and faculty-directory variety. Jose has no future availability, which demonstrates the admin “faculty without future slots” indicator. Mendoza is the primary faculty account for the Bitas and Panzo bookings.
 
 Re-apply just the demo data without rebuilding the database:
 
@@ -67,7 +70,7 @@ make reset
 
 Both targets pass `--local`, so they never touch a linked or hosted Supabase project. `make reset` also clears any other local development data.
 
-The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The demo admin also means `/auth/claim-admin` reports that an administrator already exists.
+The demo accounts use the approved `acdeducation.com` domain, so they work with or without the local `*` wildcard. Do not add `gmail.com` as an explicit allowed domain: the database tests use Gmail as the rejected-domain example. The seeded admin also means `/auth/claim-admin` reports that an administrator already exists.
 
 ## First administrator
 
@@ -88,12 +91,16 @@ The existing student account becomes faculty immediately. No invitation or pendi
 
 ## Validate
 
+For hands-on testing, use the [core test cases and bug log](reference/manual-test-cases.md). The commands below run the automated checks.
+
 ```bash
 npm run check
 npm run build
 npm run supabase:test
 npm run test:e2e
 ```
+
+For a release or a workflow change, run the primary lifecycle pass in [`reference/manual-test-cases.md`](reference/manual-test-cases.md) alongside these automated checks.
 
 `npm run check` runs format, lint, typecheck, and unit tests. End-to-end specs under `e2e/` drive real Chromium against your local Supabase. Landing-page specs run anywhere; the click-to-database specs (`admin-users`, `admin-manage`, `auth-routing`, `consultation-lifecycle`, `faculty-availability`, `password-auth`, `student-booking`) need `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (refresh it with `supabase status -o env`) and skip automatically when it is unavailable. Password specs exercise the real sign-in form; fixtures create users through the Auth Admin API and generate verification tokens where a test must not depend on reading mail. Assertions check both the screen and the database row.
 

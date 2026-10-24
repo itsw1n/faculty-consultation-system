@@ -1,6 +1,11 @@
 import 'server-only'
 import { sendConsultationEmail } from '../api/resendClient'
-import { claimEmails, markEmailSent, queueReminders } from '../repositories/emailRepository'
+import {
+  claimEmails,
+  markEmailFailed,
+  markEmailSent,
+  queueReminders,
+} from '../repositories/emailRepository'
 
 export async function deliverEmails(includeReminders = false) {
   if (includeReminders) await queueReminders()
@@ -20,9 +25,10 @@ export async function deliverEmails(includeReminders = false) {
       await markEmailSent(email.id)
       sent++
     } catch (error) {
-      console.error('Email delivery failed', {
-        id: email.id,
-        reason: error instanceof Error ? error.message : 'unknown',
+      const reason = error instanceof Error ? error.message : 'unknown'
+      console.error('Email delivery failed', { id: email.id, reason })
+      await markEmailFailed(email.id, reason).catch(() => {
+        console.error('Email failure could not be recorded', { id: email.id })
       })
     }
   }

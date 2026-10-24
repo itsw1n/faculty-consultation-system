@@ -22,6 +22,7 @@ const slot = (overrides: Partial<AvailabilityItem> = {}): AvailabilityItem => ({
   meeting_link: null,
   student_name: null,
   category: null,
+  has_history: false,
   ...overrides,
 })
 
@@ -50,6 +51,14 @@ describe('AvailabilityManager edit', () => {
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
   })
 
+  it('does not offer changes for a slot with consultation history', () => {
+    render(<AvailabilityManager slots={[slot({ status: 'CLOSED', has_history: true })]} />)
+
+    expect(screen.getByText('History')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+  })
+
   it('prefills the edit form with the slot values and its id', () => {
     render(<AvailabilityManager slots={[slot()]} />)
 
@@ -63,4 +72,13 @@ describe('AvailabilityManager edit', () => {
       '11111111-1111-4111-8111-111111111111'
     )
   })
+})
+
+it('shows filtered result feedback and allows clearing the search', () => {
+  render(<AvailabilityManager slots={[slot()]} />)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'no matching room' } })
+  expect(screen.getByText('0 of 1 upcoming slots')).toBeInTheDocument()
+  expect(screen.getByText('No availability matches your filters.')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Clear search' }))
+  expect(screen.getByText('Room 101')).toBeInTheDocument()
 })

@@ -1,75 +1,120 @@
 # Architecture
 
-Next.js 16 App Router front end backed by Supabase Auth and PostgreSQL. Product behavior is in [`product.md`](product.md); exact rules are in [`rules.md`](rules.md); schema detail is in [`data-model.md`](data-model.md).
+[Documentation guide](../README.md) · Previous: [Business rules](rules.md) · Next: [Database model](data-model.md)
 
-## Runtime boundaries
+The browser displays the interface. The Next.js application renders pages, processes forms, and checks access. Supabase Auth manages identity; PostgreSQL stores records and enforces booking and data-access rules. Resend delivers optional consultation emails.
 
-- Route pages and layouts render on the server by default; interactive calendars, dialogs, filters, and infinite lists are client components.
-- Server actions validate `FormData`, authenticate, authorize the required role, and delegate persistence to repositories or database RPCs.
-- Repositories own Supabase queries. Atomic booking and status transitions live in PostgreSQL functions.
-- `src/proxy.ts` refreshes the Supabase session cookie on each non-static request.
-- Row-level security is the final data-access boundary even after application authorization runs.
+## System components
 
-## Layers
-
-```text
-page / layout / route handler
-        |
-        v
-server action or 'use server' query loader
-        |
-        v
-feature repository
-        |
-        v
-Supabase table or RPC
+```mermaid
+flowchart LR
+    Browser["Browser: Student, Faculty, Admin"] --> App["Next.js application"]
+    App --> Auth["Supabase Auth: identity and sessions"]
+    App --> DB["PostgreSQL: records, functions, access rules"]
+    Job["Scheduled email job"] --> App
+    DB --> Outbox["Private email outbox"]
+    App --> Email["Resend: consultation emails"]
 ```
 
-Pages call repositories directly for initial server-rendered reads. `features/*/queries/*.ts` are `'use server'` loaders used by client components for cursor pagination; they add authorization and Zod validation around a repository read. Pages never call RPCs or table clients directly.
+The outbox stores work awaiting delivery. The server reads and updates it; PostgreSQL does not call Resend directly. Supabase Auth sends verification and password-recovery emails through its separately configured email service.
 
-## Feature ownership
+## How a request is handled
 
-```text
-src/features/auth          sign-in, sign-out, first-admin claim, profile guards
-src/features/applications  account page, faculty promotion, corrections
-src/features/admin         departments, faculty records
-src/features/availability  faculty availability actions and reads
-src/features/booking       faculty directory, slots, booking action
-src/features/consultations lifecycle actions, lists, detail, CSV
-src/features/dashboard     role-specific dashboard counts
-src/features/email         outbox claim and Resend delivery
-src/features/notifications in-app notifications and read state
+For an initial page load, a server-rendered page obtains authorized data from a feature repository and sends the rendered result to the browser. Interactive controls such as calendars, dialogs, and filters run as client components.
+
+For a form submission:
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Browser form
+    participant Server as Next.js Server Action
+    participant DB as PostgreSQL
+    User->>UI: Submit consultation request
+    UI->>Server: Slot, category, optional description
+    Server->>Server: Check role and validate input
+    Server->>DB: Execute book_consultation as signed-in user
+    DB->>DB: Check caller and atomically reserve/create
+    DB-->>Server: Success or booking conflict
+    Server-->>UI: Redirect to consultations or show safe feedback
 ```
 
-Shared code lives in `src/lib` (`env.ts`, `actionState.ts`, `useInfinitePage.ts`, `supabase/server.ts`). Shared UI lives in `src/components`.
+Repositories centralize feature reads. Server Actions and route handlers perform protected writes through the Supabase client or transactional database functions. Client-side list loaders also check access and validate inputs before repository reads. The [API reference](../reference/api.md) distinguishes these entry points and their return behavior.
+
+## Technical terms
+
+| Term               | Meaning in this project                                                              |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| Authentication     | Establishing who is signed in                                                        |
+| Authorization      | Checking what that account may read or change                                        |
+| Server Component   | A React component rendered on the server, used for pages and initial data            |
+| Client Component   | A component with browser interactions, such as a calendar or dialog                  |
+| Server Action      | A Next.js server function invoked by a form or client interaction                    |
+| Repository         | Feature code that obtains stored data through Supabase queries or functions          |
+| RPC                | Remote procedure call; here, executing a named PostgreSQL function                   |
+| RLS                | Row-level security: database rules controlling which rows a caller may access        |
+| Atomic transaction | Related database changes succeed together or are rolled back together                |
+| Zod                | The validation library that checks submitted fields before they are trusted          |
+| Cursor             | Values marking the position after the last loaded record for pagination              |
+| Service role       | A privileged server credential used for restricted operations; never a browser value |
+| Outbox             | Stored email tasks waiting for delivery or retry                                     |
 
 ## Authentication model
 
-Supabase Auth with email + password and mandatory email verification. Sign-up and password recovery email links are verified by `/auth/confirm`, which exchanges the token hash for a cookie-backed session. Supabase stores only the bcrypt hash in `auth.users.encrypted_password`; the application never sees or stores plaintext passwords. The auth-user trigger `handle_new_auth_user` builds a profile from trusted metadata (`id`, `email`, `full_name` falling back to the email local part). The browser is never trusted for email, role, or account status. The sign-in routing and account rules are in [`rules.md`](rules.md#sign-in-routing).
+Accounts use school email and password with mandatory email verification. The app passes credentials to Supabase Auth; it does not persist plaintext passwords in application tables. Supabase Auth stores password hashes. Email confirmation and password recovery use `/auth/confirm`, which verifies the email token and establishes a cookie-backed session.
+
+The auth-user trigger creates the application profile. The browser cannot self-assign a trusted role or account status. Profile, email verification, and allowed-domain checks determine access. [Business rules](rules.md#sign-in-routing) describes the resulting destinations.
+
+`src/proxy.ts` refreshes the Supabase session cookie on non-static requests. Refreshing a session does not authorize an action.
 
 ## Authorization
 
-- `getAuthenticatedProfile()` reads verified claims, the profile row, and the approved-domain check. It is request-memoized so multiple guards in one render share the lookup.
-- `requireRole(role)` redirects unauthenticated users to `/`, and wrong-role or wrong-status users to `/auth/continue`.
-- `authorizeRole(role)` applies the same default-deny rules but returns `401`/`403` so HTTP routes can respond with real status codes instead of redirects.
-- `requireApprovedProfile()` throws without an approved profile and guards shared reads.
-- `RoleLayout` wraps `/student`, `/faculty`, and `/admin` with `requireRole`; admin pages also guard themselves for defense in depth.
-- Every server action calls one of these helpers before touching data.
-- `src/proxy.ts` only refreshes the session cookie. It does not authorize; authorization happens at layouts, route handlers, server actions, RPCs, and RLS.
+The application has several independent checks:
 
-## Reliability and security
+1. **Pages and layouts** require the correct role before returning portal data.
+2. **Server Actions and read loaders** authenticate and authorize each request rather than trusting the visible UI.
+3. **Database functions, grants, constraints, and RLS** enforce data access and valid state changes when persistence is requested.
 
-- Untrusted mutation input is validated with Zod at the server boundary.
-- Availability overlap and double booking are protected by database constraints and transactional RPCs, not application checks alone.
-- Privileged fields (`role`, `account_status`, `position_title`, `department_id`, and approval metadata) change only through security-definer RPCs and the auth-user trigger.
-- Browser-visible environment values contain only the project URL, public Supabase key, and canonical site URL. See [`reference/environment.md`](../reference/environment.md).
-- Database and provider errors stay server-side; see [`reference/api.md`](../reference/api.md).
+| Helper                      | Purpose                                                                                                                       |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `getAuthenticatedProfile()` | Request-memoized lookup of verified identity, profile, and allowed-domain eligibility                                         |
+| `requireRole(role)`         | Requires the specified approved role; redirects unauthenticated users to sign-in and mismatched accounts through role routing |
+| `authorizeRole(role)`       | Applies access checks with `401`/`403` results for HTTP route handlers                                                        |
+| `requireApprovedProfile()`  | Requires an approved account for shared reads/actions, such as its notification inbox                                         |
+
+[RoleLayout](../../src/components/layout/RoleLayout.tsx) protects the role portals. The [auth repository](../../src/features/auth/repositories/authRepository.ts) defines the helpers. Admin pages also apply role checks themselves.
+
+A page can stream a loading shell before redirecting an unauthorized account, so its initial HTTP status is not equivalent to a route-handler permission result. The export endpoint has explicit `401`/`403` responses; see the [API reference](../reference/api.md#http-endpoints).
+
+## Data integrity and privacy
+
+A booking checks and reserves an open slot in the same transaction that creates the pending consultation. Database constraints prevent overlapping faculty availability and more than one active consultation per slot. Concurrent clicks therefore cannot create two active bookings for that slot.
+
+Private descriptions, outcomes, and approved/completed meeting links are participant-facing. Admin application views and exports use metadata and aggregate results. Exact visibility is defined in [Business rules](rules.md#visibility); database grants and result functions are documented in the [database model](data-model.md#rls-and-grants).
+
+User-controlled fields are validated on the server. UI error feedback avoids exposing database/provider details. Browser-visible configuration contains public values only; privileged credentials remain server-side. See [Environment reference](../reference/environment.md).
 
 ## Email pipeline
 
-1. Lifecycle RPCs enqueue rows in the private `email_outbox`; status notifications and next-day reminders are separate event types.
-2. The protected `GET /api/cron/email` route (bearer `CRON_SECRET`) queues reminders and calls `deliverEmails`.
-3. The processor claims up to 25 outbox records with `FOR UPDATE SKIP LOCKED` and a 10-minute lease, sends each through Resend using the record ID as an idempotency key, then marks it sent.
-4. Resend idempotency keys prevent duplicate sends when processing retries.
+1. Consultation lifecycle functions create in-app notifications and enqueue eligible status email tasks in the private `email_outbox`.
+2. Status decision/cancellation actions can attempt delivery after the database operation. Email failure does not roll back a successful consultation decision.
+3. The protected scheduled route queues next-day reminders and processes the same outbox.
+4. The processor claims up to 25 records with a ten-minute lease. It sends through Resend using each record ID as an idempotency key, then marks it sent or records failure for retry.
 
-The `00:00 UTC` daily Vercel schedule runs the route at 08:00 Philippine time. Deployment details are in [`operations.md`](../operations.md).
+An idempotency key allows repeated delivery attempts to identify the same email task. The database's `FOR UPDATE SKIP LOCKED` claim prevents workers from claiming the same unlocked batch concurrently. The [rules](rules.md#notifications-and-email) define retry limits; [Operations](../operations.md#scheduled-email) defines scheduling and configuration.
+
+## Code organization
+
+| Feature directory under `src/features/` | Responsibility                                                 |
+| --------------------------------------- | -------------------------------------------------------------- |
+| `auth`                                  | Sign-in, recovery, first-admin claim, and access guards        |
+| `applications`                          | Approved account directory, faculty promotion, and corrections |
+| `admin`                                 | Department management                                          |
+| `availability`                          | Faculty schedule actions and reads                             |
+| `booking`                               | Faculty discovery, available slots, and Student booking        |
+| `consultations`                         | Lifecycle actions, lists, details, and CSV summary formatting  |
+| `dashboard`                             | Role-specific summary reads                                    |
+| `notifications`                         | In-app inbox and read state                                    |
+| `email`                                 | Outbox processing and Resend delivery                          |
+
+Routes live in `src/app/`, shared UI in `src/components/`, common utilities and Supabase clients in `src/lib/`, and executable schema changes in `supabase/migrations/`. The [database model](data-model.md) explains the persisted records.

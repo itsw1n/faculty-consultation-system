@@ -25,7 +25,7 @@ Do not expose a service-role key or email credentials to the browser. Keep hoste
 
 ## Scheduled email
 
-The `00:00 UTC` daily Vercel schedule runs the protected `/api/cron/email` route. Configure the schedule to send `Authorization: Bearer $CRON_SECRET`. Reminders queue on each run; status notifications queue on the triggering RPC and are delivered by the same processor.
+The `00:00 UTC` daily Vercel schedule runs the protected `/api/cron/email` route. Configure the schedule to send `Authorization: Bearer $CRON_SECRET`. The route compares the credential as UTF-8 bytes without leaking length timing. Reminders queue on each run; status notifications queue on the triggering RPC and are delivered by the same processor. Failed sends receive a 10-minute retry lease.
 
 ## Releases
 
@@ -33,4 +33,4 @@ Merging `dev` → `main` runs full CI; on green, the release workflow tags the n
 
 ## Release checklist
 
-Run the validation commands from [`getting-started.md`](getting-started.md), test the confirmation and recovery emails against the target origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.
+Run the validation commands from [`getting-started.md`](getting-started.md), complete the primary lifecycle pass in [`reference/manual-test-cases.md`](reference/manual-test-cases.md), test the confirmation and recovery emails against the target origin, and verify student, faculty, and admin access independently. Deployment and production migration execution require explicit operator approval.

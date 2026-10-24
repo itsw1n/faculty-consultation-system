@@ -25,13 +25,15 @@ export default async function ManageUsersPage({
   return (
     <>
       <PageHeading
+        eyebrow="Administration workspace"
         title="Manage Users"
-        description="Everyone with a school email is a student by default. Promote faculty here."
+        description="Find school accounts, assign faculty roles, and maintain department details."
       />
       <div className="mb-5">
         <SummaryStats
+          className="grid-cols-2 sm:grid-cols-4"
           items={[
-            { label: 'Total users', value: counts.total },
+            { label: 'Active users', value: counts.total },
             { label: 'Students', value: counts.students },
             { label: 'Faculty', value: counts.faculty },
             { label: 'Admins', value: counts.admins },

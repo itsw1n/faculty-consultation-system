@@ -1,7 +1,9 @@
+import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
 import { databaseTestsEnabled } from './helpers/environment'
 import {
   bookConsultationAs,
+  decideConsultationAs,
   ensureAccount,
   ensureFacultyProfile,
   ensureSlot,
@@ -11,6 +13,7 @@ import {
   getNotifications,
   getSlot,
   setProfile,
+  tomorrowIso,
   uniqueEmail,
 } from './helpers/testDatabase'
 import { signInAs } from './helpers/testSession'
@@ -18,7 +21,7 @@ import { waitForHydration } from './helpers/hydration'
 
 const password = 'Password123!'
 
-async function setupPair(prefix: string) {
+async function setupPair(prefix: string, slotDate = tomorrowIso()) {
   const department = await getFirstDepartment()
   const facultyName = `E2E Faculty ${Date.now()}-${Math.floor(Math.random() * 10000)}`
   const facultyEmail = uniqueEmail(`${prefix}-faculty`)
@@ -29,7 +32,7 @@ async function setupPair(prefix: string) {
   const studentName = `E2E Student ${Date.now()}-${Math.floor(Math.random() * 10000)}`
   const student = await ensureAccount(studentEmail, password, studentName)
   await setProfile(student.id, { role: 'STUDENT', account_status: 'APPROVED' })
-  const slot = await ensureSlot(faculty.id)
+  const slot = await ensureSlot(faculty.id, { date: slotDate })
   return { faculty, facultyName, student, studentName, slot, facultyEmail, studentEmail }
 }
 
@@ -162,6 +165,103 @@ test.describe('Consultation lifecycle', () => {
     expect(
       (await getNotifications(student.id)).some((n) => n.type === 'CONSULTATION_REJECTED')
     ).toBe(true)
+  })
+
+  test('faculty requests filter by status and default to pending', async ({ page }) => {
+    const { faculty, studentName, slot, facultyEmail, studentEmail } =
+      await setupPair('e2e-request-filter')
+
+    await bookConsultationAs(studentEmail, password, slot.id)
+    const approvedSlot = await ensureSlot(faculty.id, {
+      start_time: '11:00',
+      end_time: '12:00',
+    })
+    const approvedId = await bookConsultationAs(studentEmail, password, approvedSlot.id)
+    await decideConsultationAs(facultyEmail, password, approvedId, true)
+
+    await signInAs(page, facultyEmail, password)
+    await page.goto('/faculty/requests')
+
+    const statusFilter = page.getByRole('button', { name: 'Status' })
+    await waitForHydration(page, statusFilter)
+    await expect(statusFilter).toContainText('Pending')
+
+    const row = page.getByRole('row').filter({ hasText: studentName })
+    await expect(row).toHaveCount(1)
+    await expect(row.getByText('Pending', { exact: true })).toBeVisible()
+    await expect(row.getByText('Approved', { exact: true })).toHaveCount(0)
+
+    await statusFilter.click()
+    await page.getByRole('option', { name: 'Approved' }).click()
+
+    await expect(page).toHaveURL(/\/faculty\/requests\?status=APPROVED/)
+    await expect(statusFilter).toContainText('Approved')
+    await expect(row).toHaveCount(1)
+    await expect(row.getByText('Approved', { exact: true })).toBeVisible()
+    await expect(row.getByText('Pending', { exact: true })).toHaveCount(0)
+
+    const mobileNavigation = page
+      .locator('details')
+      .filter({ has: page.getByLabel('Open navigation') })
+    await mobileNavigation.evaluate((node) => {
+      const details = node as HTMLDetailsElement
+      details.open = true
+    })
+    await page.locator('a[href="/faculty/consultations"]:visible').click()
+    await expect(page).toHaveURL('/faculty/consultations')
+    await page.goBack()
+    await expect(page).toHaveURL(/\/faculty\/requests\?status=APPROVED/)
+    await expect(statusFilter).toContainText('Approved')
+    await expect(row).toHaveCount(1)
+    await expect(row.getByText('Approved', { exact: true })).toBeVisible()
+    await expect(row.getByText('Pending', { exact: true })).toHaveCount(0)
+
+    await page.reload()
+    await expect(page).toHaveURL(/\/faculty\/requests\?status=APPROVED/)
+    await expect(statusFilter).toContainText('Approved')
+    await expect(row).toHaveCount(1)
+    await expect(row.getByText('Approved', { exact: true })).toBeVisible()
+    await expect(row.getByText('Pending', { exact: true })).toHaveCount(0)
+  })
+
+  test('faculty downloads only own consultation records in the selected date range', async ({
+    page,
+  }) => {
+    const date = tomorrowIso()
+    const { studentName, slot, facultyEmail, studentEmail } = await setupPair(
+      'e2e-faculty-export',
+      date
+    )
+    const consultationId = await bookConsultationAs(
+      studentEmail,
+      password,
+      slot.id,
+      'ACADEMIC',
+      'private test notes'
+    )
+    await decideConsultationAs(facultyEmail, password, consultationId, true)
+
+    const unrelated = await setupPair('e2e-faculty-export-other', date)
+    await bookConsultationAs(unrelated.studentEmail, password, unrelated.slot.id)
+
+    await signInAs(page, facultyEmail, password)
+    await page.goto('/faculty/consultations')
+    await page.locator('input[name="from"]').fill(date)
+    await page.locator('input[name="to"]').fill(date)
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Download CSV' }).click()
+    const download = await downloadPromise
+    expect(download.suggestedFilename()).toBe(`faculty-consultations-${date}-to-${date}.csv`)
+    const downloadPath = await download.path()
+    expect(downloadPath).not.toBeNull()
+    const csv = await readFile(downloadPath!, 'utf8')
+
+    expect(csv).toContain(studentName)
+    expect(csv).toContain('APPROVED')
+    expect(csv).not.toContain(unrelated.studentName)
+    expect(csv).not.toContain('private test notes')
+    expect(csv).not.toContain('meeting.example')
   })
 
   test('student cancel reopens the slot and notifies the faculty', async ({ page }) => {

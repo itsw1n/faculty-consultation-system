@@ -31,7 +31,9 @@ test.describe('Manage Users directory', () => {
     await signInAs(page, adminEmail, 'Password123!')
     await page.goto('/admin/users')
 
-    await page.getByRole('button', { name: 'Add Faculty' }).click()
+    const addFaculty = page.getByRole('button', { name: 'Add Faculty' })
+    await waitForHydration(page, addFaculty)
+    await addFaculty.click()
     const dialog = page.getByRole('dialog', { name: 'Add Faculty' })
     await dialog.getByLabel('School email').fill(facultyEmail)
     await dialog.getByRole('button', { name: 'Department' }).click()

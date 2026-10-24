@@ -5,12 +5,12 @@ import { Button as AriaButton, type ButtonProps as AriaButtonProps } from 'react
 import { cn } from '@/lib/cn'
 
 export const buttonVariants = cva(
-  'inline-flex min-h-11 min-w-28 cursor-pointer items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50',
+  'inline-flex min-h-11 min-w-28 cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-[background-color,box-shadow] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-white hover:bg-primary-hover',
-        secondary: 'bg-surface text-primary ring-1 ring-border hover:bg-subtle',
+        primary: 'bg-primary text-white shadow-xs ring-1 ring-primary/10 hover:bg-primary-hover',
+        secondary: 'bg-surface text-foreground shadow-xs ring-1 ring-border hover:bg-subtle',
         danger: 'bg-danger text-white hover:bg-danger-hover',
         ghost: 'bg-transparent text-primary hover:bg-subtle',
       },

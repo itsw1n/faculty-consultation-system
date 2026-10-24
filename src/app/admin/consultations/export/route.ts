@@ -1,6 +1,6 @@
-import { z } from 'zod'
 import { authorizeRole } from '@/features/auth/repositories/authRepository'
 import { createClient } from '@/lib/supabase/server'
+import { reportRangeSchema } from '@/features/consultations/schemas/reportRangeSchema'
 import { summaryCsv, type SummaryRow } from '@/features/consultations/services/summaryCsv'
 
 export async function GET(request: Request) {
@@ -14,14 +14,12 @@ export async function GET(request: Request) {
       { status: access.status, headers: { 'Cache-Control': 'private, no-store' } }
     )
   const params = new URL(request.url).searchParams
-  const dates = z
-    .object({ from: z.iso.date(), to: z.iso.date() })
-    .safeParse({ from: params.get('from'), to: params.get('to') })
-  if (!dates.success) return new Response('Invalid date range', { status: 400 })
+  const dates = reportRangeSchema.safeParse({
+    from: params.get('from'),
+    to: params.get('to'),
+  })
+  if (!dates.success) return new Response(dates.error.issues[0]?.message, { status: 400 })
   const { from, to } = dates.data
-  const span = (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000
-  if (span < 0 || span > 366)
-    return new Response('Choose a range of up to one year', { status: 400 })
   const { data, error } = await (
     await createClient()
   ).rpc('consultation_summary', { start_date: from, end_date: to })

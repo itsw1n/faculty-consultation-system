@@ -127,6 +127,8 @@ export async function signOut() {
 }
 
 export async function claimFirstAdmin(_state: ActionState): Promise<ActionState> {
+  // Keep the previous-state argument required by the form action signature.
+  void _state
   const supabase = await createClient()
   const { data: claims } = await supabase.auth.getClaims()
   const userId = claims?.claims?.sub

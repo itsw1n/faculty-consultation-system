@@ -21,9 +21,28 @@ export async function sendConsultationEmail(input: {
     input.event === 'APPROVED' || input.event === 'REMINDER'
       ? `${subject}. Your consultation is scheduled for ${date}. Sign in to the ACD consultation system for details.`
       : `${subject}. Sign in to the ACD consultation system to check your consultation status.`
-  const { error } = await new Resend(key).emails.send(
+  console.info('[resend] request', {
+    timestamp: new Date().toISOString(),
+    outboxId: input.id,
+    subject,
+  })
+  const { data, error } = await new Resend(key).emails.send(
     { from, to: input.recipient, subject, text },
     { idempotencyKey: input.id }
   )
-  if (error) throw new Error('Email provider rejected delivery')
+  if (error) {
+    console.error('[resend] response error', {
+      timestamp: new Date().toISOString(),
+      outboxId: input.id,
+      statusCode: error.statusCode,
+      code: error.name,
+      message: error.message,
+    })
+    throw new Error(`Email provider rejected delivery: ${error.message}`)
+  }
+  console.info('[resend] response ok', {
+    timestamp: new Date().toISOString(),
+    outboxId: input.id,
+    resendId: data.id,
+  })
 }

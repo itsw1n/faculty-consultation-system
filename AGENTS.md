@@ -31,6 +31,7 @@ faculty-consultation-system — consultation and scheduling system for Assumptio
    - Routes, actions, errors: `docs/reference/api.md`
    - Environment variables: `docs/reference/environment.md`
    - Design tokens: `docs/reference/design.md`
+   - Manual test cases: `docs/reference/manual-test-cases.md`
    - Local setup: `docs/getting-started.md`
    - Deploy and email: `docs/operations.md`
    - Branch, commit, PR rules: `docs/contributing.md`

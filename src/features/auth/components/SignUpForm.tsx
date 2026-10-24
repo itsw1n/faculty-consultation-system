@@ -60,9 +60,11 @@ export function SignUpForm() {
           {state.error}
         </p>
       ) : null}
-      <p className="text-sm font-semibold text-primary" role="status">
-        {state.message}
-      </p>
+      {state.message ? (
+        <p className="text-sm font-semibold text-primary" role="status">
+          {state.message}
+        </p>
+      ) : null}
       <SubmitButton pendingLabel="Creating account…" className="mt-2">
         Create account
       </SubmitButton>

@@ -68,14 +68,14 @@ export function BookingCalendar({
   }, [slots])
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-5 sm:p-6">
+    <section className="min-w-0 rounded-xl border border-border bg-surface p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <span className="grid size-10 shrink-0 place-items-center rounded-md bg-subtle text-accent">
             <CalendarDays size={20} aria-hidden="true" />
           </span>
           <div>
-            <h2 className="text-base font-semibold text-primary">Select a Date</h2>
+            <h2 className="text-base font-semibold text-foreground">Select a Date</h2>
             <p className="mt-0.5 text-sm text-muted">Choose a date with available time slots.</p>
           </div>
         </div>
@@ -115,8 +115,8 @@ export function BookingCalendar({
         </div>
 
         <CalendarGrid
-          weekdayStyle="short"
-          className="mt-3 w-full border-separate border-spacing-1 [&_td]:p-0 [&_th]:p-0"
+          weekdayStyle="narrow"
+          className="mt-3 w-full table-fixed border-separate border-spacing-0 [&_td]:p-0 [&_th]:p-0"
         >
           {(date) => {
             const dayAvailability = availability.get(date.toString())
@@ -126,7 +126,7 @@ export function BookingCalendar({
                 date={date}
                 className={({ isDisabled, isFocusVisible, isOutsideMonth, isSelected, isToday }) =>
                   cn(
-                    'relative flex size-10 cursor-pointer items-center justify-center rounded-full text-sm font-medium text-foreground outline-none transition-colors',
+                    'relative mx-auto flex aspect-square w-full max-w-10 cursor-pointer items-center justify-center rounded-full text-sm font-medium text-foreground outline-none transition-colors',
                     isOutsideMonth && 'text-muted/45',
                     isDisabled && 'cursor-not-allowed text-muted/35',
                     !isSelected && !isDisabled && 'hover:bg-subtle',

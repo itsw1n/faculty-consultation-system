@@ -11,5 +11,5 @@ test('renders the email and password sign-in entry point', () => {
   expect(screen.getByLabelText('Password')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Sign in/ })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Create account' })).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: 'Forgot password?' })).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: 'Forgot password?' })).not.toBeInTheDocument()
 })

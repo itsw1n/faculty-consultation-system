@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { resetPasswordSchema, signInSchema, signUpSchema } from './authSchema'
+import { signInSchema, signUpSchema } from './authSchema'
 
 const valid = {
   fullName: 'Maria Cruz',
@@ -31,17 +31,5 @@ describe('authSchema', () => {
 
   test('sign-in accepts any non-empty password', () => {
     expect(signInSchema.safeParse({ email: valid.email, password: 'x' }).success).toBe(true)
-  })
-
-  test('reset requires matching passwords', () => {
-    expect(
-      resetPasswordSchema.safeParse({
-        password: 'Password123!',
-        confirmPassword: 'Password123!',
-      }).success
-    ).toBe(true)
-    expect(
-      resetPasswordSchema.safeParse({ password: 'Password123!', confirmPassword: 'no' }).success
-    ).toBe(false)
   })
 })

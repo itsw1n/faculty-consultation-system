@@ -33,6 +33,8 @@ Assumption College of Davao is a web-based faculty consultation and scheduling s
 
 Exact record fields and the retention period are still to be confirmed with the school before paper records can be retired.
 
+The October 2026 deadline demo temporarily pauses hosted email confirmation and in-app password recovery. The intended verified-email flow above remains the target for continuation; see [`docs/operations.md`](docs/operations.md#temporary-auth-email-pause).
+
 ## Source of truth
 
 Product behavior is defined by [`docs/concepts/`](docs/concepts/). Migrations and automated tests are authoritative for database behavior. [`PROGRESS.md`](PROGRESS.md) records completion and deferred work. The full docs map is in [`docs/README.md`](docs/README.md).

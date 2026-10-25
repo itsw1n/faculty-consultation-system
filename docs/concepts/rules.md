@@ -6,9 +6,9 @@ Normative behavior enforced by the application and database. How these rules are
 
 ## Account and role rules
 
-1. Authentication uses email + password through Supabase Auth. Accounts must verify their email before signing in, and password recovery uses emailed reset links.
-2. A new account on an approved domain becomes `STUDENT / APPROVED` when created; email verification is still required before sign-in or promotion.
-3. An administrator can promote an existing verified student to `FACULTY / APPROVED`, assigning department and position. Historical faculty invites are not consumed.
+1. Authentication uses email + password through Supabase Auth. Hosted email confirmation is temporarily paused for the deadline demo; password recovery is unavailable in the app. Local Supabase continues to require confirmation for development checks.
+2. A new account on an approved domain becomes `STUDENT / APPROVED` when created after the hosted schema migrations are applied. With hosted confirmation paused, Supabase marks the email confirmed without proving inbox ownership.
+3. An administrator can promote an existing approved student to `FACULTY / APPROVED`, assigning department and position. The database still checks `email_confirmed_at`; during the hosted pause this is an automatic Auth flag, not proof of inbox ownership. Historical faculty invites are not consumed.
 4. Existing `PENDING` or `REJECTED` profiles are not overwritten by the sign-in trigger.
 5. Only the account matching `INITIAL_ADMIN_EMAIL` may claim the first admin role, once, while no approved admin exists.
 6. Users cannot request or self-assign `ADMIN`.
@@ -36,7 +36,7 @@ ADMIN     -> /admin
 `promote_registered_faculty` requires an admin and:
 
 - accepts one existing account email, a department, and a position title;
-- requires a verified, approved student on an allowed domain;
+- requires an approved student on an allowed domain and a non-null Auth confirmation timestamp;
 - changes the same `profiles` row to Faculty and assigns its department and position atomically;
 - returns a result for missing, unverified, ineligible, or already-faculty accounts.
 
@@ -44,7 +44,7 @@ There is no faculty application, invitation, or pending faculty state in the cur
 
 ### First administrator
 
-`claim_first_admin` is callable only by the server's service role after it verifies the signed-in user against `INITIAL_ADMIN_EMAIL`. The database rechecks the confirmed email and allowed domain, serializes concurrent claims with an advisory lock, and fails if any approved admin already exists. On success the profile becomes `ADMIN / APPROVED`.
+`claim_first_admin` is callable only by the server's service role after it verifies the signed-in user against `INITIAL_ADMIN_EMAIL`. The database rechecks the Auth confirmation timestamp and allowed domain, serializes concurrent claims with an advisory lock, and fails if any approved admin already exists. During the hosted email pause, Auth can set that timestamp without inbox proof, so do not leave first-admin claim open for an unclaimed address. On success the profile becomes `ADMIN / APPROVED`.
 
 ### Account correction
 

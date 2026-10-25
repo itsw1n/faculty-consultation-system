@@ -24,7 +24,7 @@ test('reflows without horizontal overflow', async ({ page }) => {
 
 test('makes the sign-in action reachable by keyboard', async ({ page }) => {
   await page.goto('/')
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < 4; i += 1) {
     await page.keyboard.press('Tab')
   }
   await expect(page.getByRole('button', { name: /^Sign in/ })).toBeFocused()

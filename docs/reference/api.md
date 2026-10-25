@@ -36,7 +36,7 @@ The endpoints below use the existing signed-in session, except the public health
 | `GET /api/faculty/[facultyId]/availability` | Approved Student     | Read one faculty member's slots                                |
 | `GET /admin/consultations/export`           | Admin                | Download a date-range summary CSV                              |
 | `GET /faculty/consultations/export`         | Approved Faculty     | Download that faculty member's date-range consultation records |
-| `GET /auth/confirm`                         | Valid email token    | Verify an email/recovery link and redirect                     |
+| `GET /auth/confirm`                         | Valid email token    | Verify an existing sign-up/email link and redirect             |
 | `GET /api/cron/email`                       | Bearer `CRON_SECRET` | Queue reminders and process consultation emails                |
 
 The health endpoint accepts no inputs and returns HTTP `200` with `{ "status": "ok" }`. It does not test the database or email provider. The other contracts are detailed below.
@@ -108,7 +108,7 @@ It does not export individual participants' descriptions, outcomes, or meeting l
 
 ### Email confirmation and scheduled delivery
 
-`/auth/confirm` requires `token_hash` and accepts `type=email`, `signup`, or `recovery`; `next` is an optional local path. Invalid or expired links redirect to `/?error=verify`. It verifies the token with Supabase Auth and uses a safe application-local redirect destination. Confirmation and recovery templates are described in [Environment reference](environment.md#auth-email-templates).
+`/auth/confirm` requires `token_hash` and accepts `type=email` or `signup`; `next` is an optional local path. Invalid, expired, or recovery links redirect to `/?error=verify`. It verifies the token with Supabase Auth and uses a safe application-local redirect destination. Confirmation templates are described in [Environment reference](environment.md#auth-email-templates). The former `/auth/forgot-password` and `/auth/reset-password` pages redirect to sign-in while password recovery is paused.
 
 The scheduled email route returns HTTP `200` JSON with `claimed` and `sent` counts, `401` for a missing/invalid secret, or `503` when processing is unavailable. It queues reminders and processes pending consultation emails. It requires a server-side bearer secret, not a normal user session. Without configured Resend delivery credentials, processing can return `{ "claimed": 0, "sent": 0 }`; that does not prove an email was sent. Scheduling and credentials belong in [Operations](../operations.md#scheduled-email).
 
@@ -120,14 +120,12 @@ Input names below are the keys submitted in `FormData`. UUID means a validated i
 
 [Implementation](../../src/features/auth/actions.ts) · [Input schemas](../../src/features/auth/schemas/authSchema.ts)
 
-| Action                 | Form fields                                        | Who / successful result                                                        |
-| ---------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `signInWithPassword`   | `email`, `password`                                | Valid credentials and verified email; redirects through role routing           |
-| `signUpWithPassword`   | `fullName`, `email`, `password`, `confirmPassword` | Allowed email; returns verification instructions                               |
-| `requestPasswordReset` | `email`                                            | Generic acknowledgement without confirming account existence                   |
-| `updatePassword`       | `password`, `confirmPassword`                      | Signed-in account; saves the new password and redirects                        |
-| `signOut`              | None                                               | Ends the session and redirects to `/`                                          |
-| `claimFirstAdmin`      | No submitted account/role fields                   | Designated signed-in account; server-only bootstrap checks, then Admin routing |
+| Action               | Form fields                                        | Who / successful result                                                          |
+| -------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `signInWithPassword` | `email`, `password`                                | Valid credentials and permitted domain; redirects through role routing           |
+| `signUpWithPassword` | `fullName`, `email`, `password`, `confirmPassword` | Allowed email; redirects when Auth returns a session, else asks for confirmation |
+| `signOut`            | None                                               | Ends the session and redirects to `/`                                            |
+| `claimFirstAdmin`    | No submitted account/role fields                   | Designated signed-in account; server-only bootstrap checks, then Admin routing   |
 
 ### Account and department management
 

@@ -4,7 +4,7 @@ import type { EmailOtpType } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { safeNextPath } from '@/lib/safeNavigation'
 
-const allowedTypes = new Set<EmailOtpType>(['email', 'signup', 'recovery'])
+const allowedTypes = new Set<EmailOtpType>(['email', 'signup'])
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl

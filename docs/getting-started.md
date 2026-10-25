@@ -16,6 +16,8 @@ npm install
 
 Local email verification uses Supabase's built-in mail catcher and the templates in `supabase/config.toml`. No provider credentials are needed. Confirmation and recovery messages appear at `http://127.0.0.1:54324` while the local stack is running.
 
+The local Auth project retains confirmation so verification coverage remains available. The temporary hosted deadline setting is documented in [Operations](operations.md#temporary-auth-email-pause); the app accepts either signup response and routes immediately when Auth returns a session.
+
 Point the app at the local stack in `.env.local`:
 
 ```env

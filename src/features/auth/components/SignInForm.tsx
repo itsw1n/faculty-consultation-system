@@ -35,14 +35,6 @@ export function SignInForm() {
         autoComplete="current-password"
         placeholder="********"
       />
-      <div className="-mt-1 flex justify-end">
-        <Link
-          className="text-sm font-semibold text-primary hover:underline"
-          href="/auth/forgot-password"
-        >
-          Forgot password?
-        </Link>
-      </div>
       {state.error ? (
         <p className="text-sm font-semibold text-danger" role="alert">
           {state.error}

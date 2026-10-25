@@ -6,7 +6,7 @@ export default function Page() {
     <AccountPanel
       eyebrow="New account"
       title="Create your account."
-      description="Use your school email. You will verify it before signing in."
+      description="Use your school email and a password to create an account."
     >
       <SignUpForm />
     </AccountPanel>

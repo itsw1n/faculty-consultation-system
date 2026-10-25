@@ -28,12 +28,12 @@ For a demonstration, verify a sender domain or subdomain you control in Resend a
 
 ## Auth email templates
 
-Supabase Auth sends sign-up confirmation and password recovery emails. Locally these are captured automatically and displayed at `http://127.0.0.1:54324`. The templates live in `supabase/templates/` and are wired in `supabase/config.toml`; they link to `/auth/confirm` using `{{ .TokenHash }}`.
+Local Supabase still sends sign-up confirmation and password recovery emails, captured at `http://127.0.0.1:54324`. The templates live in `supabase/templates/` and are wired in `supabase/config.toml`; they link to `/auth/confirm` using `{{ .TokenHash }}`.
 
-For a hosted project, configure SMTP or Supabase's email service in the Supabase Auth settings and update the same templates there. These auth emails are separate from the application's Resend delivery for consultation status notifications.
+Hosted sign-up confirmation and app password recovery are temporarily paused for the deadline demo; see [Operations](../operations.md#temporary-auth-email-pause). Restoring them requires a working SMTP provider and matching hosted templates. These Auth emails are separate from the application's Resend delivery for consultation status notifications.
 
 ## Approved email domains
 
 `approved_email_domains` is database data, not an environment variable. Migrations set the confirmed school domain. Local seed data adds a `*` wildcard for development only; never add that row to a hosted environment.
 
-New accounts are checked against this table when created, and sign-in and faculty promotion check it again. The local wildcard permits any domain only while that row exists. Email confirmation remains required with or without the wildcard.
+New accounts are checked against this table when created, and sign-in and faculty promotion check it again. The local wildcard permits any domain only while that row exists. The allowlist checks the address text; with hosted confirmation paused it does not verify that the registrant owns the school inbox.

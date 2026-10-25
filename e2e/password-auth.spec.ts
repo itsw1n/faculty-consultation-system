@@ -64,26 +64,14 @@ test.describe('Email and password authentication', () => {
     await expect(page.getByRole('status')).toContainText('Check your email')
   })
 
-  test('a recovery link sets a new password', async ({ page }) => {
-    const email = uniqueEmail('e2e-password-reset')
-    const user = await ensureAccount(email, password, 'Reset Student')
-    await setProfile(user.id, { role: 'STUDENT', account_status: 'APPROVED' })
+  test('password recovery is not offered during the demo', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('link', { name: 'Forgot password?' })).toHaveCount(0)
 
-    const { data, error } = await getServiceClient().auth.admin.generateLink({
-      type: 'recovery',
-      email,
-    })
-    if (error) throw error
+    await page.goto('/auth/forgot-password')
+    await expect(page).toHaveURL('/')
 
-    await page.goto(
-      `/auth/confirm?token_hash=${data.properties.hashed_token}&type=recovery&next=/auth/reset-password`
-    )
-    await expect(page).toHaveURL('/auth/reset-password')
-
-    const newPassword = 'NewPassword123!'
-    await page.getByLabel('New password', { exact: true }).fill(newPassword)
-    await page.getByLabel('Confirm new password', { exact: true }).fill(newPassword)
-    await page.getByRole('button', { name: 'Save new password' }).click()
-    await expect(page).toHaveURL('/student')
+    await page.goto('/auth/reset-password')
+    await expect(page).toHaveURL('/')
   })
 })

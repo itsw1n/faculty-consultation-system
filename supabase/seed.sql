@@ -183,7 +183,7 @@ begin
       (
         'a0000000-0000-4000-8000-000000000002'::uuid,
         'mendoza@acdeducation.com',
-        'Alexandra Mendoza'
+        'Maria Isabel Reyes'
       ),
       (
         'a0000000-0000-4000-8000-000000000003'::uuid,
@@ -230,7 +230,7 @@ begin
   from (
     values
       ('erwin@acdeducation.com', 'Erwin Curato'),
-      ('mendoza@acdeducation.com', 'Alexandra Mendoza'),
+      ('mendoza@acdeducation.com', 'Maria Isabel Reyes'),
       ('bitas@acdeducation.com', 'John Frence Cuevas Bitas'),
       ('jose.santos@acdeducation.com', 'Jose Miguel A. Santos'),
       ('angela.villanueva@acdeducation.com', 'Angela Marie L. Villanueva'),
@@ -298,7 +298,7 @@ begin
   from (
     values
       ('erwin@acdeducation.com', 'Erwin Curato', 'ADMIN', 'IT', null),
-      ('mendoza@acdeducation.com', 'Alexandra Mendoza', 'FACULTY', 'IT', 'Associate Professor II'),
+      ('mendoza@acdeducation.com', 'Maria Isabel Reyes', 'FACULTY', 'IT', 'Associate Professor II'),
       ('bitas@acdeducation.com', 'John Frence Cuevas Bitas', 'STUDENT', 'IT', null),
       ('jose.santos@acdeducation.com', 'Jose Miguel A. Santos', 'FACULTY', 'IT', 'Instructor III'),
       ('angela.villanueva@acdeducation.com', 'Angela Marie L. Villanueva', 'FACULTY', 'BSBA', 'Assistant Professor I'),
@@ -334,7 +334,7 @@ begin
     meeting_link
   )
   values
-    -- Alexandra Mendoza (IT)
+    -- Maria Isabel Reyes (IT)
     (
       'b0000000-0000-4000-8000-000000000001',
       v_mendoza_id,

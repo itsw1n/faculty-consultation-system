@@ -5,10 +5,10 @@
 .DEFAULT_GOAL := help
 NPM_DIR := .
 
-.PHONY: help dev demo build lint test test-e2e seed reset db-start db-stop db-reset db-test
+.PHONY: help dev demo build lint test test-e2e seed seed-1 reset db-start db-stop db-reset db-test
 
 help: ## Show all commands
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 dev: ## Start dev server + Supabase local
@@ -31,6 +31,9 @@ test-e2e: ## Run Playwright E2E tests
 
 seed: ## Load local demo accounts and sample consultations
 	npm --prefix $(NPM_DIR) run supabase:seed
+
+seed-1: ## Load the four local demo-only accounts (no slots or consultations)
+	npm --prefix $(NPM_DIR) exec -- supabase db query --local -f supabase/seed-demo-accounts.sql
 
 reset: ## Rebuild local DB from migrations only (no seed data)
 	npm --prefix $(NPM_DIR) run supabase:reset:empty

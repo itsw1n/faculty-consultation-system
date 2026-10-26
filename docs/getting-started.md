@@ -71,19 +71,39 @@ delete from public.approved_email_domains where domain = '*';
 | Role    | Name                       | Email                                | Password       |
 | ------- | -------------------------- | ------------------------------------ | -------------- |
 | Admin   | Erwin Curato               | `erwin@acdeducation.com`             | `Password123!` |
-| Faculty | Alexandra Mendoza          | `mendoza@acdeducation.com`           | `Password123!` |
+| Faculty | Maria Isabel Reyes         | `mendoza@acdeducation.com`           | `Password123!` |
 | Faculty | Jose Miguel A. Santos      | `jose.santos@acdeducation.com`       | `Password123!` |
 | Faculty | Angela Marie L. Villanueva | `angela.villanueva@acdeducation.com` | `Password123!` |
 | Student | John Frence Cuevas Bitas   | `bitas@acdeducation.com`             | `Password123!` |
 | Student | Bien Panzo                 | `panzo@acdeducation.com`             | `Password123!` |
 
-Jose and Angela are supporting faculty for department filtering and faculty-directory variety. Jose has no future availability, which demonstrates the admin “faculty without future slots” indicator. Mendoza is the primary faculty account for the Bitas and Panzo bookings.
+Jose and Angela are supporting faculty for department filtering and faculty-directory variety. Jose has no future availability, which demonstrates the admin “faculty without future slots” indicator. Maria is the primary faculty account for the Bitas and Panzo bookings.
 
 Re-apply just the demo data without rebuilding the database:
 
 ```bash
 make seed
 ```
+
+For the live-demo accounts only — one Admin, two Students, and one Faculty,
+with no sample slots or consultations — run:
+
+```bash
+make seed-1
+```
+
+All four use `Password123!`. This target adds or refreshes only the following
+local accounts and never contacts a hosted Supabase project:
+
+| Role    | Email                                   |
+| ------- | --------------------------------------- |
+| Admin   | `erwinjrcurato8975@acdeducation.com`    |
+| Student | `bienkaizerpanzo8703@acdeducation.com`  |
+| Student | `johnfrencebitas9050@acdeducation.com`  |
+| Faculty | `alexandramendoza8589@acdeducation.com` |
+
+Run `make reset` first if you want an otherwise empty database. `make seed-1`
+does not delete any existing local records.
 
 Remove the demo data by rebuilding only the local database from migrations, without applying the seed:
 

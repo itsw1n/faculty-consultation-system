@@ -10,6 +10,16 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  ...(process.env.NODE_ENV === 'development'
+    ? {
+        allowedDevOrigins: ['*.trycloudflare.com'],
+        experimental: {
+          serverActions: {
+            allowedOrigins: ['*.trycloudflare.com'],
+          },
+        },
+      }
+    : {}),
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }]
   },

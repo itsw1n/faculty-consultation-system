@@ -37,6 +37,27 @@ npm run supabase:reset
 npm run dev
 ```
 
+## Share a temporary local demo
+
+Install `cloudflared`, then run:
+
+```bash
+make demo
+```
+
+The command starts local Supabase, creates temporary HTTPS tunnels for the app
+and Supabase API, applies the public Auth callback URL, and prints the link to
+share. Signups use the same local database and confirmation messages appear in
+Mailpit at `http://127.0.0.1:54324` on the host computer. Keep the command
+running throughout the demo. Press `Ctrl+C` afterward to close both tunnels and
+restore the normal localhost Auth configuration.
+
+Run only one `make demo` command at a time. If a demo is already active, stop
+that terminal with `Ctrl+C` before creating another link.
+
+The generated `trycloudflare.com` addresses are temporary and are intended only
+for demonstrations with test data.
+
 Local `supabase:reset` applies `supabase/seed.sql`, which allows any email domain so the team can sign up with any email address. Hosted environments never receive the seed — only school domains work there. To test strict domain checks locally, run:
 
 ```sql

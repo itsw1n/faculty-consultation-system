@@ -65,6 +65,10 @@ describe('ConsultationDetailsDialog', () => {
 
   test('keeps approved consultations read-only for students', () => {
     renderDialog(baseItem, 'STUDENT')
+    expect(screen.getByRole('link', { name: 'Add to calendar' })).toHaveAttribute(
+      'download',
+      'consultation-2026-10-28.ics'
+    )
     expect(screen.queryByLabelText('Outcome Note')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Mark as Completed' })).not.toBeInTheDocument()
   })
@@ -87,6 +91,7 @@ describe('ConsultationDetailsDialog', () => {
 
   test('keeps pending consultations read-only', () => {
     renderDialog({ ...baseItem, consultation_status: 'PENDING' }, 'FACULTY')
+    expect(screen.queryByRole('link', { name: 'Add to calendar' })).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Outcome Note')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Mark as Completed' })).not.toBeInTheDocument()
   })

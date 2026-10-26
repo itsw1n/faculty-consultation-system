@@ -15,8 +15,6 @@ const refresh = () => {
   revalidatePath('/faculty/consultations')
   revalidatePath('/student')
   revalidatePath('/student/consultations')
-  revalidatePath('/faculty/consultations/[id]', 'page')
-  revalidatePath('/student/consultations/[id]', 'page')
 }
 export async function decideConsultation(formData: FormData) {
   await requireRole('FACULTY')
@@ -39,12 +37,6 @@ export async function cancelConsultation(formData: FormData) {
   refresh()
   await deliverEmails().catch(() => {})
 }
-export async function completeConsultation(formData: FormData) {
-  const result = await completeConsultationRecord(formData)
-  if (result) throw new Error(result)
-  refresh()
-}
-
 export async function completeConsultationWithFeedback(
   _state: ActionState,
   formData: FormData

@@ -201,14 +201,14 @@ Dashboard summaries are read-only database functions. Their names are listed in 
 
 These are navigable screens, not additional REST endpoints.
 
-| Routes                                                                                                            | Purpose                                                            |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `/`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`                                             | Sign-in, registration, and recovery forms                          |
-| `/auth/continue`, `/auth/claim-admin`, `/application/pending`, `/application/rejected`                            | Account routing, initial Admin setup, and historical account gates |
-| `/student`, `/student/book`, `/student/book/[facultyId]`, `/student/consultations`, `/student/consultations/[id]` | Student workflows                                                  |
-| `/faculty`, `/faculty/availability`, `/faculty/requests`, `/faculty/consultations`, `/faculty/consultations/[id]` | Faculty workflows                                                  |
-| `/admin`, `/admin/users`, `/admin/departments`, `/admin/consultations`                                            | Administrative workflows                                           |
-| `/notifications`                                                                                                  | The signed-in approved account's notification inbox                |
+| Routes                                                                                 | Purpose                                                            |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `/`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`                  | Sign-in, registration, and recovery forms                          |
+| `/auth/continue`, `/auth/claim-admin`, `/application/pending`, `/application/rejected` | Account routing, initial Admin setup, and historical account gates |
+| `/student`, `/student/book`, `/student/book/[facultyId]`, `/student/consultations`     | Student workflows                                                  |
+| `/faculty`, `/faculty/availability`, `/faculty/requests`, `/faculty/consultations`     | Faculty workflows                                                  |
+| `/admin`, `/admin/users`, `/admin/departments`, `/admin/consultations`                 | Administrative workflows                                           |
+| `/notifications`                                                                       | The signed-in approved account's notification inbox                |
 
 `/faculty/requests` accepts an optional `status` query parameter (`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `COMPLETED`, or `all`); it defaults to `PENDING`.
 

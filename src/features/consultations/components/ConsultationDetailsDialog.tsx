@@ -10,6 +10,7 @@ import { safeHttpUrl } from '@/lib/safeNavigation'
 import { categoryLabel } from '../categories'
 import { formatConsultationDay, formatConsultationTime } from '../formatSchedule'
 import { completeConsultationWithFeedback } from '../actions'
+import { consultationIcs } from '../services/consultationIcs'
 import type { ConsultationItem } from '../types'
 
 function modeLabel(item: Pick<ConsultationItem, 'mode' | 'location'>) {
@@ -42,6 +43,23 @@ export function ConsultationDetailsDialog({
       ? safeHttpUrl(item.meeting_link)
       : null
   const canComplete = viewer === 'FACULTY' && status === 'APPROVED'
+  const calendarDownload =
+    status === 'APPROVED'
+      ? `data:text/calendar;charset=utf-8,${encodeURIComponent(
+          consultationIcs({
+            id: item.id,
+            title: `Consultation with ${otherName}`,
+            purpose: categoryLabel(item.category),
+            slot_date: item.slot_date,
+            start_time: item.start_time,
+            end_time: item.end_time,
+            location:
+              item.mode === 'IN_PERSON'
+                ? item.location || 'Not specified'
+                : (meetingLink ?? 'Online'),
+          })
+        )}`
+      : null
   const savedNote = savedOutcome ?? item.outcome ?? ''
 
   useEffect(() => {
@@ -206,7 +224,16 @@ export function ConsultationDetailsDialog({
                     </div>
                   ) : null}
 
-                  <div className="consultation-footer mt-6 flex justify-end gap-3">
+                  <div className="consultation-footer mt-6 flex flex-wrap justify-end gap-3">
+                    {calendarDownload ? (
+                      <a
+                        href={calendarDownload}
+                        download={`consultation-${item.slot_date}.ics`}
+                        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-primary ring-1 ring-border transition-colors hover:bg-subtle focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                      >
+                        Add to calendar
+                      </a>
+                    ) : null}
                     <Button variant="secondary" onPress={close}>
                       {canComplete ? 'Cancel' : 'Close'}
                     </Button>

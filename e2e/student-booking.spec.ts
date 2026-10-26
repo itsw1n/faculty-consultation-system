@@ -8,7 +8,6 @@ import {
   ensureFacultyProfile,
   ensureSlot,
   getDepartments,
-  getLatestConsultationForStudent,
   getNotifications,
   getServiceClient,
   seedNotification,
@@ -185,7 +184,7 @@ test.describe('Student booking journey', () => {
   test('consultation list filters and detail shows the record', async ({ page }) => {
     const departments = await getDepartments()
     const { faculty } = await setupFaculty('e2e-list', departments[0]!.id)
-    const { student, email } = await setupStudent('e2e-list')
+    const { email } = await setupStudent('e2e-list')
     const pendingSlot = await ensureSlot(faculty.id)
     const cancelledSlot = await ensureSlot(faculty.id, { start_time: '13:00', end_time: '14:00' })
     await bookConsultationAs(email, password, pendingSlot.id)
@@ -197,11 +196,13 @@ test.describe('Student booking journey', () => {
 
     await page.getByRole('button', { name: 'Status' }).click()
     await page.getByRole('option', { name: 'Cancelled' }).click()
-    await expect(page.getByRole('row').filter({ hasText: 'Cancelled' })).toBeVisible()
+    const cancelledRow = page.getByRole('row').filter({ hasText: 'Cancelled' })
+    await expect(cancelledRow).toBeVisible()
     await expect(page.getByRole('row').filter({ hasText: 'Pending' })).toHaveCount(0)
 
-    const pending = await getLatestConsultationForStudent(student.id)
-    await page.goto(`/student/consultations/${pending!.id}`)
+    const viewDetails = cancelledRow.getByRole('button', { name: /View consultation details/ })
+    await waitForHydration(page, viewDetails)
+    await viewDetails.click()
     await expect(
       page.getByRole('heading', { name: 'Consultation details', exact: true })
     ).toBeVisible()

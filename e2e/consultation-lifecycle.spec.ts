@@ -136,11 +136,16 @@ test.describe('Consultation lifecycle', () => {
     expect((await getConsultation(booked!.id))?.status).toBe('COMPLETED')
     expect((await getSlot(slot.id))?.status).toBe('CLOSED')
 
-    // 4. Student sees the outcome on the detail page.
+    // 4. Student sees the outcome in the details modal.
     await signInAs(page, studentEmail, password)
-    await page.goto(`/student/consultations/${booked!.id}`)
-    await waitForHydration(page)
-    await expect(page.getByText('Reviewed study plan.')).toBeVisible()
+    await page.goto('/student/consultations')
+    const studentRow = page.getByRole('row').filter({ hasText: facultyName })
+    const viewDetails = studentRow.getByRole('button', {
+      name: `View consultation details with ${facultyName}`,
+    })
+    await waitForHydration(page, viewDetails)
+    await viewDetails.click()
+    await expect(page.getByRole('dialog').getByText('Reviewed study plan.')).toBeVisible()
   })
 
   test('faculty reject reopens the slot and notifies the student', async ({ page }) => {

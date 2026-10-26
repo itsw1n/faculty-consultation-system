@@ -113,10 +113,10 @@ A slot can be requested only while `OPEN`. The conditional update changes at mos
 ## Visibility
 
 - Students see their own consultations; faculty see consultations assigned to them; admins see metadata and counts.
-- Participants see category, description, and outcome on detail pages.
+- Participants see category, description, and outcome in consultation detail dialogs.
 - Participants see the meeting link for approved or completed `ONLINE` consultations; admins do not receive it, and the link must be `http` or `https`.
 - Admin list and CSV results replace the description with the category and omit participant-only notes.
-- Approved consultation detail pages offer an "Add to calendar" `.ics` download generated in the page; it contains the other participant's name, category, Manila-time slot converted to UTC, and the location or safe meeting link, never the description or outcome.
+- Approved consultation detail dialogs offer an "Add to calendar" `.ics` download generated in the browser; it contains the other participant's name, category, Manila-time slot converted to UTC, and the location or safe meeting link, never the description or outcome.
 - Consultation summaries group consultations without a department under `UNASSIGNED`.
 
 ## Departments

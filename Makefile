@@ -5,7 +5,7 @@
 .DEFAULT_GOAL := help
 NPM_DIR := .
 
-.PHONY: help dev build lint test test-e2e seed reset db-start db-stop db-reset db-test
+.PHONY: help dev demo build lint test test-e2e seed reset db-start db-stop db-reset db-test
 
 help: ## Show all commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -13,6 +13,9 @@ help: ## Show all commands
 
 dev: ## Start dev server + Supabase local
 	npm --prefix $(NPM_DIR) run supabase:start && npm --prefix $(NPM_DIR) run dev
+
+demo: ## Share the local app and Supabase through temporary HTTPS tunnels
+	bash ./scripts/start-tunneled-demo.sh
 
 build: ## Build frontend for production
 	npm --prefix $(NPM_DIR) run build

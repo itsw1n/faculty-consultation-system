@@ -18,6 +18,7 @@ import {
   type StudentDashboardSummary,
 } from '@/features/dashboard/repositories/dashboardRepository'
 import { categoryLabel } from '@/features/consultations/categories'
+import { ConsultationDetailsDialog } from '@/features/consultations/components/ConsultationDetailsDialog'
 import type { ConsultationItem } from '@/features/consultations/types'
 
 const dateFormatter = new Intl.DateTimeFormat('en-PH', {
@@ -155,9 +156,9 @@ function NextConsultation({ summary }: { summary: StudentDashboardSummary }) {
       <Link
         aria-label={`View details for ${summary.next_faculty_name} on ${formatFullDate(summary.next_slot_date)}`}
         className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline-3 focus-visible:outline-focus"
-        href={`/student/consultations/${summary.next_consultation_id}`}
+        href="/student/consultations"
       >
-        View details <ArrowRight className="size-4" aria-hidden="true" />
+        View in consultations <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
     </section>
   )
@@ -206,13 +207,7 @@ function PendingRequests({ items, count }: { items: ConsultationItem[]; count: n
               </p>
               <div className="mt-2 flex items-center justify-between gap-3">
                 <p className="text-sm text-primary">{categoryLabel(item.category)}</p>
-                <Link
-                  aria-label={`View details for ${categoryLabel(item.category)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
-                  className="text-sm font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus"
-                  href={`/student/consultations/${item.id}`}
-                >
-                  View details
-                </Link>
+                <ConsultationDetailsDialog item={item} viewer="STUDENT" />
               </div>
             </li>
           ))}
@@ -279,13 +274,7 @@ function RecentConsultations({ items }: { items: ConsultationItem[] }) {
                 <StatusBadge status={item.consultation_status} />
               </div>
               <div className="mt-1 text-right">
-                <Link
-                  aria-label={`View details for ${categoryLabel(item.category)} with ${item.faculty_name} on ${formatDate(item.slot_date)}`}
-                  className="text-sm font-semibold text-accent underline-offset-4 hover:underline focus-visible:outline-3 focus-visible:outline-focus"
-                  href={`/student/consultations/${item.id}`}
-                >
-                  View details
-                </Link>
+                <ConsultationDetailsDialog item={item} viewer="STUDENT" />
               </div>
             </li>
           ))}

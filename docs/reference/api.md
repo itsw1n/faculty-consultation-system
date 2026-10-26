@@ -73,7 +73,7 @@ Illustrative successful response; actual IDs, dates, and availability depend on 
       "slot_status": "OPEN",
       "mode": "IN_PERSON",
       "location": "Room 204",
-      "faculty_name": "Alexandra Mendoza"
+      "faculty_name": "Maria Isabel Reyes"
     }
   ]
 }

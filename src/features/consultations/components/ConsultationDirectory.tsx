@@ -39,6 +39,17 @@ function formatDate(date: string) {
   return dateFormatter.format(new Date(`${date}T00:00:00+08:00`))
 }
 
+const timeFormatter = new Intl.DateTimeFormat('en-PH', {
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+  timeZone: 'Asia/Manila',
+})
+
+function formatTime(time: string) {
+  return timeFormatter.format(new Date(`1970-01-01T${time}+08:00`))
+}
+
 export function ConsultationDirectory({
   initialPage,
   viewer,
@@ -196,7 +207,7 @@ export function ConsultationDirectory({
                 <Cell data-label="Schedule" className="px-5 py-4 text-sm text-muted">
                   <time dateTime={item.slot_date}>{formatDate(item.slot_date)}</time>
                   <p className="mt-1">
-                    {item.start_time.slice(0, 5)}–{item.end_time.slice(0, 5)}
+                    {formatTime(item.start_time)}–{formatTime(item.end_time)}
                   </p>
                 </Cell>
                 <Cell data-label="Category" className="px-5 py-4 text-sm text-muted">
